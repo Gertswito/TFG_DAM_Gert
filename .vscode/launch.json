@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-TfgdamApplication<tfgdam>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.gert.tfgdam.TfgdamApplication",
+            "projectName": "tfgdam",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "internalConsole"
+        }
+    ]
+}
