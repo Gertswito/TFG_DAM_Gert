@@ -16,15 +16,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import com.gert.tfgdam.R
+import com.gert.tfgdam.routes.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopNavBar(
-    selectedIndex: Int,
-    onHomeClick: () -> Unit,
-    onLoginClick: () -> Unit
-) {
+fun TopNavBar(navController: NavController) {
     TopAppBar(
         modifier = Modifier.statusBarsPadding(),
         colors = TopAppBarDefaults.topAppBarColors(
@@ -38,15 +36,17 @@ fun TopNavBar(
                 contentDescription = "Logo",
                 modifier = Modifier
                     .height(28.dp)
-                    .clickable { onHomeClick() }
+                    .clickable { navController.navigate(Routes.HOME) }
             )
         },
         actions = {
-            IconButton(onClick = { onLoginClick() }) {
-                Icon(
-                    imageVector = Icons.Default.AccountCircle,
-                    contentDescription = "Login"
-                )
+            NavItemList.navItemList.forEach { navItem ->
+                IconButton(onClick = { navController.navigate(navItem.route) }) {
+                    Icon(
+                        imageVector = navItem.icon,
+                        contentDescription = navItem.label
+                    )
+                }
             }
         }
     )

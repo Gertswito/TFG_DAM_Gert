@@ -12,4 +12,10 @@ val Blanco = Color(0xFFFFFFFF)
 
 val CasiBlack = Color(0xFF2B2B2B)
 
-val CasiWhite = Color(0xFFE6E6E6)
+val CasiWhite = Color(0xFFEEEEEE)
+
+val NegroClarito = Color(0xFF1E1E1E)
+
+val BlancoOscurito = Color(0xFFD5D5D5)
+
+val ErrorRojo = Color(0xFFFF304D)
