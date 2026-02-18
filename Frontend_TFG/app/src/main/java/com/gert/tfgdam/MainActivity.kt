@@ -35,7 +35,7 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val context = LocalContext.current
             val tokenFlow = JwtManager.getToken(context)
-            val tokenState = produceState<String?>(initialValue = null, key1 = tokenFlow) {
+            val tokenState = produceState<String?>(initialValue = "LOADING", key1 = tokenFlow) {
                 value = tokenFlow.firstOrNull()
             }
             val token = tokenState.value
@@ -51,17 +51,26 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
-                        if (token == null) {
-                            CircularProgressIndicator()
-                        } else {
-                            AppNavHost(
-                                navController = navController,
-                                startDestination = when (role) {
-                                    "ADMIN" -> Routes.HOME_ADMIN
-                                    "USER" -> Routes.HOME
-                                    else -> Routes.HOME
-                                }
-                            )
+                        when (token) {
+                            "LOADING" -> {
+                                CircularProgressIndicator()
+                            }
+                            null -> {
+                                AppNavHost(
+                                    navController = navController,
+                                    startDestination = Routes.HOME
+                                )
+                            }
+                            else -> {
+                                AppNavHost(
+                                    navController = navController,
+                                    startDestination = when (role) {
+                                        "ADMIN" -> Routes.HOME_ADMIN
+                                        "USER" -> Routes.HOME
+                                        else -> Routes.HOME
+                                    }
+                                )
+                            }
                         }
                     }
                 }
