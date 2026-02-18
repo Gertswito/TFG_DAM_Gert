@@ -13,7 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,13 +25,13 @@ import com.gert.tfgdam.R
 import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.util.JwtManager
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopNavBar(navController: NavController, jwtManager: JwtManager = JwtManager) {
     val context = LocalContext.current
     val token by jwtManager.getToken(context).collectAsState(initial = null)
+    val role = token?.let { JwtManager.getUserInfoFromToken(it)?.rol }
     val navItems by NavItemList.getNavItems(context).collectAsState(initial = emptyList())
     val coroutineScope = rememberCoroutineScope()
 
@@ -49,7 +48,14 @@ fun TopNavBar(navController: NavController, jwtManager: JwtManager = JwtManager)
                 contentDescription = "Logo",
                 modifier = Modifier
                     .height(28.dp)
-                    .clickable { navController.navigate(Routes.HOME) }
+                    .clickable { when(role) {
+                        "ADMIN" -> navController.navigate(Routes.HOME_ADMIN) {
+                            popUpTo(Routes.HOME_ADMIN) { inclusive = true }
+                        }
+                        else -> navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.HOME) { inclusive = true }
+                        }
+                    }}
             )
         },
         actions = {

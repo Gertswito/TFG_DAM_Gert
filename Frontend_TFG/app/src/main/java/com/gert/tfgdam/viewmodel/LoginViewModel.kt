@@ -23,7 +23,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
     var errorMessage by mutableStateOf("")
     var successMessage by mutableStateOf("")
 
-    fun login(onSuccess: () -> Unit = {}) {
+    fun login(onSuccessUser: () -> Unit = {}, onSuccessAdmin: () -> Unit = {}) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = ""
@@ -39,9 +39,17 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
 
                 JwtManager.saveToken(context, token)
 
+                val payload = JwtManager.getUserInfoFromToken(token)
+                val role = payload?.rol
+
                 successMessage = "Login exitoso"
-                delay(500)
-                onSuccess()
+                delay(300)
+
+                when (role) {
+                    "ADMIN" -> onSuccessAdmin()
+                    "USER" -> onSuccessUser()
+                    else -> errorMessage = "Rol desconocido"
+                }
             } catch (e: Exception) {
                 errorMessage = e.message ?: "Error desconocido"
             } finally {

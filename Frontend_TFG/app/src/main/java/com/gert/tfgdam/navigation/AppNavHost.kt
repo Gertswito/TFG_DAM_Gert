@@ -5,15 +5,17 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.gert.tfgdam.routes.Routes
+import com.gert.tfgdam.screens.HomeAdminScreen
 import com.gert.tfgdam.screens.HomeScreen
 import com.gert.tfgdam.screens.LoginScreen
 import com.gert.tfgdam.screens.RegisterScreen
+import com.gert.tfgdam.screens.UserDetailsScreen
 
 @Composable
-fun AppNavHost(navController: NavHostController) {
+fun AppNavHost(navController: NavHostController, startDestination: String) {
     NavHost(
         navController = navController,
-        startDestination = Routes.HOME
+        startDestination = startDestination
     ) {
         composable(Routes.HOME) { HomeScreen() }
 
@@ -28,5 +30,9 @@ fun AppNavHost(navController: NavHostController) {
                 navController = navController
             )
         }
+
+        composable(Routes.USER_DETAILS) { UserDetailsScreen() }
+
+        composable(Routes.HOME_ADMIN) { HomeAdminScreen() }
     }
 }
