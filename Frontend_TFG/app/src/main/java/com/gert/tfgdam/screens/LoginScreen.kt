@@ -87,8 +87,12 @@ fun LoginScreen(
 
                 Button(
                     onClick = { viewModel.login(
-                        onSuccessUser = { navController.navigate(Routes.HOME) },
-                        onSuccessAdmin = { navController.navigate(Routes.HOME_ADMIN) }
+                        onSuccessUser = { navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.LOGIN) { inclusive = true }
+                        }},
+                        onSuccessAdmin = { navController.navigate(Routes.HOME_ADMIN) {
+                            popUpTo(Routes.LOGIN) { inclusive = true }
+                        }}
                     )},
                     modifier = Modifier
                         .fillMaxWidth()
