@@ -3,7 +3,6 @@ package com.gert.tfgdam.model
 data class Cliente(
     var id: Long? = null,
     var rol: Rol? = null,
-    var dni: String? = null,
     var nombre: String? = null,
     var apellidos: String? = null,
     var usuario: String? = null,

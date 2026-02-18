@@ -11,10 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -31,11 +33,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.routes.Routes
+import com.gert.tfgdam.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen( navController: NavController ) {
+fun LoginScreen(
+    navController: NavController,
+    viewModel: LoginViewModel = viewModel()
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -66,10 +73,9 @@ fun LoginScreen( navController: NavController ) {
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                var user by remember { mutableStateOf("") }
                 TextFieldRegisterYLogin(
-                    value = user,
-                    onValueChange = { user = it },
+                    value = viewModel.usuario,
+                    onValueChange = { viewModel.usuario = it },
                     label = "Nombre de usuario",
                     modifier = Modifier
                         .fillMaxWidth()
@@ -78,10 +84,9 @@ fun LoginScreen( navController: NavController ) {
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                var contrasenha by remember { mutableStateOf("") }
                 TextFieldRegisterYLogin(
-                    value = contrasenha,
-                    onValueChange = { contrasenha = it },
+                    value = viewModel.contrasenha,
+                    onValueChange = { viewModel.contrasenha = it },
                     label = "Contraseña",
                     isPassword = true,
                     modifier = Modifier
@@ -92,12 +97,36 @@ fun LoginScreen( navController: NavController ) {
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
-                    onClick = { navController.navigate(Routes.HOME) },
+                    onClick = { viewModel.login() { navController.navigate(Routes.HOME) } },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 15.dp)
+                        .padding(horizontal = 15.dp),
+                    enabled = !viewModel.isLoading
                 ) {
-                    Text("Iniciar sesión")
+                    if (viewModel.isLoading) {
+                        CircularProgressIndicator(
+                            color= MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    } else {
+                        Text("INICIAR SESIÓN")
+                    }
+                }
+
+                if(viewModel.errorMessage !== "") {
+                    Text(
+                        text = viewModel.errorMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                }
+
+                if(viewModel.successMessage !== "") {
+                    Text(
+                        text = viewModel.successMessage,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(20.dp))

@@ -10,6 +10,7 @@ import jakarta.persistence.EntityNotFoundException;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +66,14 @@ public class ClienteController {
         } catch (ResponseStatusException ex) {
             return ResponseEntity.status(ex.getStatusCode()).body(Map.of("error", ex.getReason()));
         }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> login(@RequestBody Cliente cliente) {
+        String token = clienteService.login(cliente);
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/update/{id}")

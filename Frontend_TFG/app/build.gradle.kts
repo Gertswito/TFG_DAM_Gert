@@ -62,4 +62,5 @@ dependencies {
     implementation(libs.retrofit.gson)
     implementation(libs.gson)
     implementation(libs.coil.compose)
+    implementation(libs.androidx.datastore.preferences)
 }

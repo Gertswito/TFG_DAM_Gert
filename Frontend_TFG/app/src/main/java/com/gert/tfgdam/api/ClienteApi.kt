@@ -1,6 +1,7 @@
 package com.gert.tfgdam.api
 
 import com.gert.tfgdam.model.Cliente
+import com.gert.tfgdam.model.JwtResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -18,6 +19,9 @@ interface ClienteApi {
 
     @POST("api/cliente/new")
     suspend fun create(@Body cliente: Cliente): Response<Cliente>
+
+    @POST("api/cliente/login")
+    suspend fun login(@Body cliente: Cliente): Response<JwtResponse>
 
     @PUT("api/cliente/update/{id}")
     suspend fun update(

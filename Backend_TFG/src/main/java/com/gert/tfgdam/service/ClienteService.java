@@ -32,20 +32,7 @@ public class ClienteService {
     }
 
     public Cliente getClientePorId(Long id) {
-        return clienteRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "clienteNoExiste"));
-    }
-
-    public String login(Cliente cliente) {
-        if (!clienteRepository.existsByUsuario(cliente.getUsuario())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "usuarioNoExiste");
-        }
-        Cliente usuario = clienteRepository.findByUsuario(cliente.getUsuario());
-
-        if (!passwordEncoder.matches(cliente.getContrasenha(), usuario.getContrasenha())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "contrasenhaIncorrecta");
-        }
-
-        return jwtTokenUtil.generateToken(usuario.getUsuario(), usuario.getRol());
+        return clienteRepository.findWithDireccionesById(id.intValue()).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "clienteNoExiste"));    
     }
 
     public void delete(Long id) {
@@ -66,9 +53,6 @@ public class ClienteService {
         if (cliente.getEmail() != null && clienteRepository.existsByEmail(cliente.getEmail())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "emailExiste");
         }
-        if (cliente.getDni() != null && clienteRepository.existsByDni(cliente.getDni())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "dniExiste");
-        }
 
         if (cliente.getRol() == null) {
             cliente.setRol(Rol.USER);
@@ -78,6 +62,19 @@ public class ClienteService {
         cliente.setContrasenha(newPasswordEncoder.encode(cliente.getContrasenha()));
 
         return clienteRepository.save(cliente);
+    }
+
+    public String login(Cliente cliente) {
+        if (!clienteRepository.existsByUsuario(cliente.getUsuario())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "usuarioNoExiste");
+        }
+        Cliente usuario = clienteRepository.findByUsuario(cliente.getUsuario());
+
+        if (!passwordEncoder.matches(cliente.getContrasenha(), usuario.getContrasenha())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "contrasenhaIncorrecta");
+        }
+
+        return jwtTokenUtil.generateToken(usuario.getUsuario(), usuario.getRol());
     }
 
     public Cliente update(Cliente cliente) {

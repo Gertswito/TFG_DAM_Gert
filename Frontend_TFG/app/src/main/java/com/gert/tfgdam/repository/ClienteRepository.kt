@@ -22,6 +22,16 @@ class ClienteRepository {
         return api.create(cliente)
     }
 
+    suspend fun login(cliente: Cliente): String {
+        val response = api.login(cliente)
+        if (response.isSuccessful) {
+            return response.body()?.token ?: throw Exception("Token no recibido")
+        } else {
+            val errorBody = response.errorBody()?.string()
+            throw Exception(errorBody ?: "Error desconocido del servidor")
+        }
+    }
+
     suspend fun update(id: Long, cliente: Cliente): Response<Cliente> {
         return api.update(id, cliente)
     }

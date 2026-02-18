@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.*;
 
@@ -24,9 +25,6 @@ public class Cliente implements Serializable {
     @Enumerated(EnumType.STRING)
     @Column(name = "rol", nullable = false)
     private Rol rol = Rol.USER;
-
-    @Column(name = "dni", nullable = false, unique = true, length = 9)
-    private String dni;
 
     @Column(name = "nombre", nullable = false)
     private String nombre;
@@ -49,9 +47,9 @@ public class Cliente implements Serializable {
         joinColumns = @JoinColumn(name = "cliente_id"),
         inverseJoinColumns = @JoinColumn(name = "libro_id")
     )
-    @JsonIgnore
     private Set<Libro> librosFavoritos = new HashSet<>();
 
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "contrasenha")
     private String contrasenha;
 
@@ -69,14 +67,6 @@ public class Cliente implements Serializable {
 
     public void setRol(Rol rol) {
         this.rol = rol;
-    }
-
-    public String getDni() {
-        return dni;
-    }
-
-    public void setDni(String dni) {
-        this.dni = dni;
     }
 
     public String getNombre() {
