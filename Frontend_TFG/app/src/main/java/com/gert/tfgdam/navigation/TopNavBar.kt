@@ -73,7 +73,7 @@ fun TopNavBar(navController: NavController, jwtManager: JwtManager = JwtManager)
                     onClick = {
                         coroutineScope.launch {
                             jwtManager.clearToken(context)
-                            navController.navigate(Routes.LOGIN) {
+                            navController.navigate(Routes.HOME) {
                                 popUpTo(Routes.HOME) { inclusive = true }
                             }
                         }
