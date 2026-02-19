@@ -17,7 +17,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -27,9 +26,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.viewmodel.TipoLibroGenerosViewModel
-import kotlinx.coroutines.delay
 import kotlin.collections.component1
-import kotlin.collections.component2
 
 @Composable
 fun TipoLibroGenerosScreen(
@@ -39,19 +36,10 @@ fun TipoLibroGenerosScreen(
     navController: NavController
 ) {
     val librosPorTipo = viewModel.librosPorTipo
-    var showEmpty by remember { mutableStateOf(false) }
+    val showEmpty by remember(librosPorTipo) { mutableStateOf(librosPorTipo.isEmpty()) }
 
     LaunchedEffect(tipoLibroString) {
         viewModel.cargarLibrosPorTipo(tipoLibroString)
-    }
-
-    LaunchedEffect(tipoLibroString) {
-        if (librosPorTipo.isEmpty()) {
-            delay(200)
-            showEmpty = true
-        } else {
-            showEmpty = false
-        }
     }
 
     if (librosPorTipo.isEmpty() && showEmpty) {
@@ -99,7 +87,7 @@ fun TipoLibroGenerosScreen(
 
                 item {
                     Text(
-                        text = ("- " + genero) ?: "Sin género",
+                        text = ("- ") + (genero ?: "Sin género"),
                         fontSize = 24.sp,
                         modifier = Modifier
                             .padding(vertical = 8.dp)
@@ -110,7 +98,7 @@ fun TipoLibroGenerosScreen(
                 item {
                     LazyRow {
                         items(librosPorTipo) { libro ->
-                            LibroItem(libro)
+                            LibroItem(libro, navController)
                         }
                     }
                 }

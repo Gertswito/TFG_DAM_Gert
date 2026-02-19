@@ -101,7 +101,7 @@ fun HomeScreen(
                 item {
                     LazyRow {
                         items(librosDelTipo) { libro ->
-                            LibroItem(libro)
+                            LibroItem(libro, navController)
                         }
                     }
                 }
@@ -115,7 +115,10 @@ fun HomeScreen(
 }
 
 @Composable
-fun LibroItem(libro: Libro) {
+fun LibroItem(
+    libro: Libro,
+    navController: NavController
+) {
     Card(
         modifier = Modifier
             .padding(8.dp)
@@ -124,7 +127,8 @@ fun LibroItem(libro: Libro) {
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
-        )
+        ),
+        onClick = { navController.navigate(Routes.LIBRO_DETAILS.replace("{libroId}", libro.id.toString())) }
     ) {
         Column(
             modifier = Modifier

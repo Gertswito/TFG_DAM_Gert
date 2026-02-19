@@ -28,7 +28,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.viewmodel.TipoLibroGeneroSelectedViewModel
-import kotlinx.coroutines.delay
 import androidx.compose.foundation.lazy.grid.items
 
 @Composable
@@ -40,19 +39,10 @@ fun TipoLibroGeneroSelectedScreen (
     navController: NavController
 ){
     val librosPorTipoGenero = viewModel.librosPorTipoGenero
-    var showEmpty by remember { mutableStateOf(false) }
+    var showEmpty by remember (librosPorTipoGenero) { mutableStateOf(librosPorTipoGenero.isEmpty()) }
 
     LaunchedEffect(tipoLibroString) {
         viewModel.cargarLibrosPorTipoGenero(tipoLibroString, generoString)
-    }
-
-    LaunchedEffect(tipoLibroString) {
-        if (librosPorTipoGenero.isEmpty()) {
-            delay(200)
-            showEmpty = true
-        } else {
-            showEmpty = false
-        }
     }
 
     if (librosPorTipoGenero.isEmpty() && showEmpty) {
@@ -97,7 +87,7 @@ fun TipoLibroGeneroSelectedScreen (
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    LibroItem(libro)
+                    LibroItem(libro, navController)
                 }
             }
         }
