@@ -44,7 +44,7 @@ fun LibroDetailsScreen(
     libroId: Long,
     modifier: Modifier = Modifier,
     viewModel: LibroDetailsViewModel = viewModel()
-){
+) {
     val libroEspecifico = viewModel.libroEspecifico
     var showEmpty by remember { mutableStateOf(false) }
 
@@ -126,21 +126,8 @@ fun LibroDetailsScreen(
             }
 
             item {
-                val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
-                val formatoDinero = NumberFormat.getCurrencyInstance(locale)
-                val context = LocalContext.current
-                val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
-                val esUser = userInfo?.rol == "USER"
-                Button(
-                    modifier = modifier.fillMaxWidth(),
-                    enabled = esUser,
-                    onClick = { clickearBoton(context) }
-                ) {
-                    Text(
-                        text = ("AÑADIR AL CARRITO - ") + (libroEspecifico?.precio?.let { formatoDinero.format(it) } ?: "N/A"),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
-                    )
+                if(libroEspecifico !== null) {
+                    BotonAñadirCarrito(libroEspecifico, true)
                 }
             }
 
@@ -199,12 +186,4 @@ fun LibroDetailsScreen(
             }
         }
     }
-}
-
-fun clickearBoton(context: Context) {
-    Toast.makeText(
-        context,
-        "WIP: Añadido al carrito",
-        Toast.LENGTH_SHORT
-    ).show()
 }

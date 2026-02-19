@@ -7,9 +7,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,6 +73,10 @@ fun TipoLibroGenerosScreen(
             )
             .toSortedMap()
 
+        val librosPorGeneroLimitados = librosPorGenero.mapValues { (_, libros) ->
+            libros.take(5)
+        }
+
         LazyColumn(
             modifier = modifier
                 .fillMaxSize()
@@ -83,7 +91,7 @@ fun TipoLibroGenerosScreen(
                 )
             }
 
-            librosPorGenero.forEach { (genero) ->
+            librosPorGeneroLimitados.forEach { (genero, librosLimitados) ->
 
                 item {
                     Text(
@@ -97,8 +105,37 @@ fun TipoLibroGenerosScreen(
 
                 item {
                     LazyRow {
-                        items(librosPorTipo) { libro ->
+                        items(librosLimitados) { libro ->
                             LibroItem(libro, navController)
+                        }
+
+                        val totalLibros = librosPorGenero[genero]?.size ?: 0
+                        if (totalLibros > librosLimitados.size) {
+                            item {
+                                Card(
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .width(150.dp)
+                                        .height(270.dp)
+                                        .clickable{ navController.navigate(Routes.TIPO_LIBRO_GENERO_SELECTED.replace("{tipoLibro}", tipoLibroString).replace("{genero}", genero ?: "null")) },
+                                    elevation = CardDefaults.cardElevation(4.dp),
+                                    colors = CardDefaults.cardColors(
+                                        containerColor = MaterialTheme.colorScheme.surface
+                                    )
+                                ) {
+                                    Box(
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "Ver todos",
+                                            fontWeight = FontWeight.Bold,
+                                            fontSize = 16.sp,
+                                            textAlign = TextAlign.Center
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                 }
