@@ -1,6 +1,7 @@
 package com.gert.tfgdam.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -30,8 +31,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.gert.tfgdam.model.Libro
+import com.gert.tfgdam.model.TipoLibro
+import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.viewmodel.HomeViewModel
 import kotlinx.coroutines.delay
 import java.text.NumberFormat
@@ -40,9 +44,9 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = viewModel()
+    viewModel: HomeViewModel = viewModel(),
+    navController: NavController
 ) {
-
     val libros = viewModel.libros
     var showEmpty by remember { mutableStateOf(false) }
 
@@ -70,7 +74,11 @@ fun HomeScreen(
             )
         }
     } else {
-        val librosAgrupados = libros.groupBy { it.tipoLibro?.nombre ?: "Sin tipo" }
+        val librosAgrupados: Map<TipoLibro?, List<Libro>> = libros
+            .groupBy { it.tipoLibro }
+            .toList()
+            .sortedBy { it.first?.id }
+            .toMap()
 
         LazyColumn(
             modifier = modifier
@@ -81,10 +89,12 @@ fun HomeScreen(
 
                 item {
                     Text(
-                        text = tipo,
+                        text = tipo?.nombre ?: "Sin nombre",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .clickable { navController.navigate(Routes.TIPO_LIBRO_GENEROS.replace("{tipoLibro}", tipo?.nombre ?: "Sin nombre")) }
                     )
                 }
 

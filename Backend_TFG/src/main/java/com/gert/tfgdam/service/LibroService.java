@@ -22,6 +22,30 @@ public class LibroService {
         return libroRepository.findAll();
     }
 
+    public List<Libro> getAllLibroPorTipo(String tipoLibro) {
+        List<Libro> libros = libroRepository.findByTipoLibro_Nombre(tipoLibro);
+
+        if (libros.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "No existen libros para el tipo: " + tipoLibro
+            );
+        }
+        return libros;
+    }
+
+    public List<Libro> getAllLibroPorTipoGenero(String tipoLibro, String genero) {
+        List<Libro> libros = libroRepository.findByTipoLibro_NombreAndGeneros_Nombre(tipoLibro, genero);
+
+        if (libros.isEmpty()) {
+            throw new ResponseStatusException(
+                HttpStatus.NOT_FOUND,
+                "No existen libros para el tipo o géneros: " + tipoLibro + " | " + genero
+            );
+        }
+        return libros;
+    }
+
     public Libro getLibroPorId(Long id) {
         return libroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "libroNoExiste"));
     }

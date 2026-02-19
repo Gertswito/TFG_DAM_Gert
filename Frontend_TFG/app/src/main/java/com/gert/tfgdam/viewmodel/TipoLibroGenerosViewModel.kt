@@ -8,33 +8,26 @@ import androidx.lifecycle.viewModelScope
 import com.gert.tfgdam.model.Libro
 import com.gert.tfgdam.repository.LibroRepository
 import kotlinx.coroutines.launch
-import java.io.IOException
 
-class HomeViewModel : ViewModel() {
-
+class TipoLibroGenerosViewModel : ViewModel() {
     private val repository = LibroRepository()
 
-    var libros by mutableStateOf<List<Libro>>(emptyList())
-    private set
+    var librosPorTipo by mutableStateOf<List<Libro>>(emptyList())
+        private set
 
-            init {
-                cargarLibros()
-            }
-
-    private fun cargarLibros() {
+    fun cargarLibrosPorTipo(tipoLibro: String) {
         viewModelScope.launch {
             try {
-                val response = repository.getAll()
+                val response = repository.getAllPorTipo(tipoLibro)
 
                 if (response.isSuccessful) {
-                    libros = response.body() ?: emptyList()
+                    librosPorTipo = response.body() ?: emptyList()
                 } else {
-                    libros = emptyList()
+                    librosPorTipo = emptyList()
                 }
-            } catch (e: IOException) {
-                libros = emptyList()
+
             } catch (e: Exception) {
-                libros = emptyList()
+                librosPorTipo = emptyList()
             }
         }
     }

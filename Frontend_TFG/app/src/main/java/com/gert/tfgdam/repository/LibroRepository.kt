@@ -14,6 +14,14 @@ class LibroRepository {
         return api.getAll()
     }
 
+    suspend fun getAllPorTipo(tipoLibro: String): Response<List<Libro>> {
+        return api.getAllPorTipo(tipoLibro)
+    }
+
+    suspend fun getAllPorTipoGenero(tipoLibro: String, genero: String): Response<List<Libro>> {
+        return api.getAllPorTipo(tipoLibro)
+    }
+
     suspend fun getPorId(id: Long): Response<Libro> {
         return api.getPorId(id)
     }

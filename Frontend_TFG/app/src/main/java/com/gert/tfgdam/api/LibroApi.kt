@@ -13,6 +13,12 @@ interface LibroApi {
     @GET("api/libro/get")
     suspend fun getAll(): Response<List<Libro>>
 
+    @GET("api/libro/get/tipo/{tipo-libro}")
+    suspend fun getAllPorTipo(@Path("tipo-libro") tipoLibro: String): Response<List<Libro>>
+
+    @GET("api/libro/get/tipo/{tipo-libro}/genero({genero}")
+    suspend fun getAllPorTipoGenero(@Path("tipo-libro") tipoLibro: String, @Path("genero") genero: String): Response<List<Libro>>
+
     @GET("api/libro/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Libro>
 

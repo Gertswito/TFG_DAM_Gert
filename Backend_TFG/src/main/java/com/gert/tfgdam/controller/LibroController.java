@@ -37,6 +37,16 @@ public class LibroController {
         return libroService.getAllLibro();
     }
 
+    @GetMapping("/get/tipo/{tipo-libro}")
+    public List<Libro> getAllLibroPorTipo(@PathVariable("tipo-libro") String tipoLibro) {
+        return libroService.getAllLibroPorTipo(tipoLibro);
+    }
+
+    @GetMapping("/get/tipo/{tipo-libro}/genero/{genero}")
+    public List<Libro> getAllLibroPorTipo(@PathVariable("tipo-libro") String tipoLibro, @PathVariable("genero") String genero) {
+        return libroService.getAllLibroPorTipoGenero(tipoLibro, genero);
+    }
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Libro> getLibroPorId(@PathVariable Long id) {
         try {
