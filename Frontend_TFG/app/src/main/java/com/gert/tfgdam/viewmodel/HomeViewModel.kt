@@ -8,6 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.gert.tfgdam.model.Libro
 import com.gert.tfgdam.repository.LibroRepository
 import kotlinx.coroutines.launch
+import java.io.IOException
 
 class HomeViewModel : ViewModel() {
 
@@ -22,9 +23,18 @@ class HomeViewModel : ViewModel() {
 
     private fun cargarLibros() {
         viewModelScope.launch {
-            val response = repository.getAll()
-            if (response.isSuccessful) {
-                libros = response.body() ?: emptyList()
+            try {
+                val response = repository.getAll()
+                
+                if (response.isSuccessful) {
+                    libros = response.body() ?: emptyList()
+                } else {
+                    libros = emptyList()
+                }
+            } catch (e: IOException) {
+                libros = emptyList()
+            } catch (e: Exception) {
+                libros = emptyList()
             }
         }
     }
