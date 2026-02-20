@@ -32,26 +32,26 @@ public class ClienteService {
     }
 
     public Cliente getClientePorId(Long id) {
-        return clienteRepository.findWithDireccionesById(id.intValue()).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "clienteNoExiste"));    
+        return clienteRepository.findWithDireccionesById(id.intValue()).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));    
     }
 
     public void delete(Long id) {
         if (!clienteRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "clienteNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario");
         }
         try {
             clienteRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "clienteNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este usuario no puede ser eliminado", e);
         }
     }
 
     public Cliente save(Cliente cliente) {
         if (clienteRepository.existsByUsuario(cliente.getUsuario())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreUsuarioExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de usuario ya está en uso");
         }
         if (cliente.getEmail() != null && clienteRepository.existsByEmail(cliente.getEmail())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "emailExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El correo electrónico ya está en uso");
         }
 
         if (cliente.getRol() == null) {
@@ -66,12 +66,12 @@ public class ClienteService {
 
     public String login(Cliente cliente) {
         if (!clienteRepository.existsByUsuario(cliente.getUsuario())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "usuarioNoExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha encontrado al usuario");
         }
         Cliente usuario = clienteRepository.findByUsuario(cliente.getUsuario());
 
         if (!passwordEncoder.matches(cliente.getContrasenha(), usuario.getContrasenha())) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "contrasenhaIncorrecta");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "La contraseña es incorrecta");
         }
 
         return jwtTokenUtil.generateToken(usuario.getUsuario(), usuario.getRol());
@@ -80,7 +80,7 @@ public class ClienteService {
     public Cliente update(Cliente cliente) {
         Cliente existente = clienteRepository.findByUsuario(cliente.getUsuario());
         if (existente != null && !existente.getId().equals(cliente.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de usuario ya está en uso");
         }
         return clienteRepository.save(cliente);
     }

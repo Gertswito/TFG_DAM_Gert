@@ -23,17 +23,17 @@ public class LineaVentaService {
     }
 
     public LineaVenta getLineaVentaPorId(Long id) {
-        return lineaVentaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "lineaVentaNoExiste"));
+        return lineaVentaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la línea de venta"));
     }
 
     public void delete(Long id) {
         if (!lineaVentaRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "lineaVentaNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la línea de venta");
         }
         try {
             lineaVentaRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "lineaVentaNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta línea de venta no puede ser borrada", e);
         }
     }
 

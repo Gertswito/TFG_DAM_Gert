@@ -23,17 +23,17 @@ public class VentaService {
     }
 
     public Venta getVentaPorId(Long id) {
-        return ventaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "ventaNoExiste"));
+        return ventaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la venta"));
     }
 
     public void delete(Long id) {
         if (!ventaRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ventaNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la venta");
         }
         try {
             ventaRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "ventaNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta venta no puede ser borrada", e);
         }
     }
 

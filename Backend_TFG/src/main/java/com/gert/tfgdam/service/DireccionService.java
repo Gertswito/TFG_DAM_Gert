@@ -23,17 +23,17 @@ public class DireccionService {
     }
 
     public Direccion getDireccionPorId(Long id) {
-        return direccionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "direccionNoExiste"));
+        return direccionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la dirección"));
     }
 
     public void delete(Long id) {
         if (!direccionRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "direccionNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la dirección");
         }
         try {
             direccionRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "direccionNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta dirección no puede ser eliminada", e);
         }
     }
 

@@ -11,6 +11,8 @@ import com.gert.tfgdam.util.JwtManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import androidx.lifecycle.AndroidViewModel
+import com.gert.tfgdam.api.ApiError
+import com.google.gson.Gson
 
 class LoginViewModel(application: Application) : AndroidViewModel(application)  {
     private val repository = ClienteRepository()
@@ -35,6 +37,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
                     contrasenha = contrasenha.trim()
                 )
 
+                if (cliente.usuario.isNullOrBlank() || cliente.contrasenha.isNullOrBlank()) {
+                    errorMessage = "Por favor, rellene todos los campos"
+                    isLoading = false
+                    return@launch
+                }
+
                 val token: String = repository.login(cliente)
 
                 JwtManager.saveToken(context, token)
@@ -51,7 +59,15 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
                     else -> errorMessage = "Rol desconocido"
                 }
             } catch (e: Exception) {
-                errorMessage = e.message ?: "Error desconocido"
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
+
+                if(apiError.status != 401) {
+                    usuario = ""
+                }
+                contrasenha = ""
+
+                errorMessage = apiError.message ?: "Error desconocido"
             } finally {
                 isLoading = false
             }

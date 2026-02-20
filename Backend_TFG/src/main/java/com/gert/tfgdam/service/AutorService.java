@@ -23,23 +23,23 @@ public class AutorService {
     }
 
     public Autor getAutorPorId(Long id) {
-        return autorRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "autorNoExiste"));
+        return autorRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al autor"));
     }
 
     public void delete(Long id) {
         if (!autorRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "autorNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al autor");
         }
         try {
             autorRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "autorNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este autor no puede ser eliminado", e);
         }
     }
 
     public Autor save(Autor autor) {
         if (autorRepository.existsByNombre(autor.getNombre())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de autor ya está registrado");
         }
         return autorRepository.save(autor);
     }
@@ -47,7 +47,7 @@ public class AutorService {
     public Autor update(Autor autor) {
         Autor existente = autorRepository.findByNombre(autor.getNombre());
         if (existente != null && !existente.getId().equals(autor.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de autor ya está registrado");
         }
         return autorRepository.save(autor);
     }

@@ -23,23 +23,23 @@ public class EditorialService {
     }
 
     public Editorial getEditorialPorId(Long id) {
-        return editorialRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "editorialNoExiste"));
+        return editorialRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la editorial"));
     }
 
     public void delete(Long id) {
         if (!editorialRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "editorialNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la editorial");
         }
         try {
             editorialRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "editorialNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta editorial no puede ser eliminada", e);
         }
     }
 
     public Editorial save(Editorial editorial) {
         if (editorialRepository.existsByNombre(editorial.getNombre())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de editorial ya está registrado");
         }
         return editorialRepository.save(editorial);
     }
@@ -47,7 +47,7 @@ public class EditorialService {
     public Editorial update(Editorial editorial) {
         Editorial existente = editorialRepository.findByNombre(editorial.getNombre());
         if (existente != null && !existente.getId().equals(editorial.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de editorial ya está registrado");
         }
         return editorialRepository.save(editorial);
     }

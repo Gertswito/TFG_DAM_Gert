@@ -26,10 +26,7 @@ public class LibroService {
         List<Libro> libros = libroRepository.findByTipoLibro_Nombre(tipoLibro);
 
         if (libros.isEmpty()) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "No existen libros para el tipo: " + tipoLibro
-            );
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen libros para el tipo: " + tipoLibro);
         }
         return libros;
     }
@@ -38,32 +35,29 @@ public class LibroService {
         List<Libro> libros = libroRepository.findByTipoLibro_NombreAndGeneros_Nombre(tipoLibro, genero);
 
         if (libros.isEmpty()) {
-            throw new ResponseStatusException(
-                HttpStatus.NOT_FOUND,
-                "No existen libros para el tipo o géneros: " + tipoLibro + " | " + genero
-            );
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen libros para el tipo o géneros: " + tipoLibro + " | " + genero);
         }
         return libros;
     }
 
     public Libro getLibroPorId(Long id) {
-        return libroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "libroNoExiste"));
+        return libroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro"));
     }
 
     public void delete(Long id) {
         if (!libroRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "libroNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro");
         }
         try {
             libroRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "libroNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este libro no puede ser eliminado", e);
         }
     }
 
     public Libro save(Libro libro) {
         if (libroRepository.existsByTitulo(libro.getTitulo())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tituloExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del libro ya está registrado");
         }
         return libroRepository.save(libro);
     }
@@ -71,7 +65,7 @@ public class LibroService {
     public Libro update(Libro libro) {
         Libro existente = libroRepository.findByTitulo(libro.getTitulo());
         if (existente != null && !existente.getId().equals(libro.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "tituloExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del libro ya está registrado");
         }
         return libroRepository.save(libro);
     }

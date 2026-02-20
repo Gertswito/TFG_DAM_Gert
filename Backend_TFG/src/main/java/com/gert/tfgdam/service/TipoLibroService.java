@@ -23,23 +23,23 @@ public class TipoLibroService {
     }
 
     public TipoLibro getTipoLibroPorId(Long id) {
-        return tipoLibroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "tipoLibroNoExiste"));
+        return tipoLibroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el tipo de libro"));
     }
 
     public void delete(Long id) {
         if (!tipoLibroRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "tipoLibroNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el tipo de libro");
         }
         try {
             tipoLibroRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "tipoLibroNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este tipo de libro no puede ser borrado", e);
         }
     }
 
     public TipoLibro save(TipoLibro tipoLibro) {
         if (tipoLibroRepository.existsByNombre(tipoLibro.getNombre())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del tipo de libro ya está registrado");
         }
         return tipoLibroRepository.save(tipoLibro);
     }
@@ -47,7 +47,7 @@ public class TipoLibroService {
     public TipoLibro update(TipoLibro tipoLibro) {
         TipoLibro existente = tipoLibroRepository.findByNombre(tipoLibro.getNombre());
         if (existente != null && !existente.getId().equals(tipoLibro.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del tipo de libro ya está registrado");
         }
         return tipoLibroRepository.save(tipoLibro);
     }

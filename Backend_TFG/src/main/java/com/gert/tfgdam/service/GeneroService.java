@@ -23,23 +23,23 @@ public class GeneroService {
     }
 
     public Genero getGeneroPorId(Long id) {
-        return generoRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "generoNoExiste"));
+        return generoRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el género"));
     }
 
     public void delete(Long id) {
         if (!generoRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "generoNoExiste");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el género");
         }
         try {
             generoRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "generoNoSePuedeEliminar", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este género no puede ser eliminado", e);
         }
     }
 
     public Genero save(Genero genero) {
         if (generoRepository.existsByNombre(genero.getNombre())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de género ya está registrado");
         }
         return generoRepository.save(genero);
     }
@@ -47,7 +47,7 @@ public class GeneroService {
     public Genero update(Genero genero) {
         Genero existente = generoRepository.findByNombre(genero.getNombre());
         if (existente != null && !existente.getId().equals(genero.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "nombreExiste");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de género ya está registrado");
         }
         return generoRepository.save(genero);
     }
