@@ -1,7 +1,13 @@
 package com.gert.tfgdam.screens
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,7 +35,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -37,7 +42,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gert.tfgdam.viewmodel.UserDetailsViewModel
-import kotlinx.coroutines.delay
 
 @Composable
 fun UserDetailsScreen(
@@ -85,10 +89,15 @@ fun UserDetailsScreen(
             ) {
                 LazyColumn {
                     item {
+                        var expandedInformacion by remember { mutableStateOf(false) }
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(5.dp),
+                                .padding(5.dp)
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) { expandedInformacion = !expandedInformacion },
                             elevation = CardDefaults.cardElevation(4.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surface
@@ -109,192 +118,203 @@ fun UserDetailsScreen(
                                     modifier = Modifier.fillMaxWidth()
                                 )
 
-                                Spacer(modifier = Modifier.height(25.dp))
-
-                                Text(
-                                    text = ("Nombre de usuario: "),
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 20.dp)
-                                )
-
-                                Text(
-                                    text = (usuario?.usuario ?: "N/A"),
-                                    color = MaterialTheme.colorScheme.onBackground,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 30.dp)
-                                )
-
-                                if (!viewModel.isEditarClicked) {
-                                    Spacer(modifier = Modifier.height(20.dp))
-
-                                    Text(
-                                        text = ("Email: "),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 20.dp)
-                                    )
-
-                                    Text(
-                                        text = (usuario?.email ?: "N/A"),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 30.dp)
-                                    )
-
-                                    Spacer(modifier = Modifier.height(20.dp))
-
-                                    Text(
-                                        text = ("Nombre: "),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 20.dp)
-                                    )
-
-                                    Text(
-                                        text = (usuario?.nombre ?: "N/A"),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 30.dp)
-                                    )
-
-                                    Spacer(modifier = Modifier.height(20.dp))
-
-                                    Text(
-                                        text = ("Apellidos: "),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        fontWeight = FontWeight.Bold,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 20.dp)
-                                    )
-
-                                    Text(
-                                        text = (usuario?.apellidos ?: "N/A"),
-                                        color = MaterialTheme.colorScheme.onBackground,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 30.dp)
-                                    )
-
-                                    Spacer(modifier = Modifier.height(25.dp))
-
-                                    Button(
-                                        modifier = modifier
-                                            .fillMaxWidth()
-                                            .padding(horizontal = 20.dp),
-                                        onClick = { viewModel.clickEditarOCancelar(usuario) }
+                                AnimatedVisibility(
+                                    visible = expandedInformacion,
+                                    enter = expandVertically() + fadeIn(),
+                                    exit = shrinkVertically() + fadeOut()
+                                ) {
+                                    Column (
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
+                                        Spacer(modifier = Modifier.height(25.dp))
+
                                         Text(
-                                            text = "EDITAR DATOS",
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Medium
+                                            text = ("Nombre de usuario: "),
+                                            color = MaterialTheme.colorScheme.onBackground,
+                                            fontWeight = FontWeight.Bold,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 20.dp)
                                         )
-                                    }
-                                } else {
-                                    Text(
-                                        text = "El nombre de usuario no se puede cambiar",
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.error,
-                                        textAlign = TextAlign.Center,
-                                        modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
-                                    )
 
-                                    Spacer(modifier = Modifier.height(5.dp))
+                                        Text(
+                                            text = (usuario?.usuario ?: "N/A"),
+                                            color = MaterialTheme.colorScheme.onBackground,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 30.dp)
+                                        )
 
-                                    TextFieldRegisterYLogin(
-                                        value = viewModel.emailCambiado,
-                                        onValueChange = { viewModel.emailCambiado = it },
-                                        label = "Email",
-                                        modifier = Modifier.padding(horizontal = 20.dp)
-                                    )
+                                        if (!viewModel.isEditarClicked) {
+                                            Spacer(modifier = Modifier.height(20.dp))
 
-                                    Spacer(modifier = Modifier.height(20.dp))
+                                            Text(
+                                                text = ("Email: "),
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 20.dp)
+                                            )
 
-                                    TextFieldRegisterYLogin(
-                                        value = viewModel.nombreCambiado,
-                                        onValueChange = { viewModel.nombreCambiado = it },
-                                        label = "Nombre",
-                                        modifier = Modifier.padding(horizontal = 20.dp)
-                                    )
+                                            Text(
+                                                text = (usuario?.email ?: "N/A"),
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 30.dp)
+                                            )
 
-                                    Spacer(modifier = Modifier.height(20.dp))
+                                            Spacer(modifier = Modifier.height(20.dp))
 
-                                    TextFieldRegisterYLogin(
-                                        value = viewModel.apellidosCambiados,
-                                        onValueChange = { viewModel.apellidosCambiados = it },
-                                        label = "Apellidos",
-                                        modifier = Modifier.padding(horizontal = 20.dp)
-                                    )
+                                            Text(
+                                                text = ("Nombre: "),
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 20.dp)
+                                            )
 
-                                    Spacer(modifier = Modifier.height(35.dp))
+                                            Text(
+                                                text = (usuario?.nombre ?: "N/A"),
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 30.dp)
+                                            )
 
-                                    Row(
-                                        modifier = Modifier.fillMaxWidth()
-                                    ) {
-                                        Button(
-                                            modifier = modifier
-                                                .weight(1f)
-                                                .padding(start = 20.dp, end = 5.dp),
-                                            enabled = !viewModel.isLoadingEditar,
-                                            onClick = { viewModel.editarFormulario(usuario) }
-                                        ) {
-                                            if (viewModel.isLoadingEditar) {
-                                                CircularProgressIndicator(
-                                                    color = MaterialTheme.colorScheme.onPrimary,
-                                                    modifier = Modifier.size(24.dp)
-                                                )
-                                            } else {
+                                            Spacer(modifier = Modifier.height(20.dp))
+
+                                            Text(
+                                                text = ("Apellidos: "),
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                fontWeight = FontWeight.Bold,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 20.dp)
+                                            )
+
+                                            Text(
+                                                text = (usuario?.apellidos ?: "N/A"),
+                                                color = MaterialTheme.colorScheme.onBackground,
+                                                modifier = Modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 30.dp)
+                                            )
+
+                                            Spacer(modifier = Modifier.height(25.dp))
+
+                                            Button(
+                                                modifier = modifier
+                                                    .fillMaxWidth()
+                                                    .padding(horizontal = 20.dp),
+                                                onClick = { viewModel.clickEditarOCancelar(usuario) }
+                                            ) {
                                                 Text(
-                                                    text = "GUARDAR",
+                                                    text = "EDITAR DATOS",
                                                     fontSize = 16.sp,
                                                     fontWeight = FontWeight.Medium
                                                 )
                                             }
-                                        }
-
-                                        Button(
-                                            modifier = modifier
-                                                .weight(1f)
-                                                .padding(end = 20.dp, start = 5.dp),
-                                            enabled = !viewModel.isLoadingEditar,
-                                            colors = ButtonDefaults.buttonColors(
-                                                containerColor = MaterialTheme.colorScheme.secondary
-                                            ),
-                                            onClick = { viewModel.clickEditarOCancelar(usuario) }
-                                        ) {
+                                        } else {
                                             Text(
-                                                text = "SALIR",
-                                                fontSize = 16.sp,
-                                                fontWeight = FontWeight.Medium,
-                                                color = MaterialTheme.colorScheme.onSecondary
+                                                text = "El nombre de usuario no se puede cambiar",
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.error,
+                                                textAlign = TextAlign.Center,
+                                                modifier = Modifier.padding(horizontal = 15.dp, vertical = 10.dp)
                                             )
+
+                                            Spacer(modifier = Modifier.height(5.dp))
+
+                                            TextFieldRegisterYLogin(
+                                                value = viewModel.emailCambiado,
+                                                onValueChange = { viewModel.emailCambiado = it },
+                                                label = "Email",
+                                                modifier = Modifier.padding(horizontal = 20.dp)
+                                            )
+
+                                            Spacer(modifier = Modifier.height(20.dp))
+
+                                            TextFieldRegisterYLogin(
+                                                value = viewModel.nombreCambiado,
+                                                onValueChange = { viewModel.nombreCambiado = it },
+                                                label = "Nombre",
+                                                modifier = Modifier.padding(horizontal = 20.dp)
+                                            )
+
+                                            Spacer(modifier = Modifier.height(20.dp))
+
+                                            TextFieldRegisterYLogin(
+                                                value = viewModel.apellidosCambiados,
+                                                onValueChange = { viewModel.apellidosCambiados = it },
+                                                label = "Apellidos",
+                                                modifier = Modifier.padding(horizontal = 20.dp)
+                                            )
+
+                                            Spacer(modifier = Modifier.height(35.dp))
+
+                                            Row(
+                                                modifier = Modifier.fillMaxWidth()
+                                            ) {
+                                                Button(
+                                                    modifier = modifier
+                                                        .weight(1f)
+                                                        .padding(start = 20.dp, end = 5.dp),
+                                                    enabled = !viewModel.isLoadingEditar,
+                                                    onClick = { viewModel.editarFormulario(usuario) }
+                                                ) {
+                                                    if (viewModel.isLoadingEditar) {
+                                                        CircularProgressIndicator(
+                                                            color = MaterialTheme.colorScheme.onPrimary,
+                                                            modifier = Modifier.size(24.dp)
+                                                        )
+                                                    } else {
+                                                        Text(
+                                                            text = "GUARDAR",
+                                                            fontSize = 16.sp,
+                                                            fontWeight = FontWeight.Medium
+                                                        )
+                                                    }
+                                                }
+
+                                                Button(
+                                                    modifier = modifier
+                                                        .weight(1f)
+                                                        .padding(end = 20.dp, start = 5.dp),
+                                                    enabled = !viewModel.isLoadingEditar,
+                                                    colors = ButtonDefaults.buttonColors(
+                                                        containerColor = MaterialTheme.colorScheme.secondary
+                                                    ),
+                                                    onClick = { viewModel.clickEditarOCancelar(usuario) }
+                                                ) {
+                                                    Text(
+                                                        text = "SALIR",
+                                                        fontSize = 16.sp,
+                                                        fontWeight = FontWeight.Medium,
+                                                        color = MaterialTheme.colorScheme.onSecondary
+                                                    )
+                                                }
+                                            }
+
+                                            if(viewModel.errorMessageEditar !== "") {
+                                                Text(
+                                                    text = viewModel.errorMessageEditar,
+                                                    color = MaterialTheme.colorScheme.error,
+                                                    modifier = Modifier.padding(top = 8.dp)
+                                                )
+                                            }
+
+                                            if(viewModel.successMessageEditar !== "") {
+                                                Text(
+                                                    text = viewModel.successMessageEditar,
+                                                    color = MaterialTheme.colorScheme.primary,
+                                                    modifier = Modifier.padding(top = 8.dp)
+                                                )
+                                            }
                                         }
-                                    }
-
-                                    if(viewModel.errorMessageEditar !== "") {
-                                        Text(
-                                            text = viewModel.errorMessageEditar,
-                                            color = MaterialTheme.colorScheme.error,
-                                            modifier = Modifier.padding(top = 8.dp)
-                                        )
-                                    }
-
-                                    if(viewModel.successMessageEditar !== "") {
-                                        Text(
-                                            text = viewModel.successMessageEditar,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.padding(top = 8.dp)
-                                        )
                                     }
                                 }
                             }
@@ -316,10 +336,15 @@ fun UserDetailsScreen(
                     }
 
                     item {
+                        var expandedContrasenha by remember { mutableStateOf(false) }
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(5.dp),
+                                .padding(5.dp)
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) { expandedContrasenha = !expandedContrasenha },
                             elevation = CardDefaults.cardElevation(4.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surface
@@ -332,7 +357,7 @@ fun UserDetailsScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "Cambiar contraseña",
+                                    text = "Contraseña",
                                     color = MaterialTheme.colorScheme.onBackground,
                                     fontSize = 40.sp,
                                     lineHeight = 40.sp,
@@ -343,63 +368,74 @@ fun UserDetailsScreen(
                                         .padding(horizontal = 15.dp)
                                 )
 
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                TextFieldRegisterYLogin(
-                                    value = viewModel.contrasenha,
-                                    onValueChange = { viewModel.contrasenha = it },
-                                    isPassword = true,
-                                    label = "Nueva contraseña",
-                                    modifier = Modifier.padding(horizontal = 20.dp)
-                                )
-
-                                Spacer(modifier = Modifier.height(20.dp))
-
-                                TextFieldRegisterYLogin(
-                                    value = viewModel.contrasenhaRepetida,
-                                    onValueChange = { viewModel.contrasenhaRepetida = it },
-                                    isPassword = true,
-                                    label = "Repetir contraseña",
-                                    modifier = Modifier.padding(horizontal = 20.dp)
-                                )
-
-                                Spacer(modifier = Modifier.height(30.dp))
-
-                                Button(
-                                    modifier = modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 20.dp),
-                                    enabled = !viewModel.isLoadingContrasenha,
-                                    onClick = { viewModel.cambiarContrasenha(usuario) }
+                                AnimatedVisibility(
+                                    visible = expandedContrasenha,
+                                    enter = expandVertically() + fadeIn(),
+                                    exit = shrinkVertically() + fadeOut()
                                 ) {
-                                    if (viewModel.isLoadingContrasenha) {
-                                        CircularProgressIndicator(
-                                            color = MaterialTheme.colorScheme.onPrimary,
-                                            modifier = Modifier.size(24.dp)
+                                    Column (
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Spacer(modifier = Modifier.height(20.dp))
+
+                                        TextFieldRegisterYLogin(
+                                            value = viewModel.contrasenha,
+                                            onValueChange = { viewModel.contrasenha = it },
+                                            isPassword = true,
+                                            label = "Nueva contraseña",
+                                            modifier = Modifier.padding(horizontal = 20.dp)
                                         )
-                                    } else {
-                                        Text(
-                                            text = "CAMBIAR CONTRASEÑA",
-                                            fontSize = 16.sp,
-                                            fontWeight = FontWeight.Medium
+
+                                        Spacer(modifier = Modifier.height(20.dp))
+
+                                        TextFieldRegisterYLogin(
+                                            value = viewModel.contrasenhaRepetida,
+                                            onValueChange = { viewModel.contrasenhaRepetida = it },
+                                            isPassword = true,
+                                            label = "Repetir contraseña",
+                                            modifier = Modifier.padding(horizontal = 20.dp)
                                         )
+
+                                        Spacer(modifier = Modifier.height(30.dp))
+
+                                        Button(
+                                            modifier = modifier
+                                                .fillMaxWidth()
+                                                .padding(horizontal = 20.dp),
+                                            enabled = !viewModel.isLoadingContrasenha,
+                                            onClick = { viewModel.cambiarContrasenha(usuario) }
+                                        ) {
+                                            if (viewModel.isLoadingContrasenha) {
+                                                CircularProgressIndicator(
+                                                    color = MaterialTheme.colorScheme.onPrimary,
+                                                    modifier = Modifier.size(24.dp)
+                                                )
+                                            } else {
+                                                Text(
+                                                    text = "CAMBIAR CONTRASEÑA",
+                                                    fontSize = 16.sp,
+                                                    fontWeight = FontWeight.Medium
+                                                )
+                                            }
+                                        }
+
+                                        if(viewModel.errorMessageContrasenha !== "") {
+                                            Text(
+                                                text = viewModel.errorMessageContrasenha,
+                                                color = MaterialTheme.colorScheme.error,
+                                                modifier = Modifier.padding(top = 8.dp)
+                                            )
+                                        }
+
+                                        if(viewModel.successMessageContrasenha !== "") {
+                                            Text(
+                                                text = viewModel.successMessageContrasenha,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.padding(top = 8.dp)
+                                            )
+                                        }
                                     }
-                                }
-
-                                if(viewModel.errorMessageContrasenha !== "") {
-                                    Text(
-                                        text = viewModel.errorMessageContrasenha,
-                                        color = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.padding(top = 8.dp)
-                                    )
-                                }
-
-                                if(viewModel.successMessageContrasenha !== "") {
-                                    Text(
-                                        text = viewModel.successMessageContrasenha,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.padding(top = 8.dp)
-                                    )
                                 }
                             }
                         }
@@ -417,6 +453,126 @@ fun UserDetailsScreen(
                         )
 
                         Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    item {
+                        var expandedDireccion by remember { mutableStateOf(false) }
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) { expandedDireccion = !expandedDireccion },
+                            elevation = CardDefaults.cardElevation(4.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .padding(vertical = 30.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Direcciones",
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontSize = 40.sp,
+                                    lineHeight = 40.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 15.dp)
+                                )
+
+                                AnimatedVisibility(
+                                    visible = expandedDireccion,
+                                    enter = expandVertically() + fadeIn(),
+                                    exit = shrinkVertically() + fadeOut()
+                                ) {
+                                    Column (
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Spacer(modifier = Modifier.height(20.dp))
+
+                                        Text(
+                                            text = "WIP: Direcciones"
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    item {
+                        Spacer(modifier = Modifier.height(15.dp))
+
+                        HorizontalDivider(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 16.dp, horizontal = 20.dp),
+                            thickness = 1.dp,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    item {
+                        var expandedFavoritos by remember { mutableStateOf(false) }
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(5.dp)
+                                .clickable(
+                                    indication = null,
+                                    interactionSource = remember { MutableInteractionSource() }
+                                ) { expandedFavoritos = !expandedFavoritos },
+                            elevation = CardDefaults.cardElevation(4.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .wrapContentHeight()
+                                    .padding(vertical = 30.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(
+                                    text = "Libros favoritos",
+                                    color = MaterialTheme.colorScheme.onBackground,
+                                    fontSize = 40.sp,
+                                    lineHeight = 40.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 15.dp)
+                                )
+
+                                AnimatedVisibility(
+                                    visible = expandedFavoritos,
+                                    enter = expandVertically() + fadeIn(),
+                                    exit = shrinkVertically() + fadeOut()
+                                ) {
+                                    Column (
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Spacer(modifier = Modifier.height(20.dp))
+
+                                        Text(
+                                            text = "WIP: Libros favoritos"
+                                        )
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
