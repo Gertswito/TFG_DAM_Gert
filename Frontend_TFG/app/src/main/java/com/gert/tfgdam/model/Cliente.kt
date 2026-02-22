@@ -8,6 +8,6 @@ data class Cliente(
     var usuario: String? = null,
     var email: String? = null,
     var direcciones: List<Direccion> = emptyList(),
-    var librosFavoritos: Set<Libro> = emptySet(),
+    var librosDeseados: Set<Libro> = emptySet(),
     var contrasenha: String? = null
 )

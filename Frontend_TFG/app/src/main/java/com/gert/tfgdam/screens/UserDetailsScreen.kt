@@ -523,7 +523,7 @@ fun UserDetailsScreen(
                     }
 
                     item {
-                        var expandedFavoritos by remember { mutableStateOf(false) }
+                        var expandedDeseados by remember { mutableStateOf(false) }
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -531,7 +531,7 @@ fun UserDetailsScreen(
                                 .clickable(
                                     indication = null,
                                     interactionSource = remember { MutableInteractionSource() }
-                                ) { expandedFavoritos = !expandedFavoritos },
+                                ) { expandedDeseados = !expandedDeseados },
                             elevation = CardDefaults.cardElevation(4.dp),
                             colors = CardDefaults.cardColors(
                                 containerColor = MaterialTheme.colorScheme.surface
@@ -544,7 +544,7 @@ fun UserDetailsScreen(
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
                                 Text(
-                                    text = "Libros favoritos",
+                                    text = "Lista de deseos",
                                     color = MaterialTheme.colorScheme.onBackground,
                                     fontSize = 40.sp,
                                     lineHeight = 40.sp,
@@ -556,7 +556,7 @@ fun UserDetailsScreen(
                                 )
 
                                 AnimatedVisibility(
-                                    visible = expandedFavoritos,
+                                    visible = expandedDeseados,
                                     enter = expandVertically() + fadeIn(),
                                     exit = shrinkVertically() + fadeOut()
                                 ) {
@@ -567,7 +567,7 @@ fun UserDetailsScreen(
                                         Spacer(modifier = Modifier.height(20.dp))
 
                                         Text(
-                                            text = "WIP: Libros favoritos"
+                                            text = "WIP: Lista de deseos"
                                         )
                                     }
                                 }

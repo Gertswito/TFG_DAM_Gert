@@ -42,11 +42,11 @@ public class Cliente implements Serializable {
 
     @ManyToMany
     @JoinTable(
-        name = "cliente_libro_favoritos",
+        name = "deseado",
         joinColumns = @JoinColumn(name = "cliente_id"),
         inverseJoinColumns = @JoinColumn(name = "libro_id")
     )
-    private Set<Libro> librosFavoritos = new HashSet<>();
+    private Set<Libro> librosDeseados = new HashSet<>();
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(name = "contrasenha")
@@ -108,12 +108,12 @@ public class Cliente implements Serializable {
         this.direcciones = direcciones;
     }
 
-    public Set<Libro> getLibrosFavoritos() {
-        return librosFavoritos;
+    public Set<Libro> getLibrosDeseados() {
+        return librosDeseados;
     }
 
-    public void setLibrosFavoritos(Set<Libro> librosFavoritos) {
-        this.librosFavoritos = librosFavoritos;
+    public void setLibrosDeseados(Set<Libro> librosDeseados) {
+        this.librosDeseados = librosDeseados;
     }
 
     public String getContrasenha() {

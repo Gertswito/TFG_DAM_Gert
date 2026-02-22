@@ -111,8 +111,8 @@ public class ClienteService {
             clienteSinActualizar.setDirecciones(cliente.getDirecciones());
         }
 
-        if (cliente.getLibrosFavoritos() != null && !cliente.getLibrosFavoritos().isEmpty()) {
-            clienteSinActualizar.setLibrosFavoritos(cliente.getLibrosFavoritos());
+        if (cliente.getLibrosDeseados() != null && !cliente.getLibrosDeseados().isEmpty()) {
+            clienteSinActualizar.setLibrosDeseados(cliente.getLibrosDeseados());
         }
 
         if (cliente.getRol() != null) {
