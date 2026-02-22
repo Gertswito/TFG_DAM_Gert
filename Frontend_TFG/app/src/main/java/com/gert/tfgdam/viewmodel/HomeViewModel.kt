@@ -16,10 +16,9 @@ class HomeViewModel : ViewModel() {
 
     var libros by mutableStateOf<List<Libro>>(emptyList())
     private set
-
-            init {
-                cargarLibros()
-            }
+    init {
+        cargarLibros()
+    }
 
     private fun cargarLibros() {
         viewModelScope.launch {
@@ -32,8 +31,6 @@ class HomeViewModel : ViewModel() {
                     libros = emptyList()
                 }
             } catch (e: IOException) {
-                libros = emptyList()
-            } catch (e: Exception) {
                 libros = emptyList()
             }
         }

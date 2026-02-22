@@ -18,8 +18,8 @@ class ClienteRepository {
         return api.getPorId(id)
     }
 
-    suspend fun create(cliente: Cliente): Response<Cliente> {
-        return api.create(cliente)
+    suspend fun getPorUsuario(usuario: String): Response<Cliente> {
+        return api.getPorUsuario(usuario)
     }
 
     suspend fun login(cliente: Cliente): String {
@@ -30,6 +30,14 @@ class ClienteRepository {
             val errorBody = response.errorBody()?.string()
             throw Exception(errorBody ?: "Error desconocido del servidor")
         }
+    }
+
+    suspend fun cambiarContrasenha(id: Long, contrasenha: String): Response<Cliente> {
+        return api.cambiarContrasenha(id, contrasenha)
+    }
+
+    suspend fun create(cliente: Cliente): Response<Cliente> {
+        return api.create(cliente)
     }
 
     suspend fun update(id: Long, cliente: Cliente): Response<Cliente> {

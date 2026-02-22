@@ -56,7 +56,7 @@ class RegisterViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     successMessage = "Usuario registrado exitosamente"
 
-                    delay(300)
+                    delay(500)
                     onSuccess()
                 } else {
                     errorMessage = "Error en el registro: ${response.code()}"

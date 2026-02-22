@@ -11,6 +11,9 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long> {
     @EntityGraph(attributePaths = {"direcciones"})
     Optional<Cliente> findWithDireccionesById(Integer id);
 
+    @EntityGraph(attributePaths = {"direcciones"})
+    Optional<Cliente> findWithDireccionesByUsuario(String usuario);
+
     Cliente findByUsuario(String usuario);
     
     boolean existsByUsuario(String usuario);

@@ -17,11 +17,17 @@ interface ClienteApi {
     @GET("api/cliente/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Cliente>
 
-    @POST("api/cliente/new")
-    suspend fun create(@Body cliente: Cliente): Response<Cliente>
+    @GET("api/cliente/get/usuario/{usuario}")
+    suspend fun getPorUsuario(@Path("usuario") usuario: String): Response<Cliente>
 
     @POST("api/cliente/login")
     suspend fun login(@Body cliente: Cliente): Response<JwtResponse>
+
+    @PUT("api/cliente/cambiarContrasenha/{id}")
+    suspend fun cambiarContrasenha(@Path("id") id: Long, @Body contrasenha: String): Response<Cliente>
+
+    @POST("api/cliente/new")
+    suspend fun create(@Body cliente: Cliente): Response<Cliente>
 
     @PUT("api/cliente/update/{id}")
     suspend fun update(

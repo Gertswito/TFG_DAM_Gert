@@ -1,6 +1,6 @@
 package com.gert.tfgdam.model
 
 data class JwtPayload(
-    val usuario: String?,
+    val sub: String?,
     val rol: String?
 )

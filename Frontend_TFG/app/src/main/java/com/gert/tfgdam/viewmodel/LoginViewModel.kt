@@ -51,7 +51,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
                 val role = payload?.rol
 
                 successMessage = "Login exitoso"
-                delay(300)
+                delay(500)
 
                 when (role) {
                     "ADMIN" -> onSuccessAdmin()

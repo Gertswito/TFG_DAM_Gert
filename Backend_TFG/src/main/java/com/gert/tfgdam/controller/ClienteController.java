@@ -47,6 +47,38 @@ public class ClienteController {
         }
     }
 
+    @GetMapping("/get/usuario/{usuario}")
+    public ResponseEntity<Cliente> getClientePorUsuario(@PathVariable String usuario) {
+        try {
+            return ResponseEntity.ok(clienteService.getClientePorUsuario(usuario));
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<Map<String, String>> login(@RequestBody Cliente cliente) {
+        String token = clienteService.login(cliente);
+        Map<String, String> response = new HashMap<>();
+        response.put("token", token);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/cambiarContrasenha/{id}")
+    public ResponseEntity<Cliente> cambiarContrasenha(@PathVariable Long id, @RequestBody String contrasenha) {
+        try {
+            if (clienteService.getClientePorId(id) != null) {
+                String contrasenhaSinComillas = contrasenha.replace("\"", "");
+                clienteService.cambiarContrasenha(id, contrasenhaSinComillas);
+                return ResponseEntity.ok(clienteService.getClientePorId(id));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
@@ -66,14 +98,6 @@ public class ClienteController {
         } catch (ResponseStatusException ex) {
             return ResponseEntity.status(ex.getStatusCode()).body(Map.of("error", ex.getReason()));
         }
-    }
-
-    @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Cliente cliente) {
-        String token = clienteService.login(cliente);
-        Map<String, String> response = new HashMap<>();
-        response.put("token", token);
-        return ResponseEntity.ok(response);
     }
 
     @PutMapping("/update/{id}")

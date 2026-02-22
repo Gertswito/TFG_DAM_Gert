@@ -185,7 +185,7 @@ fun TextFieldRegisterYLogin(
                 if (it.length <= 150) onValueChange(it)
             },
             label = { Text(label) },
-            modifier = modifier,
+            modifier = modifier.fillMaxWidth(),
             singleLine = true,
             maxLines = 1,
             visualTransformation = PasswordVisualTransformation(),
@@ -214,7 +214,7 @@ fun TextFieldRegisterYLogin(
                 if (it.length <= 150) onValueChange(it)
             },
             label = { Text(label) },
-            modifier = modifier,
+            modifier = modifier.fillMaxWidth(),
             singleLine = true,
             maxLines = 1,
             colors = TextFieldDefaults.colors(

@@ -1,6 +1,7 @@
 package com.gert.tfgdam.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -32,7 +33,33 @@ public class ClienteService {
     }
 
     public Cliente getClientePorId(Long id) {
-        return clienteRepository.findWithDireccionesById(id.intValue()).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));    
+        return clienteRepository.findWithDireccionesById(id.intValue()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));    
+    }
+
+    public Cliente getClientePorUsuario(String usuario) { 
+        return clienteRepository.findWithDireccionesByUsuario(usuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));    
+    }
+
+    public String login(Cliente cliente) {
+        if (!clienteRepository.existsByUsuario(cliente.getUsuario())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha encontrado al usuario");
+        }
+        Cliente usuario = clienteRepository.findByUsuario(cliente.getUsuario());
+
+        if (!passwordEncoder.matches(cliente.getContrasenha(), usuario.getContrasenha())) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "La contraseña es incorrecta");
+        }
+
+        return jwtTokenUtil.generateToken(usuario.getUsuario(), usuario.getRol());
+    }
+
+    public Cliente cambiarContrasenha(Long id, String contrasenha) {
+        Cliente clienteExistente = clienteRepository.findById(id).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));
+
+        BCryptPasswordEncoder newPasswordEncoder = new BCryptPasswordEncoder();
+        clienteExistente.setContrasenha(newPasswordEncoder.encode(contrasenha));
+
+        return clienteRepository.save(clienteExistente);
     }
 
     public void delete(Long id) {
@@ -64,24 +91,34 @@ public class ClienteService {
         return clienteRepository.save(cliente);
     }
 
-    public String login(Cliente cliente) {
-        if (!clienteRepository.existsByUsuario(cliente.getUsuario())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se ha encontrado al usuario");
-        }
-        Cliente usuario = clienteRepository.findByUsuario(cliente.getUsuario());
-
-        if (!passwordEncoder.matches(cliente.getContrasenha(), usuario.getContrasenha())) {
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "La contraseña es incorrecta");
-        }
-
-        return jwtTokenUtil.generateToken(usuario.getUsuario(), usuario.getRol());
-    }
-
     public Cliente update(Cliente cliente) {
-        Cliente existente = clienteRepository.findByUsuario(cliente.getUsuario());
-        if (existente != null && !existente.getId().equals(cliente.getId())) {
+        Cliente clienteExistente = clienteRepository.findByUsuario(cliente.getUsuario());
+        if (clienteExistente != null && !clienteExistente.getId().equals(cliente.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de usuario ya está en uso");
         }
-        return clienteRepository.save(cliente);
+
+        Cliente clienteSinActualizar = clienteRepository.findById(cliente.getId().longValue()).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));
+        clienteSinActualizar.setEmail(cliente.getEmail());
+        clienteSinActualizar.setNombre(cliente.getNombre());
+        clienteSinActualizar.setApellidos(cliente.getApellidos());
+        
+        if (cliente.getContrasenha() != null && !cliente.getContrasenha().isEmpty()) {
+            BCryptPasswordEncoder newPasswordEncoder = new BCryptPasswordEncoder();
+            clienteSinActualizar.setContrasenha(newPasswordEncoder.encode(cliente.getContrasenha()));
+        }
+
+        if (cliente.getDirecciones() != null && !cliente.getDirecciones().isEmpty()) {
+            clienteSinActualizar.setDirecciones(cliente.getDirecciones());
+        }
+
+        if (cliente.getLibrosFavoritos() != null && !cliente.getLibrosFavoritos().isEmpty()) {
+            clienteSinActualizar.setLibrosFavoritos(cliente.getLibrosFavoritos());
+        }
+
+        if (cliente.getRol() != null) {
+            clienteSinActualizar.setRol(cliente.getRol());
+        }
+
+        return clienteRepository.save(clienteSinActualizar);
     }
 }
