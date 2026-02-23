@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gert.tfgdam.api.ApiError
 import com.gert.tfgdam.model.Cliente
+import com.gert.tfgdam.model.Direccion
 import com.gert.tfgdam.repository.ClienteRepository
 import com.gert.tfgdam.util.JwtManager
 import com.google.gson.Gson
@@ -39,6 +40,14 @@ class UserDetailsViewModel() : ViewModel() {
     var errorMessageEditar by mutableStateOf("")
     var successMessageEditar by mutableStateOf("")
 
+    var idDireccionEditar by mutableStateOf("")
+    var calleEditar by mutableStateOf("")
+    var numeroEditar by mutableStateOf("")
+    var pisoEditar by mutableStateOf("")
+    var ciudadEditar by mutableStateOf("")
+    var provinciaEditar by mutableStateOf("")
+    var codigoPostalEditar by mutableStateOf("")
+
     fun cargarUsuarioSesion(context: Context) {
         viewModelScope.launch {
             isLoading = true
@@ -68,65 +77,6 @@ class UserDetailsViewModel() : ViewModel() {
                 isLoading = false
             }
         }
-    }
-
-    fun cambiarContrasenha(usuario: Cliente, onSuccess: () -> Unit = {}) {
-        viewModelScope.launch {
-            isLoadingContrasenha = true
-            errorMessageContrasenha = ""
-            successMessageContrasenha = ""
-
-            try {
-                val usuarioId = usuario.id
-                val contrasenhaTrim = contrasenha.trim()
-                val contrasenhaRepetidaTrim = contrasenhaRepetida.trim()
-
-
-                if (contrasenhaTrim.isBlank() || contrasenhaRepetidaTrim.isBlank()) {
-                    errorMessageContrasenha = "Por favor, rellene todos los campos"
-                    isLoadingContrasenha = false
-
-                    restaurarContrasenha()
-                    return@launch
-                }
-
-                if (contrasenhaTrim != contrasenhaRepetidaTrim) {
-                    errorMessageContrasenha = "Las contraseñas no coinciden"
-                    isLoadingContrasenha = false
-
-                    restaurarContrasenha()
-                    return@launch
-                }
-
-                if (usuarioId == null) {
-                    errorMessageContrasenha = "No se ha cargado el usuario"
-                    isLoadingContrasenha = false
-
-                    restaurarContrasenha()
-                    return@launch
-                }
-
-                val response = repository.cambiarContrasenha(usuarioId, contrasenhaTrim)
-                if (response.isSuccessful) {
-                    successMessageContrasenha = "Contraseña cambiada exitosamente"
-                    onSuccess()
-                } else {
-                    errorMessageContrasenha = "Error al cambiar la contraseña: ${response.code()}"
-                }
-            } catch (e: IOException) {
-                val errorJson = e.message.toString()
-                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
-                errorMessageContrasenha = apiError.message ?: "Error desconocido"
-            } finally {
-                isLoadingContrasenha = false
-                restaurarContrasenha()
-            }
-        }
-    }
-
-    fun restaurarContrasenha() {
-        contrasenha = ""
-        contrasenhaRepetida = ""
     }
 
     fun editarFormulario(usuario: Cliente, onSuccess: () -> Unit = {}) {
@@ -204,5 +154,84 @@ class UserDetailsViewModel() : ViewModel() {
         nombreCambiado = usuario.nombre ?: ""
         apellidosCambiados = usuario.apellidos ?: ""
         emailCambiado = usuario.email ?: ""
+    }
+
+    fun cambiarContrasenha(usuario: Cliente, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            isLoadingContrasenha = true
+            errorMessageContrasenha = ""
+            successMessageContrasenha = ""
+
+            try {
+                val usuarioId = usuario.id
+                val contrasenhaTrim = contrasenha.trim()
+                val contrasenhaRepetidaTrim = contrasenhaRepetida.trim()
+
+
+                if (contrasenhaTrim.isBlank() || contrasenhaRepetidaTrim.isBlank()) {
+                    errorMessageContrasenha = "Por favor, rellene todos los campos"
+                    isLoadingContrasenha = false
+
+                    restaurarContrasenha()
+                    return@launch
+                }
+
+                if (contrasenhaTrim != contrasenhaRepetidaTrim) {
+                    errorMessageContrasenha = "Las contraseñas no coinciden"
+                    isLoadingContrasenha = false
+
+                    restaurarContrasenha()
+                    return@launch
+                }
+
+                if (usuarioId == null) {
+                    errorMessageContrasenha = "No se ha cargado el usuario"
+                    isLoadingContrasenha = false
+
+                    restaurarContrasenha()
+                    return@launch
+                }
+
+                val response = repository.cambiarContrasenha(usuarioId, contrasenhaTrim)
+                if (response.isSuccessful) {
+                    successMessageContrasenha = "Contraseña cambiada exitosamente"
+                    onSuccess()
+                } else {
+                    errorMessageContrasenha = "Error al cambiar la contraseña: ${response.code()}"
+                }
+            } catch (e: IOException) {
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
+                errorMessageContrasenha = apiError.message ?: "Error desconocido"
+            } finally {
+                isLoadingContrasenha = false
+                restaurarContrasenha()
+            }
+        }
+    }
+
+    fun restaurarContrasenha() {
+        contrasenha = ""
+        contrasenhaRepetida = ""
+    }
+
+    fun restaurarCamposDireccion(direccion: Direccion? = null) {
+        if (direccion != null) {
+            calleEditar = direccion.calle ?: ""
+            numeroEditar = direccion.numero.toString() ?: ""
+            pisoEditar = direccion.piso ?: ""
+            ciudadEditar = direccion.ciudad ?: ""
+            provinciaEditar = direccion.provincia ?: ""
+            codigoPostalEditar = direccion.codigoPostal ?: ""
+            idDireccionEditar = direccion.id.toString() ?: ""
+        } else {
+            calleEditar = ""
+            numeroEditar = ""
+            pisoEditar = ""
+            ciudadEditar = ""
+            provinciaEditar = ""
+            codigoPostalEditar = ""
+            idDireccionEditar = ""
+        }
     }
 }

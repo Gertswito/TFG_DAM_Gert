@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -44,12 +45,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Surface
+import androidx.compose.material3.TextField
+import androidx.compose.ui.window.Dialog
 import com.gert.tfgdam.model.Direccion
-import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.viewmodel.UserDetailsViewModel
 
 @Composable
@@ -570,22 +574,34 @@ fun UserDetailsScreen(
                                             )
                                         } else {
                                             usuario.direcciones.forEach { direccion ->
-                                                DireccionItem(direccion)
+                                                DireccionItem(direccion, false, viewModel)
                                             }
                                         }
 
                                         Spacer(modifier = Modifier.height(20.dp))
 
+                                        var abrirModalEditarDireccion by remember { mutableStateOf(false) }
                                         Button(
                                             modifier = modifier
                                                 .fillMaxWidth()
                                                 .padding(horizontal = 20.dp),
-                                            onClick = { /* TODO */ }
+                                            onClick = { abrirModalEditarDireccion = true }
                                         ) {
                                             Text(
                                                 text = "AÑADIR DIRECCIÓN",
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.Medium
+                                            )
+                                        }
+
+                                        if (abrirModalEditarDireccion) {
+                                            EditarDireccionModal(
+                                                showDialog = abrirModalEditarDireccion,
+                                                direccionEditar = null,
+                                                onDismiss = { abrirModalEditarDireccion = false },
+                                                onSave = {
+                                                    abrirModalEditarDireccion = false
+                                                }
                                             )
                                         }
                                     }
@@ -602,7 +618,8 @@ fun UserDetailsScreen(
 @Composable
 fun DireccionItem(
     direccion: Direccion,
-    isEditarDireccion: Boolean = false
+    isModalEditarClicked: Boolean = false,
+    viewModel: UserDetailsViewModel = viewModel()
 ) {
     Card(
         modifier = Modifier
@@ -716,14 +733,203 @@ fun DireccionItem(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.End
                 ) {
+                    var abrirModalEditarDireccion by remember { mutableStateOf(false) }
                     Button(
                         modifier = Modifier.width(65.dp),
-                        onClick = { /* TODO */ }
+                        onClick = { abrirModalEditarDireccion = true }
                     ) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Editar",
                             tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+
+                    if (abrirModalEditarDireccion) {
+                        EditarDireccionModal(
+                            showDialog = abrirModalEditarDireccion,
+                            direccionEditar = direccion,
+                            onDismiss = { abrirModalEditarDireccion = false },
+                            onSave = {
+                                abrirModalEditarDireccion = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EditarDireccionModal(
+    showDialog: Boolean,
+    direccionEditar: Direccion? = null,
+    viewModel: UserDetailsViewModel = viewModel(),
+    onDismiss: () -> Unit,
+    onSave: (String) -> Unit
+) {
+    if (showDialog) {
+        viewModel.restaurarCamposDireccion(direccionEditar)
+        Dialog(
+            onDismissRequest = {
+                onDismiss()
+                viewModel.restaurarCamposDireccion(null)
+            }
+        ) {
+            Surface(
+                shape = RoundedCornerShape(8.dp),
+                color = MaterialTheme.colorScheme.background,
+                tonalElevation = 8.dp
+            ) {
+                Box(modifier = Modifier.fillMaxWidth()) {
+                    Column(
+                        modifier = Modifier
+                            .wrapContentHeight()
+                            .padding(vertical = 30.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        if (direccionEditar != null) {
+                            Text(
+                                text = "Editar",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = 40.sp,
+                                lineHeight = 40.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 15.dp)
+                            )
+                        } else {
+                            Text(
+                                text = "Crear",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = 40.sp,
+                                lineHeight = 40.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 15.dp)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp, horizontal = 8.dp)
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.primary,
+                                    shape = MaterialTheme.shapes.medium
+                                ),
+                            elevation = CardDefaults.cardElevation(2.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.background
+                            )
+                        ) {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                TextFieldRegisterYLogin(
+                                    value = viewModel.calleEditar,
+                                    onValueChange = {
+                                        viewModel.calleEditar = it
+                                    },
+                                    label = "Calle",
+                                    modifier = Modifier.padding(horizontal = 10.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    TextFieldRegisterYLogin(
+                                        value = viewModel.numeroEditar,
+                                        onValueChange = {
+                                            viewModel.numeroEditar = it
+                                        },
+                                        label = "Número",
+                                        modifier = Modifier.padding(start = 10.dp, end = 5.dp).weight(1f)
+                                    )
+
+                                    TextFieldRegisterYLogin(
+                                        value = viewModel.pisoEditar,
+                                        onValueChange = {
+                                            viewModel.pisoEditar = it
+                                        },
+                                        label = "Piso",
+                                        modifier = Modifier.padding(start = 5.dp, end = 10.dp).weight(1f)
+                                    )
+                                }
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                TextFieldRegisterYLogin(
+                                    value = viewModel.ciudadEditar,
+                                    onValueChange = {
+                                        viewModel.ciudadEditar = it
+                                    },
+                                    label = "Ciudad",
+                                    modifier = Modifier.padding(horizontal = 10.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                TextFieldRegisterYLogin(
+                                    value = viewModel.provinciaEditar,
+                                    onValueChange = {
+                                        viewModel.provinciaEditar = it
+                                    },
+                                    label = "Provincia",
+                                    modifier = Modifier.padding(horizontal = 10.dp)
+                                )
+
+                                Spacer(modifier = Modifier.height(20.dp))
+
+                                TextFieldRegisterYLogin(
+                                    value = viewModel.codigoPostalEditar,
+                                    onValueChange = {
+                                        viewModel.codigoPostalEditar = it
+                                    },
+                                    label = "Código postal",
+                                    modifier = Modifier.padding(horizontal = 10.dp)
+                                )
+                            }
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                            onClick = { /* TODO */ }
+                        ) {
+                            Text (
+                                text = "GUARDAR",
+                            )
+                        }
+                    }
+
+                    IconButton(
+                        onClick = { onDismiss() },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(4.dp)
+                            .size(24.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar",
+                            tint = MaterialTheme.colorScheme.onBackground
                         )
                     }
                 }
