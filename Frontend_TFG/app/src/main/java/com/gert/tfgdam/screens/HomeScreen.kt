@@ -20,10 +20,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -113,7 +116,7 @@ fun HomeScreen(
 
                 item {
                     LazyRow(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
 
                         val librosLimitados = librosDelTipo.take(5)
@@ -126,7 +129,7 @@ fun HomeScreen(
                             item {
                                 Card(
                                     modifier = Modifier
-                                        .padding(8.dp)
+                                        .padding(4.dp)
                                         .width(150.dp)
                                         .height(270.dp)
                                         .clickable { navController.navigate(Routes.TIPO_LIBRO_GENEROS.replace("{tipoLibro}", tipo?.nombre ?: "Sin nombre")) },
@@ -167,8 +170,8 @@ fun LibroItem(
 ) {
     Card(
         modifier = Modifier
-            .padding(8.dp)
-            .width(150.dp)
+            .padding(4.dp)
+            .width(160.dp)
             .height(270.dp),
         elevation = CardDefaults.cardElevation(4.dp),
         colors = CardDefaults.cardColors(
@@ -176,51 +179,69 @@ fun LibroItem(
         ),
         onClick = { navController.navigate(Routes.LIBRO_DETAILS.replace("{libroId}", libro.id.toString())) }
     ) {
-        Column(
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxSize()
+        Box(
+            modifier = Modifier.fillMaxSize() // Permite superposición
         ) {
-            AsyncImage(
-                model = libro.portada,
-                contentDescription = libro.titulo,
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .height(150.dp),
-                contentScale = ContentScale.Fit
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            Text(
-                text = libro.titulo ?: "Sin título",
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.weight(1f))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .fillMaxSize()
+                    .padding(8.dp)
             ) {
-                val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
-                val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+                AsyncImage(
+                    model = libro.portada,
+                    contentDescription = libro.titulo,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    contentScale = ContentScale.Fit
+                )
+
+                Spacer(modifier = Modifier.height(10.dp))
+
                 Text(
-                    text = formatoDinero.format(libro.precio ?: 0.00),
-                    color = MaterialTheme.colorScheme.primary,
+                    text = libro.titulo ?: "Sin título",
                     fontWeight = FontWeight.Bold,
+                    fontSize = 16.sp,
+                    textAlign = TextAlign.Center,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                BotonAñadirCarrito(libro)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
+                    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+                    Text(
+                        text = formatoDinero.format(libro.precio ?: 0.00),
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Bold,
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    BotonAñadirCarrito(libro)
+                }
+            }
+
+            IconButton(
+                onClick = { /* TODO */ },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(2.dp)
+                    .size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = "Añadir a la lista de deseados",
+                    tint = Color.Red
+                )
             }
         }
     }

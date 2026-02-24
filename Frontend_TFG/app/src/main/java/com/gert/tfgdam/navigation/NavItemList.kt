@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.ShoppingCart
 import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.util.JwtManager
 import kotlinx.coroutines.flow.Flow
@@ -15,6 +16,7 @@ object NavItemList {
         JwtManager.getToken(context).collect { token ->
             val items = if (!token.isNullOrEmpty()) {
                 listOf(
+                    NavItem("Carrito", Icons.Default.ShoppingCart, Routes.CARRITO),
                     NavItem("User Details", Icons.Default.AccountBox, Routes.USER_SETTINGS)
                 )
             } else {

@@ -64,7 +64,7 @@ fun TipoLibroGeneroSelectedScreen (
             columns = GridCells.Adaptive(minSize = 140.dp),
             modifier = modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(8.dp),
             contentPadding = PaddingValues(8.dp)
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {

@@ -8,9 +8,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.gert.tfgdam.routes.Routes
+import com.gert.tfgdam.screens.CarritoScreen
+import com.gert.tfgdam.screens.HistorialCompraScreen
 import com.gert.tfgdam.screens.HomeAdminScreen
 import com.gert.tfgdam.screens.HomeScreen
 import com.gert.tfgdam.screens.LibroDetailsScreen
+import com.gert.tfgdam.screens.ListaDeseadosScreen
 import com.gert.tfgdam.screens.LoginScreen
 import com.gert.tfgdam.screens.RegisterScreen
 import com.gert.tfgdam.screens.TipoLibroGeneroSelectedScreen
@@ -91,5 +94,11 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
                 modifier = Modifier,
             )
         }
+
+        composable(Routes.CARRITO) { CarritoScreen(navController = navController) }
+
+        composable(Routes.HISTORIAL_COMPRA) { HistorialCompraScreen() }
+
+        composable(Routes.LISTA_DESEADOS) { ListaDeseadosScreen() }
     }
 }

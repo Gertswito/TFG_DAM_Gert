@@ -18,4 +18,4 @@ val NegroClarito = Color(0xFF1E1E1E)
 
 val BlancoOscurito = Color(0xFFDCDCDC)
 
-val ErrorRojo = Color(0xFFFF304D)
+val ErrorRojo = Color(0xFFFF0024)
