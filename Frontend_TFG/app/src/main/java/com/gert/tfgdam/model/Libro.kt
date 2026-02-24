@@ -11,6 +11,6 @@ data class Libro(
     var fechaSalida: String? = null,
     var descripcion: String? = null,
     var precio: Double? = null,
-    var stock: Integer? = null,
+    var stock: Int? = null,
     var generos: List<Genero> = emptyList(),
 )

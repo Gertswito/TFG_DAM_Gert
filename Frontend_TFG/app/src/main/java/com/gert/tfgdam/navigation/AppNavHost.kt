@@ -16,6 +16,7 @@ import com.gert.tfgdam.screens.RegisterScreen
 import com.gert.tfgdam.screens.TipoLibroGeneroSelectedScreen
 import com.gert.tfgdam.screens.TipoLibroGenerosScreen
 import com.gert.tfgdam.screens.UserDetailsScreen
+import com.gert.tfgdam.screens.UserSettingsScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController, startDestination: String) {
@@ -39,7 +40,7 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
             )
         }
 
-        composable(Routes.USER_DETAILS) { UserDetailsScreen() }
+        composable(Routes.USER_SETTINGS) { UserSettingsScreen() }
 
         composable(
             route = Routes.TIPO_LIBRO_GENEROS,

@@ -15,7 +15,7 @@ object NavItemList {
         JwtManager.getToken(context).collect { token ->
             val items = if (!token.isNullOrEmpty()) {
                 listOf(
-                    NavItem("User Details", Icons.Default.AccountBox, Routes.USER_DETAILS)
+                    NavItem("User Details", Icons.Default.AccountBox, Routes.USER_SETTINGS)
                 )
             } else {
                 listOf(
