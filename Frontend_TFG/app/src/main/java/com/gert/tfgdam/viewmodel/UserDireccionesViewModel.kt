@@ -15,6 +15,7 @@ import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import okio.IOException
+import org.json.JSONObject
 
 class UserDireccionesViewModel : ViewModel() {
     private val repository = DireccionRepository()
@@ -96,7 +97,14 @@ class UserDireccionesViewModel : ViewModel() {
                     delay(500)
                     onSuccess(response.body()!!)
                 } else {
-                    errorMessage = "Error al crear dirección"
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("error")
+                    } catch (e: Exception) {
+                        "Error en el registro"
+                    }
                 }
             } catch (e: IOException) {
                 val errorJson = e.message.toString()

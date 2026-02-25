@@ -15,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import okio.IOException
+import org.json.JSONObject
 
 class UserSettingsViewModel() : ViewModel() {
     private val repository = ClienteRepository()
@@ -109,7 +110,14 @@ class UserSettingsViewModel() : ViewModel() {
                     isEditarClicked = false
                     onSuccess()
                 } else {
-                    errorMessageEditar = "Error al actualizar el usuario: ${response.code()}"
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("error")
+                    } catch (e: Exception) {
+                        "Error en el registro"
+                    }
                     restaurarCamposUsuario(usuario)
                 }
             } catch (e: IOException) {

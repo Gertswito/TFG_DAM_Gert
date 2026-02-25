@@ -5,6 +5,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.gert.tfgdam.entity.Cliente;
 import com.gert.tfgdam.service.ClienteService;
+import com.gert.tfgdam.service.EmailService;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -29,8 +30,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class ClienteController {
     private final ClienteService clienteService;
 
-    public ClienteController(ClienteService clienteService) {
+    private final EmailService emailService;
+
+    public ClienteController(ClienteService clienteService, EmailService emailService) {
         this.clienteService = clienteService;
+        this.emailService = emailService;
     }
 
     @GetMapping("/get")
@@ -92,9 +96,16 @@ public class ClienteController {
     @PostMapping("/new")
     public ResponseEntity<Object> create(@RequestBody Cliente cliente) throws URISyntaxException {
         try {
-            Cliente nuevaCliente = clienteService.save(cliente);
-            URI location = new URI("/new/" + nuevaCliente.getId());
-            return ResponseEntity.created(location).body(nuevaCliente);
+            Cliente nuevoCliente = clienteService.save(cliente);
+
+            String asunto = "Bienvenido a Librerías Gert";
+            String nombre = nuevoCliente.getNombre() + " " + nuevoCliente.getApellidos();
+            String cuerpo = String.format("Hola %s,\n\nGracias por registrarte en Librerías Gert. Tu cuenta ha sido creada correctamente y ya puede iniciar sesión.\n\nAtentamente, el equipo de Librerías Gert", nombre);
+
+            emailService.enviarCorreo(nuevoCliente.getEmail(), asunto, cuerpo);
+
+            URI location = new URI("/new/" + nuevoCliente.getId());
+            return ResponseEntity.created(location).body(nuevoCliente);
         } catch (ResponseStatusException ex) {
             return ResponseEntity.status(ex.getStatusCode()).body(Map.of("error", ex.getReason()));
         }

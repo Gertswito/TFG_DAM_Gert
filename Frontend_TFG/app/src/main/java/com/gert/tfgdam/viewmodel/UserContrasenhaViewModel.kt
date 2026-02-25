@@ -11,6 +11,7 @@ import com.gert.tfgdam.repository.ClienteRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.launch
 import okio.IOException
+import org.json.JSONObject
 
 class UserContrasenhaViewModel : ViewModel() {
     private val repository = ClienteRepository()
@@ -63,7 +64,14 @@ class UserContrasenhaViewModel : ViewModel() {
                     successMessage = "Contraseña cambiada exitosamente"
                     onSuccess()
                 } else {
-                    errorMessage = "Error al cambiar la contraseña: ${response.code()}"
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("error")
+                    } catch (e: Exception) {
+                        "Error en el registro"
+                    }
                 }
             } catch (e: IOException) {
                 val errorJson = e.message.toString()

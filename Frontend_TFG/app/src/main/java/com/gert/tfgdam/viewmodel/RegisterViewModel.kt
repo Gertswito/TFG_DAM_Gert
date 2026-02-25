@@ -11,6 +11,7 @@ import com.gert.tfgdam.repository.ClienteRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class RegisterViewModel : ViewModel() {
     private val repository = ClienteRepository()
@@ -59,7 +60,14 @@ class RegisterViewModel : ViewModel() {
                     delay(500)
                     onSuccess()
                 } else {
-                    errorMessage = "Error en el registro: ${response.code()}"
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("error")
+                    } catch (e: Exception) {
+                        "Error en el registro"
+                    }
                 }
             } catch (e: Exception) {
                 val errorJson = e.message.toString()
