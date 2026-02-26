@@ -7,15 +7,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.gert.tfgdam.entity.Cliente;
 import com.gert.tfgdam.entity.Libro;
+import com.gert.tfgdam.repository.ClienteRepository;
 import com.gert.tfgdam.repository.LibroRepository;
 
 @Service
 public class LibroService {
     private final LibroRepository libroRepository;
+    private final ClienteRepository clienteRepository;
 
-    public LibroService(LibroRepository libroRepository) {
+    public LibroService(LibroRepository libroRepository, ClienteRepository clienteRepository) {
         this.libroRepository = libroRepository;
+        this.clienteRepository = clienteRepository;
     }
 
     public List<Libro> getAllLibro() {
@@ -44,6 +48,14 @@ public class LibroService {
         return libroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro"));
     }
 
+    public Libro getLibroEnListaDeseados(Integer id, String usuario) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
+        if (cliente == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el usuario");
+        }
+        return cliente.getLibrosDeseados().stream().filter(libro -> libro.getId().equals(id)).findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Libro no está en lista de deseados"));
+    }
+
     public void delete(Long id) {
         if (!libroRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro");
@@ -68,6 +80,30 @@ public class LibroService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre del libro ya está registrado");
         }
         return libroRepository.save(libro);
+    }
+
+    public void addLibroListaDeseados(Long id, Cliente clienteSoloUsuario) {
+        Libro libro = libroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro"));
+        Cliente cliente = clienteRepository.findByUsuario(clienteSoloUsuario.getUsuario());
+        if (cliente == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el usuario");
+        }
+        cliente.getLibrosDeseados().add(libro);
+        clienteRepository.save(cliente);
+    }
+
+    public void deleteLibroListaDeseados(Long id, String usuario) {
+        Libro libro = libroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro"));
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
+        if (cliente == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el usuario");
+        }
+        if (cliente.getLibrosDeseados().contains(libro)) {
+            cliente.getLibrosDeseados().remove(libro); 
+            clienteRepository.save(cliente);
+        } else {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "El libro no estaba en la lista de deseados");
+        }
     }
 }
 

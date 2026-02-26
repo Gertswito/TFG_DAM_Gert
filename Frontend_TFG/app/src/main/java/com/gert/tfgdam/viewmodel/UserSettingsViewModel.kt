@@ -116,7 +116,7 @@ class UserSettingsViewModel() : ViewModel() {
                         val jsonObject = JSONObject(errorJson ?: "")
                         jsonObject.getString("error")
                     } catch (e: Exception) {
-                        "Error en el registro"
+                        "Error al actualizar el usuario"
                     }
                     restaurarCamposUsuario(usuario)
                 }

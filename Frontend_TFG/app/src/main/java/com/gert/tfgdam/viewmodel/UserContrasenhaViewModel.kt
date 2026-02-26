@@ -70,7 +70,7 @@ class UserContrasenhaViewModel : ViewModel() {
                         val jsonObject = JSONObject(errorJson ?: "")
                         jsonObject.getString("error")
                     } catch (e: Exception) {
-                        "Error en el registro"
+                        "Error al cambiar la contraseña"
                     }
                 }
             } catch (e: IOException) {

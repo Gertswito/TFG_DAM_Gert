@@ -3,6 +3,7 @@ package com.gert.tfgdam.controller;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.gert.tfgdam.entity.Cliente;
 import com.gert.tfgdam.entity.Libro;
 import com.gert.tfgdam.service.LibroService;
 
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -43,7 +45,7 @@ public class LibroController {
     }
 
     @GetMapping("/get/tipo/{tipo-libro}/genero/{genero}")
-    public List<Libro> getAllLibroPorTipo(@PathVariable("tipo-libro") String tipoLibro, @PathVariable("genero") String genero) {
+    public List<Libro> getAllLibroPorTipoGenero(@PathVariable("tipo-libro") String tipoLibro, @PathVariable("genero") String genero) {
         return libroService.getAllLibroPorTipoGenero(tipoLibro, genero);
     }
 
@@ -54,6 +56,12 @@ public class LibroController {
         } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/get/lista-deseados/{id}/{usuario}")
+    public ResponseEntity<Libro> getLibroEnListaDeseados(@PathVariable Integer id, @PathVariable String usuario) {
+        Libro libro = libroService.getLibroEnListaDeseados(id, usuario);
+        return ResponseEntity.ok(libro);
     }
 
     @DeleteMapping("/delete/{id}")
@@ -89,5 +97,17 @@ public class LibroController {
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @PostMapping("/lista-deseados/add/{id}")
+    public ResponseEntity<Void>addLibroListaDeseados(@PathVariable Long id, @RequestBody Cliente cliente) {
+        libroService.addLibroListaDeseados(id, cliente);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/lista-deseados/delete/{id}/{usuario}")
+    public ResponseEntity<Void>deleteLibroListaDeseados(@PathVariable Long id, @PathVariable String usuario) {
+        libroService.deleteLibroListaDeseados(id, usuario);
+        return ResponseEntity.noContent().build();
     }
 }

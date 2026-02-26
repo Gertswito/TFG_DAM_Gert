@@ -1,7 +1,6 @@
 package com.gert.tfgdam.screens
 
-import android.content.Context
-import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,10 +9,13 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -34,6 +36,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
+import com.gert.tfgdam.model.JwtPayload
+import com.gert.tfgdam.model.Libro
 import com.gert.tfgdam.util.JwtManager
 import com.gert.tfgdam.viewmodel.LibroDetailsViewModel
 import java.text.NumberFormat
@@ -47,9 +51,14 @@ fun LibroDetailsScreen(
 ) {
     val libroEspecifico = viewModel.libroEspecifico
     var showEmpty by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
 
-    LaunchedEffect(libroId) {
-        viewModel.cargarLibrosPorTipo(libroId)
+    LaunchedEffect(libroId, userInfo) {
+        viewModel.cargarLibrosDetail(libroId)
+        userInfo?.sub?.let { usuario ->
+            viewModel.buscarLibroEnListaDeseados(libroId, usuario)
+        }
     }
 
     if (libroEspecifico == null && showEmpty) {
@@ -127,7 +136,13 @@ fun LibroDetailsScreen(
 
             item {
                 if(libroEspecifico !== null) {
-                    BotonAñadirCarrito(libroEspecifico, true)
+                    Column (
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        BotonAddListaDeseados(viewModel, userInfo, libroEspecifico, viewModel.isLibroYaDeseado)
+                        BotonAddCarritoDesdeDetails(libroEspecifico, userInfo)
+                    }
                 }
             }
 
@@ -185,5 +200,97 @@ fun LibroDetailsScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+fun BotonAddCarritoDesdeDetails(
+    libroEspecifico: Libro,
+    userInfo: JwtPayload? = null,
+) {
+    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
+    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+    val esUser = userInfo?.rol == "USER"
+
+    Button(
+        modifier = Modifier.fillMaxWidth(),
+        enabled = esUser,
+        onClick = { /*TODO*/ },
+    ) {
+        Text(
+            text = ("AÑADIR AL CARRITO - ") + (libroEspecifico.precio?.let {
+                formatoDinero.format(
+                    it
+                )
+            } ?: "N/A"),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+@Composable
+fun BotonAddListaDeseados(
+    viewModel: LibroDetailsViewModel = viewModel(),
+    userInfo: JwtPayload? = null,
+    libroEspecifico: Libro,
+    isLibroYaDeseado: Boolean = false,
+) {
+    val esUser = userInfo?.rol == "USER"
+
+    if (!isLibroYaDeseado) {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = esUser && !viewModel.isLoadingDeseado,
+            onClick = { viewModel.addLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "") },
+        ) {
+            if (viewModel.isLoadingDeseado) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            } else {
+                Text(
+                    text = ("AÑADIR A LISTA DE DESEOS"),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    } else {
+        Button(
+            modifier = Modifier.fillMaxWidth(),
+            enabled = esUser && !viewModel.isLoadingDeseado,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.background,
+                contentColor = MaterialTheme.colorScheme.onBackground,
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.onBackground
+            ),
+            onClick = { viewModel.deleteLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "") },
+        ) {
+            if (viewModel.isLoadingDeseado) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    modifier = Modifier.size(24.dp)
+                )
+            } else {
+                Text(
+                    text = ("QUITAR DE LISTA DE DESEOS"),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+        }
+    }
+
+    if (viewModel.errorMessageDeseado !== "") {
+        Text(
+            text = viewModel.errorMessageDeseado,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(top = 8.dp)
+        )
     }
 }

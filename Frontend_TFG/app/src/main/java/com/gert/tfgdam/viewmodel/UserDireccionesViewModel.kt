@@ -103,7 +103,7 @@ class UserDireccionesViewModel : ViewModel() {
                         val jsonObject = JSONObject(errorJson ?: "")
                         jsonObject.getString("error")
                     } catch (e: Exception) {
-                        "Error en el registro"
+                        "Error al crear la dirección"
                     }
                 }
             } catch (e: IOException) {
@@ -164,14 +164,21 @@ class UserDireccionesViewModel : ViewModel() {
 
                 val response = repository.update(direccionId, direccionNueva)
                 if(response.isSuccessful) {
-                    successMessage = "Dirección creada exitosamente"
+                    successMessage = "Dirección editada exitosamente"
 
                     restaurarCamposDireccion(null)
 
                     delay(500)
                     onSuccess(response.body()!!)
                 } else {
-                    errorMessage = "Error al editar dirección"
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("error")
+                    } catch (e: Exception) {
+                        "Error al editar la dirección"
+                    }
                 }
             } catch (e: IOException) {
                 val errorJson = e.message.toString()

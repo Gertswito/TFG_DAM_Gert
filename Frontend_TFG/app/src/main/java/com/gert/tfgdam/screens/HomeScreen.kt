@@ -229,7 +229,7 @@ fun LibroItem(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(top = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
@@ -252,48 +252,24 @@ fun LibroItem(
 @Composable
 fun BotonAñadirCarrito(
     libroEspecifico: Libro,
-    isLibroDetails: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
-    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
     val context = LocalContext.current
     val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
     val esUser = userInfo?.rol == "USER"
-    if (isLibroDetails) {
-        Button(
-            modifier = modifier.fillMaxWidth(),
-            enabled = esUser,
-            onClick = { ClickearBoton(context) },
-        ) {
-            Text(
-                text = ("AÑADIR AL CARRITO - ") + (libroEspecifico?.precio?.let {
-                    formatoDinero.format(
-                        it
-                    )
-                } ?: "N/A"),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
-            )
-        }
-    } else {
-        Button(
-            modifier = modifier
-                .width(60.dp)
-                .height(30.dp),
-            enabled = esUser,
-            onClick = { ClickearBoton(context) }
-        ) {
-
-
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Añadir",
-                modifier = Modifier.size(100.dp),
-                tint = MaterialTheme.colorScheme.onPrimary
-            )
-
-        }
+    Button(
+        modifier = modifier
+            .width(60.dp)
+            .height(30.dp),
+        enabled = esUser,
+        onClick = { ClickearBoton(context) }
+    ) {
+        Icon(
+            imageVector = Icons.Default.Add,
+            contentDescription = "Añadir",
+            modifier = Modifier.size(100.dp),
+            tint = MaterialTheme.colorScheme.onPrimary
+        )
     }
 }
 

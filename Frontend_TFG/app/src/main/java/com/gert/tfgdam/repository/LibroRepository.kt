@@ -1,6 +1,7 @@
 package com.gert.tfgdam.repository
 
 import com.gert.tfgdam.api.LibroApi
+import com.gert.tfgdam.model.Cliente
 import com.gert.tfgdam.model.Libro
 import com.gert.tfgdam.network.RetrofitClient
 import retrofit2.Response
@@ -19,11 +20,15 @@ class LibroRepository {
     }
 
     suspend fun getAllPorTipoGenero(tipoLibro: String, genero: String): Response<List<Libro>> {
-        return api.getAllPorTipo(tipoLibro)
+        return api.getAllPorTipoGenero(tipoLibro, genero)
     }
 
     suspend fun getPorId(id: Long): Response<Libro> {
         return api.getPorId(id)
+    }
+
+    suspend fun getLibroEnListaDeseados(id: Long, usuario: String): Response<Libro> {
+        return api.getLibroEnListaDeseados(id, usuario)
     }
 
     suspend fun create(libro: Libro): Response<Libro> {
@@ -36,5 +41,13 @@ class LibroRepository {
 
     suspend fun delete(id: Long): Response<Unit> {
         return api.delete(id)
+    }
+
+    suspend fun addLibroListaDeseados(id: Long, cliente: Cliente): Response<Unit> {
+        return api.addLibroListaDeseados(id, cliente)
+    }
+
+    suspend fun deleteLibroListaDeseados(id: Long, usuario: String): Response<Unit> {
+        return api.deleteLibroListaDeseados(id, usuario)
     }
 }

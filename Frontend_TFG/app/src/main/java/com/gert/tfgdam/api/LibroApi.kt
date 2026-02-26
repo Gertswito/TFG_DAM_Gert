@@ -1,5 +1,6 @@
 package com.gert.tfgdam.api
 
+import com.gert.tfgdam.model.Cliente
 import com.gert.tfgdam.model.Libro
 import retrofit2.Response
 import retrofit2.http.Body
@@ -16,11 +17,14 @@ interface LibroApi {
     @GET("api/libro/get/tipo/{tipo-libro}")
     suspend fun getAllPorTipo(@Path("tipo-libro") tipoLibro: String): Response<List<Libro>>
 
-    @GET("api/libro/get/tipo/{tipo-libro}/genero({genero}")
+    @GET("api/libro/get/tipo/{tipo-libro}/genero/{genero}")
     suspend fun getAllPorTipoGenero(@Path("tipo-libro") tipoLibro: String, @Path("genero") genero: String): Response<List<Libro>>
 
     @GET("api/libro/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Libro>
+
+    @GET("api/libro/get/lista-deseados/{id}/{usuario}")
+    suspend fun getLibroEnListaDeseados(@Path("id") id: Long, @Path("usuario") usuario: String): Response<Libro>
 
     @POST("api/libro/new")
     suspend fun create(@Body libro: Libro): Response<Libro>
@@ -33,4 +37,10 @@ interface LibroApi {
 
     @DELETE("api/libro/delete/{id}")
     suspend fun delete(@Path("id") id: Long): Response<Unit>
+
+    @POST("api/libro/lista-deseados/add/{id}")
+    suspend fun addLibroListaDeseados(@Path("id") id: Long, @Body cliente: Cliente): Response<Unit>
+
+    @DELETE("api/libro/lista-deseados/delete/{id}/{usuario}")
+    suspend fun deleteLibroListaDeseados(@Path("id") id: Long, @Path("usuario") usuario: String): Response<Unit>
 }
