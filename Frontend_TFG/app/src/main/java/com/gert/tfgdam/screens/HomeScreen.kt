@@ -101,6 +101,22 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 16.dp, bottom = 16.dp),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    Text(
+                        text = "- Bienvenido :D -",
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                }
+            }
+
             librosAgrupados.forEach { (tipo, librosDelTipo) ->
 
                 item {
@@ -180,7 +196,7 @@ fun LibroItem(
         onClick = { navController.navigate(Routes.LIBRO_DETAILS.replace("{libroId}", libro.id.toString())) }
     ) {
         Box(
-            modifier = Modifier.fillMaxSize() // Permite superposición
+            modifier = Modifier.fillMaxSize()
         ) {
             Column(
                 modifier = Modifier
@@ -228,20 +244,6 @@ fun LibroItem(
 
                     BotonAñadirCarrito(libro)
                 }
-            }
-
-            IconButton(
-                onClick = { /* TODO */ },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(2.dp)
-                    .size(32.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = "Añadir a la lista de deseados",
-                    tint = Color.Red
-                )
             }
         }
     }
