@@ -99,6 +99,6 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
 
         composable(Routes.HISTORIAL_COMPRA) { HistorialCompraScreen() }
 
-        composable(Routes.LISTA_DESEADOS) { ListaDeseadosScreen() }
+        composable(Routes.LISTA_DESEADOS) { ListaDeseadosScreen(navController = navController) }
     }
 }

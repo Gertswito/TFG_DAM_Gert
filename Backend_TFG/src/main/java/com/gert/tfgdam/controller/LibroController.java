@@ -58,6 +58,11 @@ public class LibroController {
         }
     }
 
+    @GetMapping("/get/lista-deseados/{usuario}")
+    public List<Libro> getAllLibrosEnListaDeseados(@PathVariable String usuario) {
+        return libroService.getAllLibrosEnListaDeseados(usuario);
+    }
+
     @GetMapping("/get/lista-deseados/{id}/{usuario}")
     public ResponseEntity<Libro> getLibroEnListaDeseados(@PathVariable Integer id, @PathVariable String usuario) {
         Libro libro = libroService.getLibroEnListaDeseados(id, usuario);

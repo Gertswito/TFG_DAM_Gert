@@ -27,6 +27,10 @@ class LibroRepository {
         return api.getPorId(id)
     }
 
+    suspend fun getAllListaDeseados(usuario: String): Response<List<Libro>> {
+        return api.getAllListaDeseados(usuario)
+    }
+
     suspend fun getLibroEnListaDeseados(id: Long, usuario: String): Response<Libro> {
         return api.getLibroEnListaDeseados(id, usuario)
     }

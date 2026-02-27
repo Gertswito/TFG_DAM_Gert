@@ -48,6 +48,14 @@ public class LibroService {
         return libroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro"));
     }
 
+    public List<Libro> getAllLibrosEnListaDeseados(String usuario) {
+        Cliente cliente = clienteRepository.findByUsuario(usuario);
+        if (cliente == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el usuario");
+        }
+        return cliente.getLibrosDeseados().stream().toList();
+    }
+
     public Libro getLibroEnListaDeseados(Integer id, String usuario) {
         Cliente cliente = clienteRepository.findByUsuario(usuario);
         if (cliente == null) {

@@ -11,7 +11,6 @@ import kotlinx.coroutines.launch
 import java.io.IOException
 
 class HomeViewModel : ViewModel() {
-
     private val repository = LibroRepository()
 
     var libros by mutableStateOf<List<Libro>>(emptyList())

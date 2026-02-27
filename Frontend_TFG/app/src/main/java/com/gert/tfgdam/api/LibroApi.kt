@@ -23,6 +23,9 @@ interface LibroApi {
     @GET("api/libro/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Libro>
 
+    @GET("api/libro/get/lista-deseados/{usuario}")
+    suspend fun getAllListaDeseados(@Path("usuario") usuario: String): Response<List<Libro>>
+
     @GET("api/libro/get/lista-deseados/{id}/{usuario}")
     suspend fun getLibroEnListaDeseados(@Path("id") id: Long, @Path("usuario") usuario: String): Response<Libro>
 
