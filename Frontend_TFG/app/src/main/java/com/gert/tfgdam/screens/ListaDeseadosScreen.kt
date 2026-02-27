@@ -110,7 +110,7 @@ fun ListaDeseadosScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp),
-                contentPadding = PaddingValues(8.dp)
+                contentPadding = PaddingValues(14.dp)
             ) {
                 items(librosDeseados.sortedBy { it.id }) { libro ->
                     Box(
@@ -195,7 +195,7 @@ fun LibroItemEnListaDeseados(
             }
 
             IconButton(
-                onClick = { viewModel.deleteLibroListaDeseados(libro, userInfo?.sub ?: "") },
+                onClick = { viewModel.deleteLibroListaDeseados(libro, userInfo?.sub ?: "", false) },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(2.dp)

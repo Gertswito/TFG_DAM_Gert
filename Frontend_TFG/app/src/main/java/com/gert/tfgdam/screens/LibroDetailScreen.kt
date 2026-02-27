@@ -40,6 +40,7 @@ import com.gert.tfgdam.model.JwtPayload
 import com.gert.tfgdam.model.Libro
 import com.gert.tfgdam.util.JwtManager
 import com.gert.tfgdam.viewmodel.LibroDetailsViewModel
+import com.gert.tfgdam.viewmodel.ListaDeseadosViewModel
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -47,7 +48,8 @@ import java.util.Locale
 fun LibroDetailsScreen(
     libroId: Long,
     modifier: Modifier = Modifier,
-    viewModel: LibroDetailsViewModel = viewModel()
+    viewModel: LibroDetailsViewModel = viewModel(),
+    listaDeseadosViewModel: ListaDeseadosViewModel = viewModel()
 ) {
     val libroEspecifico = viewModel.libroEspecifico
     var showEmpty by remember { mutableStateOf(false) }
@@ -57,7 +59,7 @@ fun LibroDetailsScreen(
     LaunchedEffect(libroId, userInfo) {
         viewModel.cargarLibrosDetail(libroId)
         userInfo?.sub?.let { usuario ->
-            viewModel.buscarLibroEnListaDeseados(libroId, usuario)
+            listaDeseadosViewModel.buscarLibroEnListaDeseados(libroId, usuario)
         }
     }
 
@@ -140,7 +142,7 @@ fun LibroDetailsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        BotonAddListaDeseados(viewModel, userInfo, libroEspecifico, viewModel.isLibroYaDeseado)
+                        BotonAddListaDeseados(listaDeseadosViewModel, userInfo, libroEspecifico, listaDeseadosViewModel.isLibroYaDeseado)
                         BotonAddCarritoDesdeDetails(libroEspecifico, userInfo)
                     }
                 }
@@ -231,7 +233,7 @@ fun BotonAddCarritoDesdeDetails(
 
 @Composable
 fun BotonAddListaDeseados(
-    viewModel: LibroDetailsViewModel = viewModel(),
+    viewModel: ListaDeseadosViewModel = viewModel(),
     userInfo: JwtPayload? = null,
     libroEspecifico: Libro,
     isLibroYaDeseado: Boolean = false,
@@ -241,10 +243,10 @@ fun BotonAddListaDeseados(
     if (!isLibroYaDeseado) {
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = esUser && !viewModel.isLoadingDeseado,
+            enabled = esUser && !viewModel.isLoading,
             onClick = { viewModel.addLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "") },
         ) {
-            if (viewModel.isLoadingDeseado) {
+            if (viewModel.isLoading) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(24.dp)
@@ -260,7 +262,7 @@ fun BotonAddListaDeseados(
     } else {
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = esUser && !viewModel.isLoadingDeseado,
+            enabled = esUser && !viewModel.isLoading,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.onBackground,
@@ -269,9 +271,9 @@ fun BotonAddListaDeseados(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.onBackground
             ),
-            onClick = { viewModel.deleteLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "") },
+            onClick = { viewModel.deleteLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "", true)},
         ) {
-            if (viewModel.isLoadingDeseado) {
+            if (viewModel.isLoading) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(24.dp)
@@ -286,9 +288,9 @@ fun BotonAddListaDeseados(
         }
     }
 
-    if (viewModel.errorMessageDeseado !== "") {
+    if (viewModel.errorMessage !== "") {
         Text(
-            text = viewModel.errorMessageDeseado,
+            text = viewModel.errorMessage,
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier.padding(top = 8.dp)
         )
