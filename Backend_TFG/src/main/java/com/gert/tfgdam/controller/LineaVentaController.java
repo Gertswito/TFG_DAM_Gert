@@ -46,6 +46,11 @@ public class LineaVentaController {
         }
     }
 
+    @GetMapping("/get/usuario/{usuario}")
+    public List<LineaVenta> getAllLineaVentaPorUsuario(@PathVariable String usuario) {
+        return lineaVentaService.getAllLineaVentaPorUsuario(usuario);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

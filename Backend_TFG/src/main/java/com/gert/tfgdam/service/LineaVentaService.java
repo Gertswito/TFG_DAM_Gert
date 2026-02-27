@@ -26,6 +26,10 @@ public class LineaVentaService {
         return lineaVentaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la línea de venta"));
     }
 
+    public List<LineaVenta> getAllLineaVentaPorUsuario(String usuario) {
+        return lineaVentaRepository.findByVentaClienteUsuario(usuario);
+    }
+
     public void delete(Long id) {
         if (!lineaVentaRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la línea de venta");

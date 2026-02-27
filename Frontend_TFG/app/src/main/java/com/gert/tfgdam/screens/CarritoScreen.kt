@@ -35,7 +35,9 @@ fun CarritoScreen(
     viewModel: CarritoViewModel = viewModel(),
     navController: NavController
 ) {
-    Column (modifier = Modifier.fillMaxSize()) {
+    Column (
+        modifier = Modifier.fillMaxSize()
+    ) {
         Row (
             modifier = Modifier
                 .fillMaxWidth()

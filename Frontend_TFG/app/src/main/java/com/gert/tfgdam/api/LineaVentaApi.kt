@@ -16,6 +16,9 @@ interface LineaVentaApi {
     @GET("api/linea-venta/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<LineaVenta>
 
+    @GET("api/linea-venta/get/usuario/{usuario}")
+    suspend fun getAllPorUsuario(@Path("usuario") usuario: String): Response<List<LineaVenta>>
+
     @POST("api/linea-venta/new")
     suspend fun create(@Body lineaVenta: LineaVenta): Response<LineaVenta>
 
