@@ -48,12 +48,12 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
                 JwtManager.saveToken(context, token)
 
                 val payload = JwtManager.getUserInfoFromToken(token)
-                val role = payload?.rol
+                val rol = payload?.rol
 
                 successMessage = "Login exitoso"
                 delay(500)
 
-                when (role) {
+                when (rol) {
                     "ADMIN" -> onSuccessAdmin()
                     "USER" -> onSuccessUser()
                     else -> errorMessage = "Rol desconocido"

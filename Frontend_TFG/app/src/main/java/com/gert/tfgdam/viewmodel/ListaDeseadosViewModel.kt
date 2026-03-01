@@ -43,7 +43,7 @@ class ListaDeseadosViewModel : ViewModel() {
         viewModelScope.launch {
             try {
                 val response = repository.getLibroEnListaDeseados(libroId, usuario)
-                if (response.isSuccessful()) {
+                if (response.isSuccessful) {
                     isLibroYaDeseado = true
                 } else {
                     isLibroYaDeseado = false

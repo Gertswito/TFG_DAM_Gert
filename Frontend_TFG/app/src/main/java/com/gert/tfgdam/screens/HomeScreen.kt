@@ -20,10 +20,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -50,6 +52,7 @@ import com.gert.tfgdam.model.TipoLibro
 import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.util.JwtManager
 import com.gert.tfgdam.viewmodel.HomeViewModel
+import com.gert.tfgdam.viewmodel.ListaDeseadosViewModel
 import kotlinx.coroutines.delay
 import java.text.NumberFormat
 import java.util.Locale
@@ -135,7 +138,7 @@ fun HomeScreen(
                         val librosLimitados = librosDelTipo.take(5)
 
                         items(librosLimitados) { libro ->
-                            LibroItem(libro, navController)
+                            LibroItem(libro, false, navController)
                         }
 
                         if (librosDelTipo.size > 5) {
@@ -179,6 +182,7 @@ fun HomeScreen(
 @Composable
 fun LibroItem(
     libro: Libro,
+    isListaDeseados: Boolean = false,
     navController: NavController
 ) {
     Card(
@@ -239,41 +243,29 @@ fun LibroItem(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    BotonAñadirCarrito(libro)
+                    BotonAddCarrito(libro)
+                }
+            }
+
+            if(isListaDeseados) {
+                val listaDeseadosViewModel: ListaDeseadosViewModel = viewModel()
+                val context = LocalContext.current
+                val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
+
+                IconButton(
+                    onClick = { listaDeseadosViewModel.deleteLibroListaDeseados(libro, userInfo?.sub ?: "", false) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(0.dp)
+                        .size(32.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Quitar de lista de deseados",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
                 }
             }
         }
     }
-}
-
-@Composable
-fun BotonAñadirCarrito(
-    libroEspecifico: Libro,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
-    val esUser = userInfo?.rol == "USER"
-    Button(
-        modifier = modifier
-            .width(60.dp)
-            .height(30.dp),
-        enabled = esUser,
-        onClick = { ClickearBoton(context) }
-    ) {
-        Icon(
-            imageVector = Icons.Default.Add,
-            contentDescription = "Añadir",
-            modifier = Modifier.size(100.dp),
-            tint = MaterialTheme.colorScheme.onPrimary
-        )
-    }
-}
-
-fun ClickearBoton(context: Context) {
-    Toast.makeText(
-        context,
-        "WIP: Añadido al carrito",
-        Toast.LENGTH_SHORT
-    ).show()
 }

@@ -87,7 +87,7 @@ fun TipoLibroGeneroSelectedScreen (
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    LibroItem(libro, navController)
+                    LibroItem(libro, false, navController)
                 }
             }
         }

@@ -106,7 +106,7 @@ fun TipoLibroGenerosScreen(
                 item {
                     LazyRow {
                         items(librosLimitados) { libro ->
-                            LibroItem(libro, navController)
+                            LibroItem(libro, false, navController)
                         }
 
                         val totalLibros = librosPorGenero[genero]?.size ?: 0

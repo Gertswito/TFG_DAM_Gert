@@ -36,13 +36,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImage
-import com.gert.tfgdam.model.JwtPayload
 import com.gert.tfgdam.model.Libro
 import com.gert.tfgdam.util.JwtManager
 import com.gert.tfgdam.viewmodel.LibroDetailsViewModel
 import com.gert.tfgdam.viewmodel.ListaDeseadosViewModel
-import java.text.NumberFormat
-import java.util.Locale
 
 @Composable
 fun LibroDetailsScreen(
@@ -124,15 +121,18 @@ fun LibroDetailsScreen(
                 Column(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
-                    libroEspecifico?.autor?.let {
-                        Text("Autor: ${it.nombre}", fontWeight = FontWeight.Medium)
-                    }
-                    libroEspecifico?.editorial?.let {
-                        Text("Editorial: ${it.nombre}", fontWeight = FontWeight.Medium)
-                    }
-                    libroEspecifico?.fechaSalida?.let {
-                        Text("Fecha de salida: $it", fontWeight = FontWeight.Medium)
-                    }
+                    Text(
+                        text = ("Autor: ") + (libroEspecifico?.autor?.nombre ?: "N/A"),
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = ("Editorial: ") + (libroEspecifico?.editorial?.nombre ?: "N/A"),
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = ("Fecha de salida: ") + (libroEspecifico?.fechaSalida ?: "01/01/2026"),
+                        fontWeight = FontWeight.Medium
+                    )
                 }
             }
 
@@ -142,8 +142,8 @@ fun LibroDetailsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        BotonAddListaDeseados(listaDeseadosViewModel, userInfo, libroEspecifico, listaDeseadosViewModel.isLibroYaDeseado)
-                        BotonAddCarritoDesdeDetails(libroEspecifico, userInfo)
+                        BotonAddListaDeseados(libroEspecifico, listaDeseadosViewModel.isLibroYaDeseado)
+                        BotonAddCarrito(libroEspecifico, true)
                     }
                 }
             }
@@ -206,47 +206,22 @@ fun LibroDetailsScreen(
 }
 
 @Composable
-fun BotonAddCarritoDesdeDetails(
-    libroEspecifico: Libro,
-    userInfo: JwtPayload? = null,
-) {
-    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
-    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
-    val esUser = userInfo?.rol == "USER"
-
-    Button(
-        modifier = Modifier.fillMaxWidth(),
-        enabled = esUser,
-        onClick = { /*TODO*/ },
-    ) {
-        Text(
-            text = ("AÑADIR AL CARRITO - ") + (libroEspecifico.precio?.let {
-                formatoDinero.format(
-                    it
-                )
-            } ?: "N/A"),
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
-        )
-    }
-}
-
-@Composable
 fun BotonAddListaDeseados(
-    viewModel: ListaDeseadosViewModel = viewModel(),
-    userInfo: JwtPayload? = null,
     libroEspecifico: Libro,
     isLibroYaDeseado: Boolean = false,
 ) {
+    val listaDeseadosViewModel: ListaDeseadosViewModel = viewModel()
+    val context = LocalContext.current
+    val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
     val esUser = userInfo?.rol == "USER"
 
     if (!isLibroYaDeseado) {
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = esUser && !viewModel.isLoading,
-            onClick = { viewModel.addLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "") },
+            enabled = esUser && !listaDeseadosViewModel.isLoading,
+            onClick = { listaDeseadosViewModel.addLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "") },
         ) {
-            if (viewModel.isLoading) {
+            if (listaDeseadosViewModel.isLoading) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(24.dp)
@@ -262,7 +237,7 @@ fun BotonAddListaDeseados(
     } else {
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = esUser && !viewModel.isLoading,
+            enabled = esUser && !listaDeseadosViewModel.isLoading,
             colors = ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.background,
                 contentColor = MaterialTheme.colorScheme.onBackground,
@@ -271,9 +246,9 @@ fun BotonAddListaDeseados(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.onBackground
             ),
-            onClick = { viewModel.deleteLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "", true)},
+            onClick = { listaDeseadosViewModel.deleteLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "", true)},
         ) {
-            if (viewModel.isLoading) {
+            if (listaDeseadosViewModel.isLoading) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.size(24.dp)
@@ -288,9 +263,9 @@ fun BotonAddListaDeseados(
         }
     }
 
-    if (viewModel.errorMessage !== "") {
+    if (listaDeseadosViewModel.errorMessage !== "") {
         Text(
-            text = viewModel.errorMessage,
+            text = listaDeseadosViewModel.errorMessage,
             color = MaterialTheme.colorScheme.error,
             modifier = Modifier.padding(top = 8.dp)
         )

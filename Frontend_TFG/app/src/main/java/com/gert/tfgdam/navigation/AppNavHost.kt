@@ -18,7 +18,6 @@ import com.gert.tfgdam.screens.LoginScreen
 import com.gert.tfgdam.screens.RegisterScreen
 import com.gert.tfgdam.screens.TipoLibroGeneroSelectedScreen
 import com.gert.tfgdam.screens.TipoLibroGenerosScreen
-import com.gert.tfgdam.screens.UserDetailsScreen
 import com.gert.tfgdam.screens.UserSettingsScreen
 
 @Composable

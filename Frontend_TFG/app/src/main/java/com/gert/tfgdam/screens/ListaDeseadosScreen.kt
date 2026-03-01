@@ -1,6 +1,7 @@
 package com.gert.tfgdam.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -101,102 +102,17 @@ fun ListaDeseadosScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(8.dp),
-                contentPadding = PaddingValues(14.dp)
+                contentPadding = PaddingValues(0.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 items(librosDeseados.sortedBy { it.id }) { libro ->
                     Box(
                         modifier = Modifier.fillMaxWidth(),
                         contentAlignment = Alignment.Center
                     ) {
-                        LibroItemEnListaDeseados(libro, userInfo, navController)
+                        LibroItem(libro, true, navController)
                     }
                 }
-            }
-        }
-    }
-}
-
-@Composable
-fun LibroItemEnListaDeseados(
-    libro: Libro,
-    userInfo: JwtPayload? = null,
-    navController: NavController,
-    viewModel: ListaDeseadosViewModel = viewModel()
-) {
-    Card(
-        modifier = Modifier
-            .padding(4.dp)
-            .width(160.dp)
-            .height(270.dp),
-        elevation = CardDefaults.cardElevation(4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        onClick = { navController.navigate(Routes.LIBRO_DETAILS.replace("{libroId}", libro.id.toString())) }
-    ) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(8.dp)
-            ) {
-                AsyncImage(
-                    model = libro.portada,
-                    contentDescription = libro.titulo,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
-                    contentScale = ContentScale.Fit
-                )
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Text(
-                    text = libro.titulo ?: "Sin título",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                Spacer(modifier = Modifier.weight(1f))
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
-                    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
-                    Text(
-                        text = formatoDinero.format(libro.precio ?: 0.00),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
-                    )
-
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    BotonAñadirCarrito(libro)
-                }
-            }
-
-            IconButton(
-                onClick = { viewModel.deleteLibroListaDeseados(libro, userInfo?.sub ?: "", false) },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(2.dp)
-                    .size(32.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Quitar de lista de deseados",
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
             }
         }
     }
