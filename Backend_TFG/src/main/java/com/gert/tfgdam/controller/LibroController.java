@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -37,6 +36,11 @@ public class LibroController {
     @GetMapping("/get")
     public List<Libro> getAllLibro() {
         return libroService.getAllLibro();
+    }
+
+    @GetMapping("/get/view")
+    public List<Libro> getAllLibroLimitadoParaView() {
+        return libroService.getAllLibroLimitadoParaView();
     }
 
     @GetMapping("/get/tipo/{tipo-libro}")

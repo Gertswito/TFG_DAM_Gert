@@ -30,17 +30,9 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
 
         composable(Routes.HOME_ADMIN) { HomeAdminScreen() }
 
-        composable(Routes.LOGIN) { backStackEntry ->
-            LoginScreen(
-                navController = navController
-            )
-        }
+        composable(Routes.LOGIN) { backStackEntry -> LoginScreen(navController = navController) }
 
-        composable(Routes.REGISTER) { backStackEntry ->
-            RegisterScreen(
-                navController = navController
-            )
-        }
+        composable(Routes.REGISTER) { backStackEntry -> RegisterScreen(navController = navController) }
 
         composable(Routes.USER_SETTINGS) { UserSettingsScreen() }
 
@@ -74,7 +66,6 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
             TipoLibroGeneroSelectedScreen(
                 tipoLibroString = tipoLibro,
                 generoString = genero,
-                modifier = Modifier,
                 navController = navController
             )
         }
@@ -89,8 +80,7 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
             val libroId = backStackEntry.arguments?.getString("libroId") ?: ""
 
             LibroDetailsScreen(
-                libroId = libroId.toLong(),
-                modifier = Modifier,
+                libroId = libroId.toLong()
             )
         }
 

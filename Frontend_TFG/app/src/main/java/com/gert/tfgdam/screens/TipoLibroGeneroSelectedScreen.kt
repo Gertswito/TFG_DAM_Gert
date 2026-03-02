@@ -1,6 +1,7 @@
 package com.gert.tfgdam.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,7 +35,6 @@ import androidx.compose.foundation.lazy.grid.items
 fun TipoLibroGeneroSelectedScreen (
     tipoLibroString: String,
     generoString: String,
-    modifier: Modifier = Modifier,
     viewModel: TipoLibroGeneroSelectedViewModel = viewModel(),
     navController: NavController
 ){
@@ -47,7 +47,7 @@ fun TipoLibroGeneroSelectedScreen (
 
     if (librosPorTipoGenero.isEmpty() && showEmpty) {
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
@@ -62,10 +62,11 @@ fun TipoLibroGeneroSelectedScreen (
     } else {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 140.dp),
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(8.dp),
-            contentPadding = PaddingValues(8.dp)
+            contentPadding = PaddingValues(0.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             item(span = { GridItemSpan(maxLineSpan) }) {
                 Text(
@@ -78,7 +79,7 @@ fun TipoLibroGeneroSelectedScreen (
                             append(generoString)
                         }
                     },
-                    modifier = Modifier.padding(top = 8.dp, bottom = 10.dp)
+                    modifier = Modifier.padding(top = 10.dp, bottom = 8.dp, start = 8.dp)
                 )
             }
 

@@ -15,6 +15,10 @@ class LibroRepository {
         return api.getAll()
     }
 
+    suspend fun getAllLimitadoParaView(): Response<List<Libro>> {
+        return api.getAllLimitadoParaView()
+    }
+
     suspend fun getAllPorTipo(tipoLibro: String): Response<List<Libro>> {
         return api.getAllPorTipo(tipoLibro)
     }

@@ -14,6 +14,9 @@ interface LibroApi {
     @GET("api/libro/get")
     suspend fun getAll(): Response<List<Libro>>
 
+    @GET("api/libro/get/view")
+    suspend fun getAllLimitadoParaView(): Response<List<Libro>>
+
     @GET("api/libro/get/tipo/{tipo-libro}")
     suspend fun getAllPorTipo(@Path("tipo-libro") tipoLibro: String): Response<List<Libro>>
 

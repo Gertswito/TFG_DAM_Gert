@@ -105,7 +105,7 @@ fun HomeScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(top = 16.dp, bottom = 16.dp),
+                        .padding(top = 16.dp, bottom = 10.dp),
                     contentAlignment = Alignment.TopCenter
                 ) {
                     Text(
@@ -135,36 +135,32 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
 
-                        val librosLimitados = librosDelTipo.take(5)
-
-                        items(librosLimitados) { libro ->
+                        items(librosDelTipo) { libro ->
                             LibroItem(libro, false, navController)
                         }
 
-                        if (librosDelTipo.size > 5) {
-                            item {
-                                Card(
-                                    modifier = Modifier
-                                        .padding(4.dp)
-                                        .width(150.dp)
-                                        .height(270.dp)
-                                        .clickable { navController.navigate(Routes.TIPO_LIBRO_GENEROS.replace("{tipoLibro}", tipo?.nombre ?: "Sin nombre")) },
-                                    elevation = CardDefaults.cardElevation(4.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surface
-                                    )
+                        item {
+                            Card(
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .width(150.dp)
+                                    .height(270.dp)
+                                    .clickable { navController.navigate(Routes.TIPO_LIBRO_GENEROS.replace("{tipoLibro}", tipo?.nombre ?: "Sin nombre")) },
+                                elevation = CardDefaults.cardElevation(4.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "Ver todos",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp,
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
+                                    Text(
+                                        text = "Ver todos",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        textAlign = TextAlign.Center
+                                    )
                                 }
                             }
                         }

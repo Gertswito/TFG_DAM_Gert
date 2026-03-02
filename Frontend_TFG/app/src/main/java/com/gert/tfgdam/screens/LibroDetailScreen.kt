@@ -44,7 +44,6 @@ import com.gert.tfgdam.viewmodel.ListaDeseadosViewModel
 @Composable
 fun LibroDetailsScreen(
     libroId: Long,
-    modifier: Modifier = Modifier,
     viewModel: LibroDetailsViewModel = viewModel(),
     listaDeseadosViewModel: ListaDeseadosViewModel = viewModel()
 ) {
@@ -62,7 +61,7 @@ fun LibroDetailsScreen(
 
     if (libroEspecifico == null && showEmpty) {
         Box(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
@@ -76,7 +75,7 @@ fun LibroDetailsScreen(
         }
     } else {
         LazyColumn(
-            modifier = modifier
+            modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -88,7 +87,9 @@ fun LibroDetailsScreen(
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     lineHeight = 34.sp,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
                 )
             }
 
@@ -111,7 +112,7 @@ fun LibroDetailsScreen(
                 HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(top = 16.dp, bottom = 0.dp),
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -139,7 +140,9 @@ fun LibroDetailsScreen(
             item {
                 if(libroEspecifico !== null) {
                     Column (
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         BotonAddListaDeseados(libroEspecifico, listaDeseadosViewModel.isLibroYaDeseado)
@@ -148,10 +151,10 @@ fun LibroDetailsScreen(
                 }
             }
 
-            item {
-                libroEspecifico?.descripcion?.let { desc ->
+            if (libroEspecifico?.descripcion != null && libroEspecifico.descripcion != "") {
+                item {
                     Text(
-                        text = desc,
+                        text = libroEspecifico.descripcion ?: "SIN DESCRIPCIÓN",
                         fontSize = 16.sp,
                         lineHeight = 20.sp
                     )
@@ -162,7 +165,7 @@ fun LibroDetailsScreen(
                 HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(top = 16.dp, bottom = 0.dp),
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.onBackground
                 )
@@ -174,7 +177,7 @@ fun LibroDetailsScreen(
                         text = "Géneros:",
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp,
-                        modifier = Modifier.padding(vertical = 4.dp)
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
                     FlowRow(
                         modifier = Modifier.fillMaxWidth(),
@@ -202,72 +205,5 @@ fun LibroDetailsScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-fun BotonAddListaDeseados(
-    libroEspecifico: Libro,
-    isLibroYaDeseado: Boolean = false,
-) {
-    val listaDeseadosViewModel: ListaDeseadosViewModel = viewModel()
-    val context = LocalContext.current
-    val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
-    val esUser = userInfo?.rol == "USER"
-
-    if (!isLibroYaDeseado) {
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = esUser && !listaDeseadosViewModel.isLoading,
-            onClick = { listaDeseadosViewModel.addLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "") },
-        ) {
-            if (listaDeseadosViewModel.isLoading) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp)
-                )
-            } else {
-                Text(
-                    text = ("AÑADIR A LISTA DE DESEOS"),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    } else {
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = esUser && !listaDeseadosViewModel.isLoading,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.background,
-                contentColor = MaterialTheme.colorScheme.onBackground,
-            ),
-            border = BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.onBackground
-            ),
-            onClick = { listaDeseadosViewModel.deleteLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "", true)},
-        ) {
-            if (listaDeseadosViewModel.isLoading) {
-                CircularProgressIndicator(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(24.dp)
-                )
-            } else {
-                Text(
-                    text = ("QUITAR DE LISTA DE DESEOS"),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
-        }
-    }
-
-    if (listaDeseadosViewModel.errorMessage !== "") {
-        Text(
-            text = listaDeseadosViewModel.errorMessage,
-            color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(top = 8.dp)
-        )
     }
 }

@@ -26,6 +26,10 @@ public class LibroService {
         return libroRepository.findAll();
     }
 
+    public List<Libro> getAllLibroLimitadoParaView() {
+        return libroRepository.findLibrosLimitadosYDivididosPorTipoLibro();
+    }
+
     public List<Libro> getAllLibroPorTipo(String tipoLibro) {
         List<Libro> libros = libroRepository.findByTipoLibro_Nombre(tipoLibro);
 

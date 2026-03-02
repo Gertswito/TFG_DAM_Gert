@@ -92,7 +92,6 @@ fun TipoLibroGenerosScreen(
             }
 
             librosPorGeneroLimitados.forEach { (genero, librosLimitados) ->
-
                 item {
                     Text(
                         text = ("- ") + (genero ?: "Sin género"),
@@ -109,31 +108,28 @@ fun TipoLibroGenerosScreen(
                             LibroItem(libro, false, navController)
                         }
 
-                        val totalLibros = librosPorGenero[genero]?.size ?: 0
-                        if (totalLibros > librosLimitados.size) {
-                            item {
-                                Card(
-                                    modifier = Modifier
-                                        .padding(8.dp)
-                                        .width(150.dp)
-                                        .height(270.dp)
-                                        .clickable{ navController.navigate(Routes.TIPO_LIBRO_GENERO_SELECTED.replace("{tipoLibro}", tipoLibroString).replace("{genero}", genero ?: "null")) },
-                                    elevation = CardDefaults.cardElevation(4.dp),
-                                    colors = CardDefaults.cardColors(
-                                        containerColor = MaterialTheme.colorScheme.surface
-                                    )
+                        item {
+                            Card(
+                                modifier = Modifier
+                                    .padding(8.dp)
+                                    .width(150.dp)
+                                    .height(270.dp)
+                                    .clickable{ navController.navigate(Routes.TIPO_LIBRO_GENERO_SELECTED.replace("{tipoLibro}", tipoLibroString).replace("{genero}", genero ?: "null")) },
+                                elevation = CardDefaults.cardElevation(4.dp),
+                                colors = CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface
+                                )
+                            ) {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "Ver todos",
-                                            fontWeight = FontWeight.Bold,
-                                            fontSize = 16.sp,
-                                            textAlign = TextAlign.Center
-                                        )
-                                    }
+                                    Text(
+                                        text = "Ver todos",
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 16.sp,
+                                        textAlign = TextAlign.Center
+                                    )
                                 }
                             }
                         }

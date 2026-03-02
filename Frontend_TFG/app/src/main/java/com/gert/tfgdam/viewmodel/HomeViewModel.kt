@@ -22,7 +22,7 @@ class HomeViewModel : ViewModel() {
     private fun cargarLibros() {
         viewModelScope.launch {
             try {
-                val response = repository.getAll()
+                val response = repository.getAllLimitadoParaView()
 
                 if (response.isSuccessful) {
                     libros = response.body() ?: emptyList()
