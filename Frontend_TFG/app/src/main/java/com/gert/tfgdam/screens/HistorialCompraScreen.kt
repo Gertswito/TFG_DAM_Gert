@@ -143,31 +143,84 @@ fun VentaExpandableCard(
         Column(
             modifier = Modifier.padding(vertical = 16.dp, horizontal = 0.dp)
         ) {
-            Text(
-                text = ("Venta #") + (venta?.id),
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(horizontal = 12.dp)
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 12.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+
+                Text(
+                    text = ("Venta #") + (venta?.id),
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = buildAnnotatedString {
+                        append("Total: ")
+                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                            append(formatoDinero.format(venta?.precioFinal ?: 0.00))
+                        }
+                    },
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = ("Fecha: ") + (venta?.fecha) + " " + (venta?.hora),
-                fontSize = 14.sp,
+                buildAnnotatedString {
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) { append("Fecha: ") }
+
+                    withStyle(
+                        style = SpanStyle(
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.inverseSurface
+                        )
+                    ) { append((venta?.fecha) + " " + (venta?.hora)) }
+                },
                 modifier = Modifier.padding(horizontal = 12.dp)
             )
 
-            Text(
-                text = buildAnnotatedString {
-                    append("Total: ")
-                    withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
-                        append(formatoDinero.format(venta?.precioFinal ?: 0.00))
-                    }
-                },
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(horizontal = 12.dp)
-            )
+            Spacer(modifier = Modifier.height(2.dp))
+
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = ("Dirección de envío: "),
+                    fontSize = 14.sp,
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    fontWeight = FontWeight.Bold
+                )
+
+                Column (
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        text = (venta?.direccion?.calle) + " " + (venta?.direccion?.numero) + " " + (venta?.direccion?.piso + ", "),
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        lineHeight = 14.sp,
+                        color = MaterialTheme.colorScheme.inverseSurface
+                    )
+
+                    Text(
+                        text = ((venta?.direccion?.ciudad) + ", " + (venta?.direccion?.provincia) + " | " + (venta?.direccion?.codigoPostal)),
+                        fontSize = 12.sp,
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        lineHeight = 14.sp,
+                        color = MaterialTheme.colorScheme.inverseSurface
+                    )
+                }
+            }
 
             AnimatedVisibility(
                 visible = verLineasVenta,

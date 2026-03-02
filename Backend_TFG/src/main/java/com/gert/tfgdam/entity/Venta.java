@@ -5,6 +5,8 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -21,6 +23,11 @@ public class Venta implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "cliente_id")
     private Cliente cliente;
+
+    @ManyToOne
+    @JoinColumn(name = "direccion_id")
+    @JsonIgnoreProperties(value = { "cliente" }, allowSetters = true)
+    private Direccion direccion;
 
     @Column(name = "fecha")
     private LocalDate fecha;
@@ -45,6 +52,14 @@ public class Venta implements Serializable {
 
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
+    }
+
+    public Direccion getDireccion() {
+        return direccion;
+    }
+
+    public void setDireccion(Direccion direccion) {
+        this.direccion = direccion;
     }
 
     public LocalDate getFecha() {
