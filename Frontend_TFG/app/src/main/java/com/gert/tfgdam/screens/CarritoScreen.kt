@@ -34,9 +34,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -208,14 +211,18 @@ fun CarritoScreen(
                         val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
                         val formatoDinero = NumberFormat.getCurrencyInstance(locale)
                         Text(
-                            text = ("Total: ") + (formatoDinero.format(total)),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
+                            text = buildAnnotatedString {
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onBackground)) {
+                                    append("Total: ")
+                                }
+                                withStyle(style = SpanStyle(fontWeight = FontWeight.Normal, fontSize = 18.sp, color = MaterialTheme.colorScheme.secondary)) {
+                                    append(formatoDinero.format(total))
+                                }
+                            }
                         )
 
                         Button(
-                            onClick = { /* TODO */ }
+                            onClick = { navController.navigate(Routes.PAGO) }
                         ) {
                             Text(
                                 text = "COMPRAR",
@@ -287,7 +294,7 @@ fun LibroItemCarrito(
                     Text(
                         text = formatoDinero.format((item.libro.precio ?: 0.00) * item.cantidad),
                         fontSize = 16.sp,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.secondary
                     )
 
                     Row(

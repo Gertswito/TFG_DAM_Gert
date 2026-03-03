@@ -12,4 +12,5 @@ object Routes {
     const val CARRITO = "carrito"
     const val HISTORIAL_COMPRA = "historial_compra"
     const val LISTA_DESEADOS = "lista_deseados"
+    const val PAGO = "pago"
 }

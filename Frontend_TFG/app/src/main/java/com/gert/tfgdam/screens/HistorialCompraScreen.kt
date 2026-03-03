@@ -160,7 +160,7 @@ fun VentaExpandableCard(
                 Text(
                     text = buildAnnotatedString {
                         append("Total: ")
-                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)) {
+                        withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.secondary)) {
                             append(formatoDinero.format(venta?.precioFinal ?: 0.00))
                         }
                     },
@@ -262,20 +262,20 @@ fun VentaExpandableCard(
                                             fontWeight = FontWeight.Bold
                                         )
                                         Text(
-                                            text = "- ${linea.libro?.autor?.nombre ?: "Autor"}",
+                                            text = "- " + (linea.libro?.autor?.nombre ?: "Autor"),
                                             fontWeight = FontWeight.Medium
                                         )
                                         Text(
-                                            text = "Cantidad: ${linea.cantidad}",
+                                            text = "Cantidad: " + (linea.cantidad),
                                             fontWeight = FontWeight.Thin,
                                             fontSize = 10.sp
                                         )
                                     }
 
                                     Text(
-                                        text = "+${formatoDinero.format(linea.precioTotal)}",
-                                        fontWeight = FontWeight.Bold,
-                                        color = MaterialTheme.colorScheme.primary
+                                        text = "+" + formatoDinero.format(linea.precioTotal),
+                                        fontWeight = FontWeight.Medium,
+                                        color = MaterialTheme.colorScheme.secondary
                                     )
                                 }
 

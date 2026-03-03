@@ -37,6 +37,9 @@ class UserDireccionesViewModel : ViewModel() {
     var errorMessage by mutableStateOf("")
     var successMessage by mutableStateOf("")
 
+    var direccionSeleccionada by mutableStateOf<Direccion?>(null)
+        private set
+
     fun setDireccionesIniciales(usuarioScreenAnterior: Cliente, listaDirecciones: List<Direccion>) {
         direcciones = listaDirecciones
         usuario = usuarioScreenAnterior
@@ -190,6 +193,14 @@ class UserDireccionesViewModel : ViewModel() {
                 isLoading = false
             }
         }
+    }
+
+    fun seleccionarDireccion(direccion: Direccion) {
+        direccionSeleccionada = direccion
+    }
+
+    fun deseleccionarDireccion() {
+        direccionSeleccionada = null
     }
 
     fun restaurarCamposDireccion(direccion: Direccion? = null) {

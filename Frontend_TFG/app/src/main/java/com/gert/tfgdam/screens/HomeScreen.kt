@@ -233,8 +233,8 @@ fun LibroItem(
                     val formatoDinero = NumberFormat.getCurrencyInstance(locale)
                     Text(
                         text = formatoDinero.format(libro.precio ?: 0.00),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.secondary,
+                        fontWeight = FontWeight.Medium,
                     )
 
                     Spacer(modifier = Modifier.weight(1f))

@@ -38,13 +38,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.window.Dialog
 import com.gert.tfgdam.model.Cliente
 import com.gert.tfgdam.model.Direccion
@@ -110,7 +113,7 @@ fun UserDireccionesScreen(
                         )
                     } else {
                         viewModel.direcciones.forEach { direccion ->
-                            DireccionItem(direccion, viewModel)
+                            DireccionItem(direccion, false)
                         }
                     }
 
@@ -150,9 +153,11 @@ fun UserDireccionesScreen(
 @Composable
 fun DireccionItem(
     direccion: Direccion,
+    isPago: Boolean = false,
     viewModel: UserDireccionesViewModel = viewModel()
 ) {
     var abrirModalEditarDireccion by remember { mutableStateOf(false) }
+    val estaSeleccionada = viewModel.direccionSeleccionada?.id == direccion.id
 
     Card(
         modifier = Modifier
@@ -201,7 +206,7 @@ fun DireccionItem(
                         color = MaterialTheme.colorScheme.onBackground
                     )
                     Text(
-                        text = "${direccion.numero ?: "-"} · ${direccion.piso ?: "-"}",
+                        text = (direccion.numero.toString()) + " · " + (direccion.piso ?: "-"),
                         fontSize = 15.sp
                     )
                 }
@@ -266,28 +271,55 @@ fun DireccionItem(
                     modifier = Modifier.weight(1f),
                     horizontalAlignment = Alignment.End
                 ) {
-                    Button(
-                        modifier = Modifier.width(65.dp),
-                        onClick = { abrirModalEditarDireccion = true }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Editar",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
+                    if(!isPago) {
+                        Button(
+                            modifier = Modifier.width(65.dp),
+                            onClick = { abrirModalEditarDireccion = true }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "Editar",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
 
-                    if (abrirModalEditarDireccion) {
-                        EditarDireccionModal(
-                            showDialog = abrirModalEditarDireccion,
-                            direccionEditar = direccion,
-                            viewModel = viewModel,
-                            onDismiss = { abrirModalEditarDireccion = false },
-                            onSave = { direccionActualizada ->
-                                viewModel.actualizarDireccion(direccionActualizada)
-                                abrirModalEditarDireccion = false
+                        if (abrirModalEditarDireccion) {
+                            EditarDireccionModal(
+                                showDialog = abrirModalEditarDireccion,
+                                direccionEditar = direccion,
+                                viewModel = viewModel,
+                                onDismiss = { abrirModalEditarDireccion = false },
+                                onSave = { direccionActualizada ->
+                                    viewModel.actualizarDireccion(direccionActualizada)
+                                    abrirModalEditarDireccion = false
+                                }
+                            )
+                        }
+                    } else {
+                        if (!estaSeleccionada) {
+                            Button(
+                                onClick = { viewModel.seleccionarDireccion(direccion) }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "Seleccionar",
+                                    tint = MaterialTheme.colorScheme.onPrimary
+                                )
                             }
-                        )
+                        } else {
+                            Button(
+                                onClick = { viewModel.deseleccionarDireccion() },
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Close,
+                                    contentDescription = "Seleccionar",
+                                )
+                            }
+                        }
                     }
                 }
             }

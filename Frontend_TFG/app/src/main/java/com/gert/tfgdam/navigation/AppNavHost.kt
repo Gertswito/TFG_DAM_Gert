@@ -15,6 +15,7 @@ import com.gert.tfgdam.screens.HomeScreen
 import com.gert.tfgdam.screens.LibroDetailsScreen
 import com.gert.tfgdam.screens.ListaDeseadosScreen
 import com.gert.tfgdam.screens.LoginScreen
+import com.gert.tfgdam.screens.PagoScreen
 import com.gert.tfgdam.screens.RegisterScreen
 import com.gert.tfgdam.screens.TipoLibroGeneroSelectedScreen
 import com.gert.tfgdam.screens.TipoLibroGenerosScreen
@@ -89,5 +90,7 @@ fun AppNavHost(navController: NavHostController, startDestination: String) {
         composable(Routes.HISTORIAL_COMPRA) { HistorialCompraScreen() }
 
         composable(Routes.LISTA_DESEADOS) { ListaDeseadosScreen(navController = navController) }
+
+        composable(Routes.PAGO) { PagoScreen(navController = navController) }
     }
 }
