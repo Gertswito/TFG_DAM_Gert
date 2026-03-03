@@ -1,5 +1,6 @@
 package com.gert.tfgdam.screens
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -135,10 +136,14 @@ fun PagoScreen(
                         enter = expandVertically() + fadeIn(),
                         exit = shrinkVertically() + fadeOut()
                     ) {
+                        val maxHeight = 275.dp
+                        val minHeight = 150.dp
+                        val dynamicHeight = if (carritoItems.size >= 2) maxHeight else minHeight
+
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .heightIn(max = 275.dp)
+                                .heightIn(min = minHeight, max = dynamicHeight)
                         ) {
                             HorizontalDivider(
                                 modifier = Modifier
@@ -270,7 +275,7 @@ fun PagoScreen(
                 modifier = Modifier
                     .padding(horizontal = 8.dp)
                     .fillMaxWidth()
-                    .height(120.dp),
+                    .height(115.dp),
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -289,7 +294,7 @@ fun PagoScreen(
                     ) {
                         Text(
                             text = "Método de pago: PayPal",
-                            fontSize = 20.sp,
+                            fontSize = 16.sp,
                             fontWeight = FontWeight.Medium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
@@ -298,14 +303,31 @@ fun PagoScreen(
                         Spacer(modifier = Modifier.height(12.dp))
 
                         Button(
-                            onClick = { navController.navigate(Routes.CARRITO) },
-                            modifier = Modifier.fillMaxWidth()
+                            onClick = { viewModel.finalizarCompra(carritoItems, userDireccionesViewModel.direccionSeleccionada!!, usuario!!, carritoViewModel) {
+                                navController.navigate(Routes.HOME)
+                            }},
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = userDireccionesViewModel.direccionSeleccionada != null && carritoItems.isNotEmpty() && usuario != null && !viewModel.isLoading
                         ) {
                             Text(
                                 text = "FINALIZAR COMPRA",
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Medium
                             )
+                        }
+
+                        val context = LocalContext.current
+                        if (viewModel.errorMessage !== "") {
+                            LaunchedEffect(viewModel.errorMessage) {
+                                Toast.makeText(context, viewModel.errorMessage, Toast.LENGTH_LONG).show()
+                                viewModel.errorMessage = ""
+                            }
+                        }
+                        if (viewModel.successMessage !== "") {
+                            LaunchedEffect(viewModel.successMessage) {
+                                Toast.makeText(context, viewModel.successMessage, Toast.LENGTH_LONG).show()
+                                viewModel.successMessage = ""
+                            }
                         }
                     }
                 }

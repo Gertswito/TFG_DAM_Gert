@@ -3,6 +3,7 @@ package com.gert.tfgdam.controller;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.gert.tfgdam.entity.FinalizarCompra;
 import com.gert.tfgdam.entity.Venta;
 import com.gert.tfgdam.service.VentaService;
 
@@ -78,6 +79,21 @@ public class VentaController {
             }
         } catch (EntityNotFoundException e) {
             return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PostMapping("/finalizar-compra")
+    public ResponseEntity<Object> finalizarCompra(@RequestBody FinalizarCompra finalizarCompra) {
+        try {
+            Venta nuevaVenta = ventaService.finalizarCompra(finalizarCompra);
+            URI location = URI.create("/new/" + nuevaVenta.getId());
+            return ResponseEntity.created(location).body(nuevaVenta);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
         }
     }
 }

@@ -1,6 +1,8 @@
 package com.gert.tfgdam.repository
 
 import com.gert.tfgdam.api.VentaApi
+import com.gert.tfgdam.model.FinalizarCompra
+import com.gert.tfgdam.model.LineaVenta
 import com.gert.tfgdam.model.Venta
 import com.gert.tfgdam.network.RetrofitClient
 import retrofit2.Response
@@ -28,5 +30,9 @@ class VentaRepository {
 
     suspend fun delete(id: Long): Response<Unit> {
         return api.delete(id)
+    }
+
+    suspend fun finalizarCompra(finalizarCompra: FinalizarCompra): Response<Venta> {
+        return api.finalizarCompra(finalizarCompra)
     }
 }

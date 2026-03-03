@@ -103,6 +103,16 @@ class CarritoViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
+    fun vaciarCarrito() {
+        viewModelScope.launch {
+            val usuario = getUsuarioActual()
+            val carritoKey = stringPreferencesKey("carrito_items_$usuario")
+            context.dataStore.edit { preferences ->
+                preferences[carritoKey] = "[]"
+            }
+        }
+    }
+
     fun calcularTotal(): Double {
         return carritoItems.value.sumOf { (it.libro.precio ?: 0.0) * it.cantidad }
     }
