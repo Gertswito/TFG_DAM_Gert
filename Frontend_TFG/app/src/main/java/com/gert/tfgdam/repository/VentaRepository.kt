@@ -1,8 +1,8 @@
 package com.gert.tfgdam.repository
 
 import com.gert.tfgdam.api.VentaApi
+import com.gert.tfgdam.model.CarritoItem
 import com.gert.tfgdam.model.FinalizarCompra
-import com.gert.tfgdam.model.LineaVenta
 import com.gert.tfgdam.model.Venta
 import com.gert.tfgdam.network.RetrofitClient
 import retrofit2.Response
@@ -32,7 +32,15 @@ class VentaRepository {
         return api.delete(id)
     }
 
-    suspend fun finalizarCompra(finalizarCompra: FinalizarCompra): Response<Venta> {
-        return api.finalizarCompra(finalizarCompra)
+    suspend fun validarStock(carrito: List<CarritoItem>): Response<Unit> {
+        return api.validarStock(carrito)
+    }
+
+    suspend fun createPaypalOrder(finalizarCompra: FinalizarCompra): Response<Map<String, Any>> {
+        return api.createPaypalOrder(finalizarCompra)
+    }
+
+    suspend fun capturePaypalOrder(orderId: String): Response<Venta> {
+        return api.capturePaypalOrder(orderId)
     }
 }

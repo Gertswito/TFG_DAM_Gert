@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.gert.tfgdam.api.ApiError
 import com.gert.tfgdam.model.CarritoItem
 import com.gert.tfgdam.model.Cliente
 import com.gert.tfgdam.model.Direccion
@@ -13,11 +12,7 @@ import com.gert.tfgdam.model.FinalizarCompra
 import com.gert.tfgdam.model.LineaVenta
 import com.gert.tfgdam.model.Venta
 import com.gert.tfgdam.repository.VentaRepository
-import com.google.gson.Gson
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import okio.IOException
-import org.json.JSONObject
 
 class PagoViewModel() : ViewModel() {
     private val repository = VentaRepository()
@@ -25,8 +20,9 @@ class PagoViewModel() : ViewModel() {
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
     var successMessage by mutableStateOf("")
+    var approvalUrl by mutableStateOf<String?>(null)
 
-    fun finalizarCompra(carrito: List<CarritoItem>, direccionSeleccionada: Direccion, usuario: Cliente, carritoViewModel: CarritoViewModel, onSuccess: () -> Unit = {}) {
+    fun iniciarProcesoPago(carrito: List<CarritoItem>, direccionSeleccionada: Direccion, usuario: Cliente) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = ""
@@ -52,29 +48,61 @@ class PagoViewModel() : ViewModel() {
                 }
 
                 val finalizarCompra = FinalizarCompra(nuevaVenta, nuevasLineasVenta)
-                val response = repository.finalizarCompra(finalizarCompra)
-                if (response.isSuccessful) {
-                    successMessage = "Compra realizada con éxito, muchas gracias por su compra !!!"
-                    carritoViewModel.vaciarCarrito()
-                    delay(500)
-                    onSuccess()
-                } else {
-                    val errorJson = response.errorBody()?.string()
 
-                    errorMessage = try {
-                        val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
-                    } catch (e: Exception) {
-                        "Error al finalizar la compra"
-                    }
+                val response = repository.createPaypalOrder(finalizarCompra)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    val links =
+                        body?.get("links") as List<Map<String, Any>>
+
+                    val approveUrl = links.first {
+                        it["rel"] == "approve"
+                    }["href"] as String
+                    approvalUrl = approveUrl
+                } else {
+                    errorMessage = "Error creando pedido en PayPal"
                 }
             } catch (e: Exception) {
-                val errorJson = e.message.toString()
-                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
-                errorMessage = apiError.message ?: "Error desconocido"
+                errorMessage = "Error creando pedido en PayPal"
             } finally {
                 isLoading = false;
             }
+        }
+    }
+
+    fun capturarPago(orderId: String, carritoViewModel: CarritoViewModel) {
+        viewModelScope.launch {
+            carritoViewModel.vaciarCarrito()
+            isLoading = true
+            errorMessage = ""
+
+            try {
+                val response = repository.capturePaypalOrder(orderId)
+                if (response.isSuccessful) {
+                    successMessage = "Compra realizada con éxito, muchas gracias !!!"
+                } else {
+                    errorMessage = "Error guardando la venta en la base de datos"
+                }
+            } catch (e: Exception) {
+                errorMessage = "Error guardando la venta en la base de datos"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    suspend fun validarStock(carrito: List<CarritoItem>): Boolean {
+        return try {
+            val response = repository.validarStock(carrito)
+            if (response.isSuccessful) {
+                true
+            } else {
+                errorMessage = response.errorBody()?.string() ?: "Stock insuficiente"
+                false
+            }
+        } catch (e: Exception) {
+            errorMessage = "Error validando stock"
+            false
         }
     }
 }

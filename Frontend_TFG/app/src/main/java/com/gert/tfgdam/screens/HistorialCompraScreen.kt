@@ -64,7 +64,9 @@ fun HistorialCompraScreen(
     }
 
     Column (
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 8.dp)
     ) {
         Box(
             modifier = Modifier

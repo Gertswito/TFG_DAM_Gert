@@ -1,6 +1,8 @@
 package com.gert.tfgdam.screens
 
+import android.net.Uri
 import android.widget.Toast
+import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -33,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +54,7 @@ import com.gert.tfgdam.viewmodel.CarritoViewModel
 import com.gert.tfgdam.viewmodel.PagoViewModel
 import com.gert.tfgdam.viewmodel.UserDireccionesViewModel
 import com.gert.tfgdam.viewmodel.UserSettingsViewModel
+import kotlinx.coroutines.launch
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -302,10 +306,16 @@ fun PagoScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
+                        val scope = rememberCoroutineScope()
+
                         Button(
-                            onClick = { viewModel.finalizarCompra(carritoItems, userDireccionesViewModel.direccionSeleccionada!!, usuario!!, carritoViewModel) {
-                                navController.navigate(Routes.HOME)
-                            }},
+                            onClick = {
+                                scope.launch {
+                                    val stockOk = viewModel.validarStock(carritoItems)
+                                    if (!stockOk) return@launch
+                                    viewModel.iniciarProcesoPago(carritoItems, userDireccionesViewModel.direccionSeleccionada!!, usuario!!)
+                                }
+                            },
                             modifier = Modifier.fillMaxWidth(),
                             enabled = userDireccionesViewModel.direccionSeleccionada != null && carritoItems.isNotEmpty() && usuario != null && !viewModel.isLoading
                         ) {
@@ -317,6 +327,15 @@ fun PagoScreen(
                         }
 
                         val context = LocalContext.current
+                        val approvalUrl = viewModel.approvalUrl
+
+                        LaunchedEffect(approvalUrl) {
+                            approvalUrl?.let {
+                                val customTabsIntent = CustomTabsIntent.Builder().build()
+                                customTabsIntent.launchUrl(context, Uri.parse(it))
+                            }
+                        }
+
                         if (viewModel.errorMessage !== "") {
                             LaunchedEffect(viewModel.errorMessage) {
                                 Toast.makeText(context, viewModel.errorMessage, Toast.LENGTH_LONG).show()

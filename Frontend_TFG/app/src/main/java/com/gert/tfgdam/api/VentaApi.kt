@@ -1,7 +1,7 @@
 package com.gert.tfgdam.api
 
+import com.gert.tfgdam.model.CarritoItem
 import com.gert.tfgdam.model.FinalizarCompra
-import com.gert.tfgdam.model.LineaVenta
 import com.gert.tfgdam.model.Venta
 import retrofit2.Response
 import retrofit2.http.Body
@@ -29,7 +29,12 @@ interface VentaApi {
 
     @DELETE("api/venta/delete/{id}")
     suspend fun delete(@Path("id") id: Long): Response<Unit>
+    @POST("api/venta/validar-stock")
+    suspend fun validarStock(@Body lineas: List<CarritoItem>): Response<Unit>
 
-    @POST("api/venta/finalizar-compra")
-    suspend fun finalizarCompra(@Body finalizarCompra: FinalizarCompra): Response<Venta>
+    @POST("api/venta/paypal/create-order")
+    suspend fun createPaypalOrder(@Body finalizarCompra: FinalizarCompra): Response<Map<String, Any>>
+
+    @POST("api/venta/paypal/capture/{orderId}")
+    suspend fun capturePaypalOrder(@Path("orderId") orderId: String): Response<Venta>
 }

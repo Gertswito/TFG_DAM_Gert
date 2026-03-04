@@ -12,25 +12,26 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.gert.tfgdam.navigation.AppNavHost
 import com.gert.tfgdam.navigation.TopNavBar
 import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.ui.theme.TFGDAMGertTheme
 import com.gert.tfgdam.util.JwtManager
+import com.gert.tfgdam.viewmodel.CarritoViewModel
+import com.gert.tfgdam.viewmodel.PagoViewModel
 import kotlinx.coroutines.flow.firstOrNull
 
 class MainActivity : ComponentActivity() {
+    private val orderIdFromPaypal = mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -44,8 +45,14 @@ class MainActivity : ComponentActivity() {
             isAppearanceLightNavigationBars = false
         }
 
+        orderIdFromPaypal.value = intent?.data?.getQueryParameter("token")
+
         setContent {
             val navController = rememberNavController()
+
+            val pagoViewModel: PagoViewModel = viewModel()
+            val carritoViewModel: CarritoViewModel = viewModel()
+
             val context = LocalContext.current
             val tokenFlow = JwtManager.getToken(context)
             val tokenState = produceState<String?>(initialValue = "LOADING", key1 = tokenFlow) {
@@ -83,6 +90,11 @@ class MainActivity : ComponentActivity() {
                                         else -> Routes.HOME
                                     }
                                 )
+                            }
+                        }
+                        LaunchedEffect(orderIdFromPaypal.value) {
+                            orderIdFromPaypal.value?.let { orderId ->
+                                pagoViewModel.capturarPago(orderId = orderId, carritoViewModel = carritoViewModel)
                             }
                         }
                     }
