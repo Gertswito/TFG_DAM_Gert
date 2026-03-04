@@ -30,7 +30,7 @@ import com.gert.tfgdam.viewmodel.PagoViewModel
 import kotlinx.coroutines.flow.firstOrNull
 
 class MainActivity : ComponentActivity() {
-    private val orderIdFromPaypal = mutableStateOf<String?>(null)
+    private val orderIdPaypal = mutableStateOf<String?>(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,13 +45,10 @@ class MainActivity : ComponentActivity() {
             isAppearanceLightNavigationBars = false
         }
 
-        orderIdFromPaypal.value = intent?.data?.getQueryParameter("token")
+        orderIdPaypal.value = intent?.data?.getQueryParameter("token")
 
         setContent {
             val navController = rememberNavController()
-
-            val pagoViewModel: PagoViewModel = viewModel()
-            val carritoViewModel: CarritoViewModel = viewModel()
 
             val context = LocalContext.current
             val tokenFlow = JwtManager.getToken(context)
@@ -78,7 +75,8 @@ class MainActivity : ComponentActivity() {
                             null -> {
                                 AppNavHost(
                                     navController = navController,
-                                    startDestination = Routes.HOME
+                                    startDestination = Routes.HOME,
+                                    null
                                 )
                             }
                             else -> {
@@ -88,13 +86,9 @@ class MainActivity : ComponentActivity() {
                                         "ADMIN" -> Routes.HOME_ADMIN
                                         "USER" -> Routes.HOME
                                         else -> Routes.HOME
-                                    }
+                                    },
+                                    orderIdPaypal = orderIdPaypal.value
                                 )
-                            }
-                        }
-                        LaunchedEffect(orderIdFromPaypal.value) {
-                            orderIdFromPaypal.value?.let { orderId ->
-                                pagoViewModel.capturarPago(orderId = orderId, carritoViewModel = carritoViewModel)
                             }
                         }
                     }

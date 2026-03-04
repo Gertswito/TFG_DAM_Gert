@@ -38,6 +38,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -260,12 +261,20 @@ fun VentaExpandableCard(
                                 ) {
                                     Column {
                                         Text(
-                                            text = linea.libro?.titulo ?: "Libro",
-                                            fontWeight = FontWeight.Bold
+                                            text = linea.libro?.titulo?.let {
+                                                if (it.length > 30) it.take(30) + "..." else it
+                                            } ?: "Libro",
+                                            fontWeight = FontWeight.Bold,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                         Text(
-                                            text = "- " + (linea.libro?.autor?.nombre ?: "Autor"),
-                                            fontWeight = FontWeight.Medium
+                                            text = ("- ") + (linea.libro?.autor?.nombre?.let {
+                                                if (it.length > 30) it.take(30) + "..." else it
+                                            } ?: "Autor"),
+                                            fontWeight = FontWeight.Medium,
+                                            maxLines = 1,
+                                            overflow = TextOverflow.Ellipsis
                                         )
                                         Text(
                                             text = "Cantidad: " + (linea.cantidad),
