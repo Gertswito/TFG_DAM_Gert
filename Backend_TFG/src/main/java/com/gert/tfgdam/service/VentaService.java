@@ -29,10 +29,13 @@ public class VentaService {
 
     private final LibroRepository libroRepository;
 
-    public VentaService(VentaRepository ventaRepository, LineaVentaRepository lineaVentaRepository, LibroRepository libroRepository) {
+    private final EmailService emailService;
+
+    public VentaService(VentaRepository ventaRepository, LineaVentaRepository lineaVentaRepository, LibroRepository libroRepository, EmailService emailService) {
         this.ventaRepository = ventaRepository;
         this.lineaVentaRepository = lineaVentaRepository;
         this.libroRepository = libroRepository;
+        this.emailService = emailService;
     }
 
     public List<Venta> getAllVenta() {
@@ -91,5 +94,9 @@ public class VentaService {
         } catch (Exception e) {
             throw new RuntimeException("Error al finalizar la compra: " + e.getMessage(), e);
         }
+    }
+
+    public void enviarCorreoVenta(FinalizarCompra finalizarCompra) {
+        emailService.enviarCorreoVenta(finalizarCompra);
     }
 }

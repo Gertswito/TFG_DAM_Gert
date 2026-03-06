@@ -21,10 +21,13 @@ public class ClienteService {
 
     private final JwtTokenUtil jwtTokenUtil;
 
-    public ClienteService(ClienteRepository clienteRepository, BCryptPasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil) {
+    private final EmailService emailService;
+
+    public ClienteService(ClienteRepository clienteRepository, BCryptPasswordEncoder passwordEncoder, JwtTokenUtil jwtTokenUtil, EmailService emailService) {
         this.clienteRepository = clienteRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenUtil = jwtTokenUtil;
+        this.emailService = emailService;
     }
 
     public List<Cliente> getAllCliente() {
@@ -119,5 +122,9 @@ public class ClienteService {
         }
 
         return clienteRepository.save(clienteSinActualizar);
+    }
+
+    public void enviarCorreoRegistro(Cliente nuevoCliente) {
+        emailService.enviarCorreoRegistro(nuevoCliente);
     }
 }

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>"FACTURA LIBRERIAS GERT"</title>
+        <meta charset="UTF-8" />
+        <style>
+            @page {
+                size: A4;
+                margin: 10mm;
+                background: #1E1E1E;
+            }
+
+            html, body {
+                background-color: #1E1E1E;
+            }
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                color: #FFFFFF;
+                background-color: #1E1E1E;
+            }
+            h1 {
+                border-bottom: 2px solid #31574A;
+                padding-bottom: 10px;
+                padding-left: 10px;
+                color: #CBB26A;
+            }
+            h2 {
+                position: absolute;
+                text-align: right;
+                right: 12px;
+                top: 0px;
+                color: #FFFFFF;
+            }
+            .hr {
+                margin-bottom: 25px;
+                border: none; 
+                border-top: 2px solid #31574A;
+            }
+            .info-table {
+                width: 100%;
+                margin-top: 10px;
+                margin-bottom: 25px;
+                border-collapse: collapse;
+                background-color: #1E1E1E;
+            }
+            .info-table td {
+                border: none;
+                padding: 2px 0;
+                vertical-align: top;
+            }
+            .right {
+                text-align: right;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 10px;
+                background-color: #2B2B2B;
+            }
+            th, td {
+                border: 1px solid #181818;
+                padding: 12px 15px;
+                text-align: left;
+            }
+            th {
+                background-color: #31574A;
+                color: #FFFFFF;
+            }
+            tfoot td {
+                font-weight: bold;
+                font-size: 1.1em;
+            }
+            .footer {
+                margin-top: 30px;
+                font-size: 0.9em;
+                color: #DCDCDC;
+                border-top: 1px solid #31574A;
+                padding-top: 10px;
+                text-align: center;
+            }
+            .low-light {
+                color: #DCDCDC;
+            }
+            .green-txt {
+                color: #CBB26A;
+            }
+            .header-tabla:nth-child(even) {
+                background-color: #2B2B2B;
+            }
+            tr {
+                page-break-inside: avoid;
+            }
+            tbody tr {
+                page-break-inside: avoid;
+                background-color: #2B2B2B;
+            }
+            .info-table tbody tr {
+                background-color: #1E1E1E;
+            }
+            .avoid-break {
+                page-break-inside: avoid;
+            }
+            th:nth-child(6), td:nth-child(6) {
+                white-space: nowrap;
+                text-align: right;
+            }
+        </style>
+    </head>
+    <body>
+        <h1> - Librerías Gert - </h1>
+        <h2>Factura #<span th:text="${ventaId}">123</span></h2>
+
+        <table class="info-table">
+            <tr>
+                <td>
+                    <strong>Cliente: </strong>
+                    <span th:text="${clienteNombre}">Juan Pérez</span>
+                    <span class="low-light">- &#40; <span th:text="${clienteUsuario}">juanito777</span> &#41;</span>
+                </td>
+                <td class="right">
+                    <span th:text="${direccion1}">Calle Zamora 12 6D</span>,
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <strong>Fecha: </strong>
+                    <span th:text="${fecha}">06/03/2026</span>
+                    <span th:text="${hora}">11:30</span>
+                </td>
+                <td class="right">
+                    <span th:text="${direccion2}">Fuenlabrada, Madrid | 28941</span>
+                </td>
+            </tr>
+        </table>
+
+        <table>
+            <colgroup>
+                <col style="width:37%" />
+                <col style="width:16%" />
+                <col style="width:16%" />
+                <col style="width:8%" />
+                <col style="width:8%" />
+                <col style="width:15%" />
+            </colgroup>
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Editorial</th>
+                    <th>Uds</th>
+                    <th>Precio ud.</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="l : ${librosComprados}" class="header-tabla">
+                    <td th:text="${l.titulo}">Título</td>
+                    <td th:text="${l.autor}">Autor</td>
+                    <td th:text="${l.editorial}">Editorial</td>
+                    <td><span th:text="${l.cantidadPedida}">1</span>uds</td>
+                    <td th:text="${#numbers.formatDecimal(l.precioParcial,1,'COMMA',2,'POINT') + '€'}">10,00€</td>
+                    <td th:text="${#numbers.formatDecimal(l.precioTotal,1,'COMMA',2,'POINT') + '€'}">10,00€</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="5" style="text-align:right;">Importe total:</td>
+                    <td th:text="${#numbers.formatDecimal(precioFinal,1,'COMMA',2,'POINT') + '€'}" class="green-txt">100,00€</td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="footer avoid-break">Gracias por comprar en nuestra librería :D</div>
+    </body>
+</html>

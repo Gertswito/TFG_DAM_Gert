@@ -117,6 +117,7 @@ public class VentaController {
         }
 
         Venta venta = ventaService.finalizarCompra(finalizarCompra);
+        ventaService.enviarCorreoVenta(finalizarCompra);
         ventaTemporalEnMemoria.eliminar(orderId);
         return ResponseEntity.ok(venta);
     }
