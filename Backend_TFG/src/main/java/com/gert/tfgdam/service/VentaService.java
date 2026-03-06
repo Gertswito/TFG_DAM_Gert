@@ -42,6 +42,10 @@ public class VentaService {
         return ventaRepository.findAll();
     }
 
+    public List<Venta> getAllVentaPorUsuario(String usuario) {
+        return ventaRepository.findByClienteUsuario(usuario);
+    }
+
     public Venta getVentaPorId(Long id) {
         return ventaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la venta"));
     }

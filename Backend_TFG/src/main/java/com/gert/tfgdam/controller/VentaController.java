@@ -52,6 +52,11 @@ public class VentaController {
         return ventaService.getAllVenta();
     }
 
+    @GetMapping("/get/usuario/{usuario}")
+    public List<Venta> getAllVentaPorUsuario(@PathVariable String usuario) {
+        return ventaService.getAllVentaPorUsuario(usuario);
+    }
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Venta> getVentaPorId(@PathVariable Long id) {
         try {

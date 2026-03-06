@@ -16,6 +16,10 @@ class VentaRepository {
         return api.getAll()
     }
 
+    suspend fun getAllPorUsuario(usuario: String): Response<List<Venta>> {
+        return api.getAllPorUsuario(usuario)
+    }
+
     suspend fun getPorId(id: Long): Response<Venta> {
         return api.getPorId(id)
     }

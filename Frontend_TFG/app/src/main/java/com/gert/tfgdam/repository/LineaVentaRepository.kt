@@ -14,8 +14,8 @@ class LineaVentaRepository {
         return api.getAll()
     }
 
-    suspend fun getAllPorUsuario(usuario: String): Response<List<LineaVenta>> {
-        return api.getAllPorUsuario(usuario)
+    suspend fun getAllPorVenta(ventaId: Long): Response<List<LineaVenta>> {
+        return api.getAllPorVenta(ventaId)
     }
 
     suspend fun getPorId(id: Long): Response<LineaVenta> {

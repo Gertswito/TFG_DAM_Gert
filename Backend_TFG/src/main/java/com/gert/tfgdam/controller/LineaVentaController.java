@@ -46,9 +46,9 @@ public class LineaVentaController {
         }
     }
 
-    @GetMapping("/get/usuario/{usuario}")
-    public List<LineaVenta> getAllLineaVentaPorUsuario(@PathVariable String usuario) {
-        return lineaVentaService.getAllLineaVentaPorUsuario(usuario);
+    @GetMapping("/get/venta/{ventaId}")
+    public List<LineaVenta> getAllLineaVentaPorVenta(@PathVariable Long ventaId) {
+        return lineaVentaService.getAllLineaVentaPorVenta(ventaId);
     }
 
     @DeleteMapping("/delete/{id}")

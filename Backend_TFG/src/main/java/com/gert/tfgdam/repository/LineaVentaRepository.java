@@ -7,5 +7,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LineaVentaRepository extends JpaRepository<LineaVenta, Long> {
-    List<LineaVenta> findByVentaClienteUsuario(String usuario);
+    List<LineaVenta> findByVentaId(Long ventaId);
 }

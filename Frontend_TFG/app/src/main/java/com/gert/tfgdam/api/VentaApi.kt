@@ -15,6 +15,9 @@ interface VentaApi {
     @GET("api/venta/get")
     suspend fun getAll(): Response<List<Venta>>
 
+    @GET("api/venta/get/usuario/{usuario}")
+    suspend fun getAllPorUsuario(@Path("usuario") usuario: String): Response<List<Venta>>
+
     @GET("api/venta/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Venta>
 

@@ -6,29 +6,52 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gert.tfgdam.model.LineaVenta
+import com.gert.tfgdam.model.Venta
 import com.gert.tfgdam.repository.LineaVentaRepository
+import com.gert.tfgdam.repository.VentaRepository
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 class HistorialCompraViewModel : ViewModel() {
-    private val repository = LineaVentaRepository()
+    private val lineaVentarepository = LineaVentaRepository()
+    private val ventaRepository = VentaRepository()
 
-    var listaHistorial by mutableStateOf<List<LineaVenta>>(emptyList())
+    var listaVentaHistorial by mutableStateOf<List<Venta>>(emptyList())
+        private set
+    var lineasPorVenta by mutableStateOf<Map<Long, List<LineaVenta>>>(emptyMap())
         private set
 
-    fun cargarHistorial(usuario: String) {
+    fun cargarVentasHistorial(usuario: String) {
         viewModelScope.launch {
             try {
-                val response = repository.getAllPorUsuario(usuario)
+                val response = ventaRepository.getAllPorUsuario(usuario)
 
                 if (response.isSuccessful) {
-                    listaHistorial = response.body() ?: emptyList()
+                    listaVentaHistorial = response.body() ?: emptyList()
                 } else {
-                    listaHistorial = emptyList()
+                    listaVentaHistorial = emptyList()
                 }
             } catch (e: IOException) {
-                listaHistorial = emptyList()
+                listaVentaHistorial = emptyList()
             }
+        }
+    }
+
+    fun cargarLineasVentasHistorial(ventaId: Long) {
+        if (lineasPorVenta.containsKey(ventaId)) return
+
+        viewModelScope.launch {
+            try {
+                val response = lineaVentarepository.getAllPorVenta(ventaId)
+
+                if (response.isSuccessful) {
+                    val nuevas = response.body() ?: emptyList()
+
+                    lineasPorVenta = lineasPorVenta.toMutableMap().apply {
+                        put(ventaId, nuevas)
+                    }
+                }
+            } catch (_: IOException) {}
         }
     }
 }

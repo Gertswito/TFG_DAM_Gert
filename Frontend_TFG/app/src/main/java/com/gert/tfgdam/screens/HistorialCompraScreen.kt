@@ -43,7 +43,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.gert.tfgdam.model.LineaVenta
+import androidx.compose.material3.CircularProgressIndicator
 import com.gert.tfgdam.model.Venta
 import com.gert.tfgdam.util.JwtManager
 import com.gert.tfgdam.viewmodel.HistorialCompraViewModel
@@ -54,13 +54,13 @@ import java.util.Locale
 fun HistorialCompraScreen(
     viewModel: HistorialCompraViewModel = viewModel()
 ) {
-    val listaHistorial = viewModel.listaHistorial
+    val listaVentaHistorial = viewModel.listaVentaHistorial
     val context = LocalContext.current
     val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
 
     LaunchedEffect(userInfo?.sub) {
         userInfo?.sub?.let { usuario ->
-            viewModel.cargarHistorial(usuario)
+            viewModel.cargarVentasHistorial(usuario)
         }
     }
 
@@ -84,7 +84,7 @@ fun HistorialCompraScreen(
             )
         }
 
-        if (listaHistorial.isEmpty()) {
+        if (listaVentaHistorial.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -101,20 +101,15 @@ fun HistorialCompraScreen(
                 )
             }
         } else {
-            val ventasAgrupadas = listaHistorial.groupBy { it.venta?.id }.toSortedMap(compareBy(nullsLast()) { it })
             LazyColumn(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
                 verticalArrangement = Arrangement.Top
             ) {
-                ventasAgrupadas.forEach { (ventaId, lineas) ->
-
+                listaVentaHistorial.forEach { venta ->
                     item {
-                        VentaExpandableCard(
-                            venta = lineas.first().venta,
-                            lineas = lineas.sortedBy { it.id }
-                        )
+                        VentaExpandableCard(venta, viewModel)
                     }
                 }
             }
@@ -125,11 +120,14 @@ fun HistorialCompraScreen(
 @Composable
 fun VentaExpandableCard(
     venta: Venta?,
-    lineas: List<LineaVenta>
+    viewModel: HistorialCompraViewModel = viewModel()
 ) {
     var verLineasVenta by remember { mutableStateOf(false) }
     val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
     val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+
+    val lineas = viewModel.lineasPorVenta[venta?.id] ?: emptyList()
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -137,7 +135,13 @@ fun VentaExpandableCard(
             .clickable(
                 indication = null,
                 interactionSource = remember { MutableInteractionSource() }
-            ) { verLineasVenta = !verLineasVenta },
+            ) {
+                verLineasVenta = !verLineasVenta
+
+                if (verLineasVenta) {
+                    venta?.id?.let { viewModel.cargarLineasVentasHistorial(it) }
+                }
+            },
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -173,57 +177,35 @@ fun VentaExpandableCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Text(
-                buildAnnotatedString {
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    ) { append("Fecha: ") }
-
-                    withStyle(
-                        style = SpanStyle(
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.inverseSurface
-                        )
-                    ) { append((venta?.fecha) + " " + (venta?.hora)) }
-                },
-                modifier = Modifier.padding(horizontal = 12.dp)
-            )
-
-            Spacer(modifier = Modifier.height(2.dp))
-
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(
-                    text = ("Dirección de envío: "),
-                    fontSize = 14.sp,
+                    text = (venta?.direccion?.calle) + " " + (venta?.direccion?.numero) + " " + (venta?.direccion?.piso) + "",
+                    fontSize = 12.sp,
                     modifier = Modifier.padding(horizontal = 12.dp),
-                    fontWeight = FontWeight.Bold
+                    lineHeight = 14.sp,
+                    color = MaterialTheme.colorScheme.inverseSurface
                 )
 
-                Column (
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = (venta?.direccion?.calle) + " " + (venta?.direccion?.numero) + " " + (venta?.direccion?.piso + ", "),
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 12.dp),
-                        lineHeight = 14.sp,
-                        color = MaterialTheme.colorScheme.inverseSurface
-                    )
-
-                    Text(
-                        text = ((venta?.direccion?.ciudad) + ", " + (venta?.direccion?.provincia) + " | " + (venta?.direccion?.codigoPostal)),
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(horizontal = 12.dp),
-                        lineHeight = 14.sp,
-                        color = MaterialTheme.colorScheme.inverseSurface
-                    )
-                }
+                Text(
+                    text = (venta?.direccion?.ciudad) + ", " + (venta?.direccion?.provincia) + " | " + (venta?.direccion?.codigoPostal ?: "N/A"),
+                    fontSize = 12.sp,
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    lineHeight = 14.sp,
+                    color = MaterialTheme.colorScheme.inverseSurface
+                )
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            Text(
+                text = (venta?.fecha) + " " + (venta?.hora),
+                fontSize = 12.sp,
+                modifier = Modifier.padding(horizontal = 12.dp),
+                lineHeight = 14.sp,
+                color = MaterialTheme.colorScheme.inverseSurface
+            )
 
             AnimatedVisibility(
                 visible = verLineasVenta,
@@ -253,48 +235,69 @@ fun VentaExpandableCard(
                                 .fillMaxWidth()
                                 .padding(8.dp)
                         ) {
-                            lineas.forEachIndexed { index, linea ->
+
+                            if (lineas.isEmpty()) {
+
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.Bottom
+                                    horizontalArrangement = Arrangement.Center
                                 ) {
-                                    Column {
-                                        Text(
-                                            text = linea.libro?.titulo?.let {
-                                                if (it.length > 30) it.take(30) + "..." else it
-                                            } ?: "Libro",
-                                            fontWeight = FontWeight.Bold,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                        Text(
-                                            text = ("- ") + (linea.libro?.autor?.nombre?.let {
-                                                if (it.length > 30) it.take(30) + "..." else it
-                                            } ?: "Autor"),
-                                            fontWeight = FontWeight.Medium,
-                                            maxLines = 1,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
+                                    CircularProgressIndicator()
+                                }
+
+                            } else {
+
+                                lineas.forEachIndexed { index, linea ->
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.Bottom
+                                    ) {
+                                        Column {
+                                            Text(
+                                                text = linea.libro?.titulo?.let {
+                                                    if (it.length > 35) it.take(35) + "..." else it
+                                                } ?: "Libro",
+                                                fontWeight = FontWeight.Bold,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                            Text(
+                                                text = ("- ") + (linea.libro?.autor?.nombre?.let {
+                                                    if (it.length > 35) it.take(35) + "..." else it
+                                                } ?: "Autor"),
+                                                fontWeight = FontWeight.Medium,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
+
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.Bottom
+                                    ) {
                                         Text(
                                             text = "Cantidad: " + (linea.cantidad),
                                             fontWeight = FontWeight.Thin,
-                                            fontSize = 10.sp
+                                            fontSize = 10.sp,
+                                            modifier = Modifier.weight(1f)
+                                        )
+
+                                        Text(
+                                            text = "+" + formatoDinero.format(linea.precioTotal),
+                                            fontWeight = FontWeight.Medium,
+                                            color = MaterialTheme.colorScheme.secondary,
                                         )
                                     }
 
-                                    Text(
-                                        text = "+" + formatoDinero.format(linea.precioTotal),
-                                        fontWeight = FontWeight.Medium,
-                                        color = MaterialTheme.colorScheme.secondary
-                                    )
-                                }
-
-                                if (index != lineas.lastIndex) {
-                                    HorizontalDivider(
-                                        modifier = Modifier.padding(vertical = 12.dp),
-                                        color = MaterialTheme.colorScheme.onBackground
-                                    )
+                                    if (index != lineas.lastIndex) {
+                                        HorizontalDivider(
+                                            modifier = Modifier.padding(vertical = 12.dp),
+                                            color = MaterialTheme.colorScheme.onBackground
+                                        )
+                                    }
                                 }
                             }
                         }
