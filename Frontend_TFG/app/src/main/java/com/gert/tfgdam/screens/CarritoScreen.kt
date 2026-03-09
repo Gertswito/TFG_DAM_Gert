@@ -242,6 +242,7 @@ fun LibroItemCarrito(
     item: CarritoItem,
 ){
     val viewModel: CarritoViewModel = viewModel()
+    val context = LocalContext.current
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -301,6 +302,7 @@ fun LibroItemCarrito(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(onClick = {
+                            viewModel.vibrar(context)
                             if (item.cantidad > 1) {
                                 viewModel.quitarUnoDelCarrito(item.libro.id!!)
                             } else {
@@ -321,7 +323,10 @@ fun LibroItemCarrito(
                         )
 
                         IconButton(
-                            onClick = { viewModel.addAlCarrito(item.libro) }
+                            onClick = {
+                                viewModel.vibrar(context)
+                                viewModel.addAlCarrito(item.libro)
+                            }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
@@ -330,7 +335,12 @@ fun LibroItemCarrito(
                         }
                     }
 
-                    IconButton(onClick = { viewModel.deleteDelCarrito(item.libro.id!!) }) {
+                    IconButton(
+                        onClick = {
+                            viewModel.vibrar(context)
+                            viewModel.deleteDelCarrito(item.libro.id!!)
+                        }
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Eliminar",
@@ -359,7 +369,10 @@ fun BotonAddCarrito(
                 .width(60.dp)
                 .height(30.dp),
             enabled = esUser,
-            onClick = { carritoViewModel.addAlCarrito(libroEspecifico) }
+            onClick = {
+                carritoViewModel.vibrar(context)
+                carritoViewModel.addAlCarrito(libroEspecifico)
+            }
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
@@ -373,7 +386,10 @@ fun BotonAddCarrito(
         Button(
             modifier = Modifier.fillMaxWidth(),
             enabled = esUser,
-            onClick = { carritoViewModel.addAlCarrito(libroEspecifico) },
+            onClick = {
+                carritoViewModel.vibrar(context)
+                carritoViewModel.addAlCarrito(libroEspecifico)
+            },
         ) {
             Text(
                 text = ("AÑADIR AL CARRITO - ") + (libroEspecifico.precio?.let { formatoDinero.format(it) } ?: "N/A"),

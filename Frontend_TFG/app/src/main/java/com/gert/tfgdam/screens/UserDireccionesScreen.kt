@@ -48,6 +48,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
 import com.gert.tfgdam.model.Cliente
 import com.gert.tfgdam.model.Direccion
@@ -158,6 +159,7 @@ fun DireccionItem(
 ) {
     var abrirModalEditarDireccion by remember { mutableStateOf(false) }
     val estaSeleccionada = viewModel.direccionSeleccionada?.id == direccion.id
+    val context = LocalContext.current
 
     Card(
         modifier = Modifier
@@ -298,7 +300,10 @@ fun DireccionItem(
                     } else {
                         if (!estaSeleccionada) {
                             Button(
-                                onClick = { viewModel.seleccionarDireccion(direccion) }
+                                onClick = {
+                                    viewModel.vibrar(context)
+                                    viewModel.seleccionarDireccion(direccion)
+                                }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Check,
@@ -308,7 +313,10 @@ fun DireccionItem(
                             }
                         } else {
                             Button(
-                                onClick = { viewModel.deseleccionarDireccion() },
+                                onClick = {
+                                    viewModel.vibrar(context)
+                                    viewModel.deseleccionarDireccion()
+                                },
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = MaterialTheme.colorScheme.surface,
                                     contentColor = MaterialTheme.colorScheme.onPrimary

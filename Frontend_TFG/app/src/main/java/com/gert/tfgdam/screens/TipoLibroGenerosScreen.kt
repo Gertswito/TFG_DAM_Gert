@@ -111,7 +111,7 @@ fun TipoLibroGenerosScreen(
                         item {
                             Card(
                                 modifier = Modifier
-                                    .padding(8.dp)
+                                    .padding(4.dp)
                                     .width(150.dp)
                                     .height(270.dp)
                                     .clickable{ navController.navigate(Routes.TIPO_LIBRO_GENERO_SELECTED.replace("{tipoLibro}", tipoLibroString).replace("{genero}", genero ?: "null")) },

@@ -249,7 +249,10 @@ fun LibroItem(
                 val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
 
                 IconButton(
-                    onClick = { listaDeseadosViewModel.deleteLibroListaDeseados(libro, userInfo?.sub ?: "", false) },
+                    onClick = {
+                        listaDeseadosViewModel.vibrar(context)
+                        listaDeseadosViewModel.deleteLibroListaDeseados(libro, userInfo?.sub ?: "", false)
+                    },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(0.dp)

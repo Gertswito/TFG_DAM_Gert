@@ -141,7 +141,7 @@ fun LibroDetailsScreen(
                 if(libroEspecifico !== null) {
                     Column (
                         modifier = Modifier
-                            .padding(vertical = 8.dp)
+                            .padding(vertical = 0.dp)
                             .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
@@ -162,10 +162,20 @@ fun LibroDetailsScreen(
             }
 
             item {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text (
+                        text = ("ISBN: ") + (libroEspecifico?.isbn ?: "N/A"),
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                }
+
                 HorizontalDivider(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp, bottom = 0.dp),
+                        .padding(top = 10.dp, bottom = 0.dp),
                     thickness = 1.dp,
                     color = MaterialTheme.colorScheme.onBackground
                 )

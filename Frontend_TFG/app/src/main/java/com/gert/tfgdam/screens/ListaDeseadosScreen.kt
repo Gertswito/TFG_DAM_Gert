@@ -136,7 +136,10 @@ fun BotonAddListaDeseados(
         Button(
             modifier = Modifier.fillMaxWidth(),
             enabled = esUser && !listaDeseadosViewModel.isLoading,
-            onClick = { listaDeseadosViewModel.addLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "") },
+            onClick = {
+                listaDeseadosViewModel.vibrar(context)
+                listaDeseadosViewModel.addLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "")
+            },
         ) {
             if (listaDeseadosViewModel.isLoading) {
                 CircularProgressIndicator(
@@ -163,7 +166,10 @@ fun BotonAddListaDeseados(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.onBackground
             ),
-            onClick = { listaDeseadosViewModel.deleteLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "", true)},
+            onClick = {
+                listaDeseadosViewModel.vibrar(context)
+                listaDeseadosViewModel.deleteLibroListaDeseados(libroEspecifico, userInfo?.sub ?: "", true)
+            },
         ) {
             if (listaDeseadosViewModel.isLoading) {
                 CircularProgressIndicator(

@@ -145,6 +145,7 @@ fun TopNavBar(
             if (!token.isNullOrEmpty()) {
                 IconButton(
                     onClick = {
+                        carritoViewModel.vibrar(context)
                         coroutineScope.launch {
                             jwtManager.clearToken(context)
                             navController.navigate(Routes.HOME) {
