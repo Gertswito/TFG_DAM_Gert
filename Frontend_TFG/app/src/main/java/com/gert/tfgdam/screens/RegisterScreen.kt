@@ -237,3 +237,71 @@ fun TextFieldRegisterYLogin(
         )
     }
 }
+
+@Composable
+fun TextFieldRegisterYLoginColoresAlternativos(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    modifier: Modifier = Modifier,
+    isPassword: Boolean = false,
+) {
+    if (isPassword) {
+        TextField(
+            value = value,
+            onValueChange = {
+                if (it.length <= 150) onValueChange(it)
+            },
+            label = { Text(label) },
+            modifier = modifier.fillMaxWidth(),
+            singleLine = true,
+            maxLines = 1,
+            visualTransformation = PasswordVisualTransformation(),
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                errorTextColor = MaterialTheme.colorScheme.onError,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                errorCursorColor = MaterialTheme.colorScheme.onError,
+                focusedIndicatorColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground,
+                errorIndicatorColor = MaterialTheme.colorScheme.onError,
+                focusedLabelColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onBackground,
+                errorPlaceholderColor = MaterialTheme.colorScheme.onError
+            )
+        )
+    } else {
+        TextField(
+            value = value,
+            onValueChange = {
+                if (it.length <= 150) onValueChange(it)
+            },
+            label = { Text(label) },
+            modifier = modifier.fillMaxWidth(),
+            singleLine = true,
+            maxLines = 1,
+            colors = TextFieldDefaults.colors(
+                focusedTextColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+                errorTextColor = MaterialTheme.colorScheme.onError,
+                focusedContainerColor = MaterialTheme.colorScheme.background,
+                unfocusedContainerColor = MaterialTheme.colorScheme.background,
+                cursorColor = MaterialTheme.colorScheme.onBackground,
+                errorCursorColor = MaterialTheme.colorScheme.onError,
+                focusedIndicatorColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedIndicatorColor = MaterialTheme.colorScheme.onBackground,
+                errorIndicatorColor = MaterialTheme.colorScheme.onError,
+                focusedLabelColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedLabelColor = MaterialTheme.colorScheme.onBackground,
+                focusedPlaceholderColor = MaterialTheme.colorScheme.onBackground,
+                unfocusedPlaceholderColor = MaterialTheme.colorScheme.onBackground,
+                errorPlaceholderColor = MaterialTheme.colorScheme.onError
+            )
+        )
+    }
+}

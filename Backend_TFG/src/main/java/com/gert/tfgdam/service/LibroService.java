@@ -26,6 +26,10 @@ public class LibroService {
         return libroRepository.findAll();
     }
 
+    public List<Libro> getAllLibroLimitadoPorStock() {
+        return libroRepository.findLibrosLimitadoPorStock();
+    }
+
     public List<Libro> getAllLibroLimitadoParaView() {
         return libroRepository.findLibrosLimitadosYDivididosPorTipoLibro();
     }
@@ -116,6 +120,13 @@ public class LibroService {
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "El libro no estaba en la lista de deseados");
         }
+    }
+
+    public Libro actualizarStock(Long id, Integer addedStock) {
+        Libro libroActualizar = getLibroPorId(id);
+        Integer stockFinal = (libroActualizar.getStock()) + (addedStock); 
+        libroActualizar.setStock(stockFinal);
+        return libroRepository.save(libroActualizar);
     }
 }
 

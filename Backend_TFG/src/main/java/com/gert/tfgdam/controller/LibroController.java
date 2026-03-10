@@ -38,6 +38,11 @@ public class LibroController {
         return libroService.getAllLibro();
     }
 
+    @GetMapping("/get/stock")
+    public List<Libro> getAllLibroLimitadoPorStock() {
+        return libroService.getAllLibroLimitadoPorStock();
+    }
+
     @GetMapping("/get/view")
     public List<Libro> getAllLibroLimitadoParaView() {
         return libroService.getAllLibroLimitadoParaView();
@@ -118,5 +123,19 @@ public class LibroController {
     public ResponseEntity<Void>deleteLibroListaDeseados(@PathVariable Long id, @PathVariable String usuario) {
         libroService.deleteLibroListaDeseados(id, usuario);
         return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/update/stock/{id}")
+    public ResponseEntity<Libro> actualizarStock(@PathVariable Long id, @RequestBody Integer addedStock) {
+        try {
+            if (libroService.getLibroPorId(id) != null) {
+                libroService.actualizarStock(id, addedStock);
+                return ResponseEntity.ok(libroService.getLibroPorId(id));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 }

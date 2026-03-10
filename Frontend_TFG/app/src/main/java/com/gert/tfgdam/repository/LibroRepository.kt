@@ -15,6 +15,10 @@ class LibroRepository {
         return api.getAll()
     }
 
+    suspend fun getAllLimitadoPorStock(): Response<List<Libro>> {
+        return api.getAllLimitadoPorStock()
+    }
+
     suspend fun getAllLimitadoParaView(): Response<List<Libro>> {
         return api.getAllLimitadoParaView()
     }
@@ -57,5 +61,9 @@ class LibroRepository {
 
     suspend fun deleteLibroListaDeseados(id: Long, usuario: String): Response<Unit> {
         return api.deleteLibroListaDeseados(id, usuario)
+    }
+
+    suspend fun actualizarStock(id: Long, stock: Int): Response<Libro> {
+        return api.actualizarStock(id, stock)
     }
 }

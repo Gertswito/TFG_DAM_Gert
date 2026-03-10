@@ -354,13 +354,13 @@ fun EditarDireccionModal(
             Surface(
                 shape = RoundedCornerShape(8.dp),
                 color = MaterialTheme.colorScheme.background,
-                tonalElevation = 8.dp
+                tonalElevation = 0.dp
             ) {
                 Box(modifier = Modifier.fillMaxWidth()) {
                     Column(
                         modifier = Modifier
                             .wrapContentHeight()
-                            .padding(vertical = 30.dp),
+                            .padding(top = 30.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         if (direccionEditar != null) {
@@ -400,15 +400,15 @@ fun EditarDireccionModal(
                                     color = MaterialTheme.colorScheme.primary,
                                     shape = MaterialTheme.shapes.medium
                                 ),
-                            elevation = CardDefaults.cardElevation(2.dp),
+                            elevation = CardDefaults.cardElevation(0.dp),
                             colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.background
+                                containerColor = MaterialTheme.colorScheme.surface
                             )
                         ) {
                             Column(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(16.dp)
+                                    .padding(top = 10.dp, bottom = 16.dp, start = 10.dp, end = 10.dp)
                             ) {
                                 TextFieldRegisterYLogin(
                                     value = viewModel.calleEditar,
@@ -474,12 +474,26 @@ fun EditarDireccionModal(
                                         viewModel.codigoPostalEditar = it
                                     },
                                     label = "Código postal",
-                                    modifier = Modifier.padding(horizontal = 10.dp)
+                                    modifier = Modifier.padding(start = 10.dp, end = 10.dp, bottom = 10.dp)
                                 )
                             }
                         }
 
-                        Spacer(modifier = Modifier.height(20.dp))
+                        Spacer(modifier = Modifier.height(15.dp))
+
+                        if (viewModel.errorMessage !== "") {
+                            Text(
+                                text = viewModel.errorMessage,
+                                color = MaterialTheme.colorScheme.error,
+                            )
+                        }
+
+                        if (viewModel.successMessage !== "") {
+                            Text(
+                                text = viewModel.successMessage,
+                                color = MaterialTheme.colorScheme.primary,
+                            )
+                        }
 
                         if (direccionEditar != null) {
                             Button(
@@ -534,21 +548,7 @@ fun EditarDireccionModal(
                             }
                         }
 
-                        if (viewModel.errorMessage !== "") {
-                            Text(
-                                text = viewModel.errorMessage,
-                                color = MaterialTheme.colorScheme.error,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-                        }
-
-                        if (viewModel.successMessage !== "") {
-                            Text(
-                                text = viewModel.successMessage,
-                                color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-                        }
+                        Spacer(modifier = Modifier.height(20.dp))
                     }
 
                     IconButton(
@@ -561,7 +561,7 @@ fun EditarDireccionModal(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Cerrar",
-                            tint = MaterialTheme.colorScheme.onBackground
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 }

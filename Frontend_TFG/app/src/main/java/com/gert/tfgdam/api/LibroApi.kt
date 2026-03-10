@@ -14,6 +14,9 @@ interface LibroApi {
     @GET("api/libro/get")
     suspend fun getAll(): Response<List<Libro>>
 
+    @GET("api/libro/get/stock")
+    suspend fun getAllLimitadoPorStock(): Response<List<Libro>>
+
     @GET("api/libro/get/view")
     suspend fun getAllLimitadoParaView(): Response<List<Libro>>
 
@@ -49,4 +52,7 @@ interface LibroApi {
 
     @DELETE("api/libro/lista-deseados/delete/{id}/{usuario}")
     suspend fun deleteLibroListaDeseados(@Path("id") id: Long, @Path("usuario") usuario: String): Response<Unit>
+
+    @PUT("api/libro/update/stock/{id}")
+    suspend fun actualizarStock(@Path("id") id: Long, @Body stock: Int): Response<Libro>
 }

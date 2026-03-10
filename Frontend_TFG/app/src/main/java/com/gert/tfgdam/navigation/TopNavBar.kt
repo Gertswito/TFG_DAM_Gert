@@ -77,6 +77,8 @@ fun TopNavBar(
         },
         actions = {
             navItems.forEach { navItem ->
+                if (role == "ADMIN" && navItem.route == Routes.CARRITO) return@forEach
+
                 if (navItem.route == Routes.CARRITO) {
                     IconButton(onClick = { navController.navigate(navItem.route) }) {
                         BadgedBox(

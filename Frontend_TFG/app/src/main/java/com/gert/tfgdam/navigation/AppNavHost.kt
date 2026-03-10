@@ -31,7 +31,7 @@ fun AppNavHost(navController: NavHostController, startDestination: String, order
     ) {
         composable(Routes.HOME) { HomeScreen(navController = navController) }
 
-        composable(Routes.HOME_ADMIN) { HomeAdminScreen() }
+        composable(Routes.HOME_ADMIN) { HomeAdminScreen(navController = navController) }
 
         composable(Routes.LOGIN) { backStackEntry -> LoginScreen(navController = navController) }
 

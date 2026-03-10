@@ -18,6 +18,13 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
     List<Libro> findAll();
 
     @Query(value = """
+        SELECT * 
+        FROM libro l
+        WHERE l.stock <= 20
+        """, nativeQuery = true)
+    List<Libro> findLibrosLimitadoPorStock();
+
+    @Query(value = """
         SELECT * FROM (
             SELECT l.*,
                 ROW_NUMBER() OVER (PARTITION BY l.tipolibro_id ORDER BY l.id) as rn

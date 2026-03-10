@@ -194,7 +194,7 @@ fun UserDetailsScreen (
 
                                 Spacer(modifier = Modifier.height(20.dp))
 
-                                TextFieldRegisterYLogin(
+                                TextFieldRegisterYLoginColoresAlternativos(
                                     value = viewModel.emailCambiado,
                                     onValueChange = {
                                         viewModel.emailCambiado = it
@@ -205,7 +205,7 @@ fun UserDetailsScreen (
 
                                 Spacer(modifier = Modifier.height(20.dp))
 
-                                TextFieldRegisterYLogin(
+                                TextFieldRegisterYLoginColoresAlternativos(
                                     value = viewModel.nombreCambiado,
                                     onValueChange = {
                                         viewModel.nombreCambiado = it
@@ -216,7 +216,7 @@ fun UserDetailsScreen (
 
                                 Spacer(modifier = Modifier.height(20.dp))
 
-                                TextFieldRegisterYLogin(
+                                TextFieldRegisterYLoginColoresAlternativos(
                                     value = viewModel.apellidosCambiados,
                                     onValueChange = {
                                         viewModel.apellidosCambiados = it
