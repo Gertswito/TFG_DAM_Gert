@@ -38,6 +38,8 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
 
     List<Libro> findByTipoLibro_NombreAndGeneros_Nombre(String tipoLibro, String genero);
 
+    List<Libro> findByAutor_Nombre(String autor);
+
     boolean existsByTitulo(String titulo);
     
     Libro findByTitulo(String titulo);

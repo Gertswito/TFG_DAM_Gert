@@ -25,6 +25,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -67,7 +68,7 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                TextFieldRegisterYLogin(
+                TextFieldEstilo(
                     value = viewModel.usuario,
                     onValueChange = { viewModel.usuario = it },
                     label = "Nombre de usuario",
@@ -84,14 +85,14 @@ fun RegisterScreen(
                         .padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
-                    TextFieldRegisterYLogin(
+                    TextFieldEstilo(
                         value = viewModel.nombre,
                         onValueChange = { viewModel.nombre = it },
                         label = "Nombre",
                         modifier = Modifier.weight(1f)
                     )
 
-                    TextFieldRegisterYLogin(
+                    TextFieldEstilo(
                         value = viewModel.apellidos,
                         onValueChange = { viewModel.apellidos = it },
                         label = "Apellidos",
@@ -101,7 +102,7 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                TextFieldRegisterYLogin(
+                TextFieldEstilo(
                     value = viewModel.email,
                     onValueChange = { viewModel.email = it },
                     label = "Correo electrónico",
@@ -112,7 +113,7 @@ fun RegisterScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                TextFieldRegisterYLogin(
+                TextFieldEstilo(
                     value = viewModel.contrasenha,
                     onValueChange = { viewModel.contrasenha = it },
                     label = "Contraseña",
@@ -133,7 +134,7 @@ fun RegisterScreen(
                 ) {
                     if (viewModel.isLoading) {
                         CircularProgressIndicator(
-                            color= MaterialTheme.colorScheme.onPrimary,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.size(24.dp)
                         )
                     } else {
@@ -141,7 +142,7 @@ fun RegisterScreen(
                     }
                 }
 
-                if(viewModel.errorMessage !== "") {
+                if (viewModel.errorMessage !== "") {
                     Text(
                         text = viewModel.errorMessage,
                         color = MaterialTheme.colorScheme.error,
@@ -149,7 +150,7 @@ fun RegisterScreen(
                     )
                 }
 
-                if(viewModel.successMessage !== "") {
+                if (viewModel.successMessage !== "") {
                     Text(
                         text = viewModel.successMessage,
                         color = MaterialTheme.colorScheme.primary,
@@ -163,6 +164,7 @@ fun RegisterScreen(
                     text = "¿Tiene una cuenta? Inicie sesión",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.secondary,
+                    textDecoration = TextDecoration.Underline,
                     modifier = Modifier.clickable { navController.navigate(Routes.LOGIN) }
                 )
             }
@@ -171,7 +173,7 @@ fun RegisterScreen(
 }
 
 @Composable
-fun TextFieldRegisterYLogin(
+fun TextFieldEstilo(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,
@@ -239,7 +241,7 @@ fun TextFieldRegisterYLogin(
 }
 
 @Composable
-fun TextFieldRegisterYLoginColoresAlternativos(
+fun TextFieldEstiloAlternativo(
     value: String,
     onValueChange: (String) -> Unit,
     label: String,

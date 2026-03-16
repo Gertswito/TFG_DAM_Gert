@@ -105,7 +105,7 @@ fun UserContrasenhaScreen(
                         ) {
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            TextFieldRegisterYLoginColoresAlternativos(
+                            TextFieldEstiloAlternativo(
                                 value = viewModel.contrasenha,
                                 onValueChange = { viewModel.contrasenha = it },
                                 isPassword = true,
@@ -115,7 +115,7 @@ fun UserContrasenhaScreen(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
-                            TextFieldRegisterYLoginColoresAlternativos(
+                            TextFieldEstiloAlternativo(
                                 value = viewModel.contrasenhaRepetida,
                                 onValueChange = {
                                     viewModel.contrasenhaRepetida = it

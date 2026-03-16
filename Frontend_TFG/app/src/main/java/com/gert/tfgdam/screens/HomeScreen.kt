@@ -41,6 +41,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -124,6 +125,7 @@ fun HomeScreen(
                         text = tipo?.nombre ?: "Sin nombre",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
+                        textDecoration = TextDecoration.Underline,
                         modifier = Modifier
                             .padding(vertical = 8.dp)
                             .clickable { navController.navigate(Routes.TIPO_LIBRO_GENEROS.replace("{tipoLibro}", tipo?.nombre ?: "Sin nombre")) }

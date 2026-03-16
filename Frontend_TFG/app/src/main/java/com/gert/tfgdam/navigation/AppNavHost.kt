@@ -15,6 +15,7 @@ import com.gert.tfgdam.screens.HistorialCompraScreen
 import com.gert.tfgdam.screens.HomeAdminScreen
 import com.gert.tfgdam.screens.HomeScreen
 import com.gert.tfgdam.screens.LibroDetailsScreen
+import com.gert.tfgdam.screens.LibrosPorAutorScreen
 import com.gert.tfgdam.screens.ListaDeseadosScreen
 import com.gert.tfgdam.screens.LoginScreen
 import com.gert.tfgdam.screens.PagoScreen
@@ -22,6 +23,7 @@ import com.gert.tfgdam.screens.RegisterScreen
 import com.gert.tfgdam.screens.TipoLibroGeneroSelectedScreen
 import com.gert.tfgdam.screens.TipoLibroGenerosScreen
 import com.gert.tfgdam.screens.UserSettingsScreen
+import com.gert.tfgdam.viewmodel.LibrosPorAutorViewModel
 
 @Composable
 fun AppNavHost(navController: NavHostController, startDestination: String, orderIdPaypal: String?, ) {
@@ -71,7 +73,18 @@ fun AppNavHost(navController: NavHostController, startDestination: String, order
         ) { backStackEntry ->
             val libroId = backStackEntry.arguments?.getString("libroId") ?: ""
 
-            LibroDetailsScreen(libroId = libroId.toLong())
+            LibroDetailsScreen(libroId = libroId.toLong(), navController = navController)
+        }
+
+        composable(
+            route = Routes.LIBROS_POR_AUTOR,
+            arguments = listOf(
+                navArgument("autor") { type = NavType.StringType },
+            )
+        ) { backStackEntry ->
+            val autor = backStackEntry.arguments?.getString("autor") ?: ""
+
+            LibrosPorAutorScreen(autor = autor, navController = navController)
         }
 
         composable(Routes.CARRITO) { CarritoScreen(navController = navController) }

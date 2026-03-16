@@ -31,6 +31,10 @@ class LibroRepository {
         return api.getAllPorTipoGenero(tipoLibro, genero)
     }
 
+    suspend fun getAllPorNombreDeAutor(autor: String): Response<List<Libro>> {
+        return api.getAllPorNombreDeAutor(autor)
+    }
+
     suspend fun getPorId(id: Long): Response<Libro> {
         return api.getPorId(id)
     }

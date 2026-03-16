@@ -9,6 +9,7 @@ object Routes {
     const val TIPO_LIBRO_GENEROS = "tipo_libro_generos/{tipoLibro}"
     const val TIPO_LIBRO_GENERO_SELECTED = "tipo_libro_genero_selected/{tipoLibro}/{genero}"
     const val LIBRO_DETAILS = "libro_details/{libroId}"
+    const val LIBROS_POR_AUTOR = "libros_por_autor/{autor}"
     const val CARRITO = "carrito"
     const val HISTORIAL_COMPRA = "historial_compra"
     const val LISTA_DESEADOS = "lista_deseados"

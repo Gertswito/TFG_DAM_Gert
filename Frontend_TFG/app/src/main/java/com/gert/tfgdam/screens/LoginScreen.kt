@@ -20,6 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,7 +63,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(15.dp))
 
-                TextFieldRegisterYLogin(
+                TextFieldEstilo(
                     value = viewModel.usuario,
                     onValueChange = { viewModel.usuario = it },
                     label = "Nombre de usuario",
@@ -73,7 +74,7 @@ fun LoginScreen(
 
                 Spacer(modifier = Modifier.height(20.dp))
 
-                TextFieldRegisterYLogin(
+                TextFieldEstilo(
                     value = viewModel.contrasenha,
                     onValueChange = { viewModel.contrasenha = it },
                     label = "Contraseña",
@@ -131,6 +132,7 @@ fun LoginScreen(
                     text = "¿No tiene una cuenta? Registrese",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.secondary,
+                    textDecoration = TextDecoration.Underline,
                     modifier = Modifier.clickable { navController.navigate(Routes.REGISTER) }
                 )
             }

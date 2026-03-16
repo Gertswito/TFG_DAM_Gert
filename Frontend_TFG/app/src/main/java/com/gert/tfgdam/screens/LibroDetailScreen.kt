@@ -1,7 +1,7 @@
 package com.gert.tfgdam.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,13 +9,9 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -30,13 +26,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import coil.compose.AsyncImage
-import com.gert.tfgdam.model.Libro
+import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.util.JwtManager
 import com.gert.tfgdam.viewmodel.LibroDetailsViewModel
 import com.gert.tfgdam.viewmodel.ListaDeseadosViewModel
@@ -45,7 +46,8 @@ import com.gert.tfgdam.viewmodel.ListaDeseadosViewModel
 fun LibroDetailsScreen(
     libroId: Long,
     viewModel: LibroDetailsViewModel = viewModel(),
-    listaDeseadosViewModel: ListaDeseadosViewModel = viewModel()
+    listaDeseadosViewModel: ListaDeseadosViewModel = viewModel(),
+    navController: NavController
 ) {
     val libroEspecifico = viewModel.libroEspecifico
     var showEmpty by remember { mutableStateOf(false) }
@@ -123,8 +125,15 @@ fun LibroDetailsScreen(
                     verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Text(
-                        text = ("Autor: ") + (libroEspecifico?.autor?.nombre ?: "N/A"),
-                        fontWeight = FontWeight.Medium
+                        text = buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Medium)
+                            ) { append("Autor: ") }
+                            withStyle(
+                                style = SpanStyle(color = MaterialTheme.colorScheme.secondary, textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Medium)
+                            ) { append(libroEspecifico?.autor?.nombre ?: "N/A") }
+                        },
+                        modifier = Modifier.clickable { navController.navigate(Routes.LIBROS_POR_AUTOR.replace("{autor}", libroEspecifico?.autor?.nombre ?: "N/A")) }
                     )
                     Text(
                         text = ("Editorial: ") + (libroEspecifico?.editorial?.nombre ?: "N/A"),

@@ -22,8 +22,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -94,11 +98,16 @@ fun TipoLibroGenerosScreen(
             librosPorGeneroLimitados.forEach { (genero, librosLimitados) ->
                 item {
                     Text(
-                        text = ("- ") + (genero ?: "Sin género"),
+                        text = buildAnnotatedString {
+                            append("- ")
+                            withStyle(
+                                style = SpanStyle(textDecoration = TextDecoration.Underline)
+                            ) { append(genero ?: "Sin género") }
+                        },
                         fontSize = 24.sp,
                         modifier = Modifier
                             .padding(vertical = 8.dp)
-                            .clickable{ navController.navigate(Routes.TIPO_LIBRO_GENERO_SELECTED.replace("{tipoLibro}", tipoLibroString).replace("{genero}", genero ?: "null")) }
+                            .clickable { navController.navigate(Routes.TIPO_LIBRO_GENERO_SELECTED.replace("{tipoLibro}", tipoLibroString).replace("{genero}", genero ?: "null")) }
                     )
                 }
 

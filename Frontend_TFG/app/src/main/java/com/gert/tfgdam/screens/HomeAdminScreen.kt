@@ -438,8 +438,8 @@ fun EditarStockLibroModal(
                             color = MaterialTheme.colorScheme.inverseSurface,
                             modifier = Modifier.padding(horizontal = 8.dp)
                         )
-                        
-                        TextFieldRegisterYLoginColoresAlternativos(
+
+                        TextFieldEstiloAlternativo(
                             value = viewModel.addStock,
                             onValueChange = { viewModel.addStock = it },
                             label = "Stock a añadir",

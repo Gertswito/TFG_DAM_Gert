@@ -410,7 +410,7 @@ fun EditarDireccionModal(
                                     .fillMaxWidth()
                                     .padding(top = 10.dp, bottom = 16.dp, start = 10.dp, end = 10.dp)
                             ) {
-                                TextFieldRegisterYLogin(
+                                TextFieldEstilo(
                                     value = viewModel.calleEditar,
                                     onValueChange = {
                                         viewModel.calleEditar = it
@@ -425,7 +425,7 @@ fun EditarDireccionModal(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
-                                    TextFieldRegisterYLogin(
+                                    TextFieldEstilo(
                                         value = viewModel.numeroEditar,
                                         onValueChange = {
                                             viewModel.numeroEditar = it
@@ -434,7 +434,7 @@ fun EditarDireccionModal(
                                         modifier = Modifier.padding(start = 10.dp, end = 5.dp).weight(1f)
                                     )
 
-                                    TextFieldRegisterYLogin(
+                                    TextFieldEstilo(
                                         value = viewModel.pisoEditar,
                                         onValueChange = {
                                             viewModel.pisoEditar = it
@@ -446,7 +446,7 @@ fun EditarDireccionModal(
 
                                 Spacer(modifier = Modifier.height(20.dp))
 
-                                TextFieldRegisterYLogin(
+                                TextFieldEstilo(
                                     value = viewModel.ciudadEditar,
                                     onValueChange = {
                                         viewModel.ciudadEditar = it
@@ -457,7 +457,7 @@ fun EditarDireccionModal(
 
                                 Spacer(modifier = Modifier.height(20.dp))
 
-                                TextFieldRegisterYLogin(
+                                TextFieldEstilo(
                                     value = viewModel.provinciaEditar,
                                     onValueChange = {
                                         viewModel.provinciaEditar = it
@@ -468,7 +468,7 @@ fun EditarDireccionModal(
 
                                 Spacer(modifier = Modifier.height(20.dp))
 
-                                TextFieldRegisterYLogin(
+                                TextFieldEstilo(
                                     value = viewModel.codigoPostalEditar,
                                     onValueChange = {
                                         viewModel.codigoPostalEditar = it
