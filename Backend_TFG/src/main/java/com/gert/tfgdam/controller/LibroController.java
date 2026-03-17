@@ -63,6 +63,11 @@ public class LibroController {
         return libroService.getAllPorNombreDeAutor(autor);
     }
 
+    @GetMapping("/get/editorial/{editorial}")
+    public List<Libro> getAllPorNombreDeEditorial(@PathVariable("editorial") String editorial) {
+        return libroService.getAllPorNombreDeEditorial(editorial);
+    }
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Libro> getLibroPorId(@PathVariable Long id) {
         try {

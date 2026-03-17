@@ -61,6 +61,15 @@ public class LibroService {
         return libros;
     }
 
+    public List<Libro> getAllPorNombreDeEditorial(String editorial) {
+        List<Libro> libros = libroRepository.findByEditorial_Nombre(editorial);
+
+        if (libros.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen libros para el autor seleccionado");
+        }
+        return libros;
+    }
+
     public Libro getLibroPorId(Long id) {
         return libroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro"));
     }

@@ -33,12 +33,14 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
         WHERE t.rn <= 5
         """, nativeQuery = true)
     List<Libro> findLibrosLimitadosYDivididosPorTipoLibro();
-
+    
     List<Libro> findByTipoLibro_Nombre(String nombre);
-
+    
     List<Libro> findByTipoLibro_NombreAndGeneros_Nombre(String tipoLibro, String genero);
-
+    
     List<Libro> findByAutor_Nombre(String autor);
+    
+    List<Libro> findByEditorial_Nombre(String editorial);
 
     boolean existsByTitulo(String titulo);
     

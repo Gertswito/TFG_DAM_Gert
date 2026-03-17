@@ -279,17 +279,18 @@ fun HomeAdminScreen(
         }
 
         if (libros.isEmpty() && showEmpty) {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.background),
-                contentAlignment = Alignment.Center,
+            Column(
+                modifier = modifier.padding(vertical = 10.dp, horizontal = 8.dp),
+                verticalArrangement = Arrangement.Top,
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "No hay libros disponibles",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onBackground
+                    text = "No hay libros disponibles para manejar su stock",
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 10.dp)
                 )
             }
         } else {

@@ -16,6 +16,7 @@ import com.gert.tfgdam.screens.HomeAdminScreen
 import com.gert.tfgdam.screens.HomeScreen
 import com.gert.tfgdam.screens.LibroDetailsScreen
 import com.gert.tfgdam.screens.LibrosPorAutorScreen
+import com.gert.tfgdam.screens.LibrosPorEditorialScreen
 import com.gert.tfgdam.screens.ListaDeseadosScreen
 import com.gert.tfgdam.screens.LoginScreen
 import com.gert.tfgdam.screens.PagoScreen
@@ -85,6 +86,17 @@ fun AppNavHost(navController: NavHostController, startDestination: String, order
             val autor = backStackEntry.arguments?.getString("autor") ?: ""
 
             LibrosPorAutorScreen(autor = autor, navController = navController)
+        }
+
+        composable(
+            route = Routes.LIBROS_POR_EDITORIAL,
+            arguments = listOf(
+                navArgument("editorial") { type = NavType.StringType },
+            )
+        ) { backStackEntry ->
+            val editorial = backStackEntry.arguments?.getString("editorial") ?: ""
+
+            LibrosPorEditorialScreen(editorial = editorial, navController = navController)
         }
 
         composable(Routes.CARRITO) { CarritoScreen(navController = navController) }

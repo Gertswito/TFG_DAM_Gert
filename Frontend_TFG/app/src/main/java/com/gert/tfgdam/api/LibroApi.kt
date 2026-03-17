@@ -29,6 +29,9 @@ interface LibroApi {
     @GET("api/libro/get/autor/{autor}")
     suspend fun getAllPorNombreDeAutor(@Path("autor") autor: String): Response<List<Libro>>
 
+    @GET("api/libro/get/editorial/{editorial}")
+    suspend fun getAllPorNombreDeEditorial(@Path("editorial") editorial: String): Response<List<Libro>>
+
     @GET("api/libro/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Libro>
 

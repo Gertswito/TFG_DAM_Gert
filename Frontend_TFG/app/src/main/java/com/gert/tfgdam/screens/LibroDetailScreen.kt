@@ -136,8 +136,15 @@ fun LibroDetailsScreen(
                         modifier = Modifier.clickable { navController.navigate(Routes.LIBROS_POR_AUTOR.replace("{autor}", libroEspecifico?.autor?.nombre ?: "N/A")) }
                     )
                     Text(
-                        text = ("Editorial: ") + (libroEspecifico?.editorial?.nombre ?: "N/A"),
-                        fontWeight = FontWeight.Medium
+                        text = buildAnnotatedString {
+                            withStyle(
+                                style = SpanStyle(color = MaterialTheme.colorScheme.onBackground, fontWeight = FontWeight.Medium)
+                            ) { append("Editorial: ") }
+                            withStyle(
+                                style = SpanStyle(color = MaterialTheme.colorScheme.secondary, textDecoration = TextDecoration.Underline, fontWeight = FontWeight.Medium)
+                            ) { append(libroEspecifico?.editorial?.nombre ?: "N/A") }
+                        },
+                        modifier = Modifier.clickable { navController.navigate(Routes.LIBROS_POR_EDITORIAL.replace("{editorial}", libroEspecifico?.editorial?.nombre ?: "N/A")) }
                     )
                     Text(
                         text = ("Fecha de salida: ") + (libroEspecifico?.fechaSalida ?: "01/01/2026"),
