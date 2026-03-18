@@ -215,14 +215,15 @@ fun LibroDetailsScreen(
                             Box(
                                 modifier = Modifier
                                     .background(
-                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
                                         shape = RoundedCornerShape(12.dp)
                                     )
                                     .padding(horizontal = 12.dp, vertical = 6.dp)
+                                    .clickable { navController.navigate(Routes.TIPO_LIBRO_GENERO_SELECTED.replace("{tipoLibro}", libroEspecifico.tipoLibro?.nombre ?: "null").replace("{genero}", genero.nombre ?: "null")) }
                             ) {
                                 Text(
                                     text = genero.nombre ?: "Sin genero",
-                                    color = MaterialTheme.colorScheme.primary,
+                                    color = MaterialTheme.colorScheme.secondary,
                                     fontSize = 14.sp
                                 )
                             }
