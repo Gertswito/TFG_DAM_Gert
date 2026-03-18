@@ -11,6 +11,7 @@ object Routes {
     const val LIBRO_DETAILS = "libro_details/{libroId}"
     const val LIBROS_POR_AUTOR = "libros_por_autor/{autor}"
     const val LIBROS_POR_EDITORIAL = "libros_por_editorial/{editorial}"
+    const val LIBROS_NOVEDADES = "libros_novedades"
     const val CARRITO = "carrito"
     const val HISTORIAL_COMPRA = "historial_compra"
     const val LISTA_DESEADOS = "lista_deseados"

@@ -68,6 +68,16 @@ public class LibroController {
         return libroService.getAllPorNombreDeEditorial(editorial);
     }
 
+    @GetMapping("/get/novedades-mes")
+    public List<Libro> getAllLibroNovedadesMes() {
+        return libroService.getAllLibroNovedadesMes();
+    }
+
+    @GetMapping("/get/novedades-latest")
+    public List<Libro> getAllLibroNovedadesUltimaAdicion() {
+        return libroService.getAllLibroNovedadesUltimaAdicion();
+    }
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Libro> getLibroPorId(@PathVariable Long id) {
         try {

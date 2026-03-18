@@ -1,6 +1,10 @@
 package com.gert.tfgdam.service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -68,6 +72,18 @@ public class LibroService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen libros para el autor seleccionado");
         }
         return libros;
+    }
+
+    public List<Libro> getAllLibroNovedadesMes() {
+        int mes = LocalDate.now().getMonthValue();
+        int yearEnIngles = LocalDate.now().getYear();
+        return libroRepository.findByMesActual(mes, yearEnIngles);
+    }
+
+    public List<Libro> getAllLibroNovedadesUltimaAdicion() {
+        int mes = LocalDate.now().getMonthValue();
+        int yearEnIngles = LocalDate.now().getYear();
+        return libroRepository.findTop10ExcluyendoMesActual(mes, yearEnIngles);
     }
 
     public Libro getLibroPorId(Long id) {

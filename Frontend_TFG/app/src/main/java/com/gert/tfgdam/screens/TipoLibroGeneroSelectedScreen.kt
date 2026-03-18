@@ -79,7 +79,9 @@ fun TipoLibroGeneroSelectedScreen (
                             append(generoString)
                         }
                     },
-                    modifier = Modifier.padding(top = 10.dp, bottom = 8.dp, start = 8.dp)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp, bottom = 8.dp, start = 8.dp)
                 )
             }
 

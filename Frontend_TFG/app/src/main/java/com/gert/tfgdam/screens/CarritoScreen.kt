@@ -51,6 +51,7 @@ import com.gert.tfgdam.routes.Routes
 import com.gert.tfgdam.util.JwtManager
 import com.gert.tfgdam.viewmodel.CarritoViewModel
 import java.text.NumberFormat
+import java.time.LocalDate
 import java.util.Locale
 
 @Composable
@@ -363,12 +364,18 @@ fun BotonAddCarrito(
     val userInfo by JwtManager.getUserInfoFlow(context).collectAsState(initial = null)
     val esUser = userInfo?.rol == "USER"
 
+    val hoy = LocalDate.now()
+    val disponible = libroEspecifico.fechaSalida?.let { fecha ->
+        val fechaParsed = LocalDate.parse(fecha)
+        !fechaParsed.isAfter(hoy)
+    } ?: true
+
     if (!isLibroDetails) {
         Button(
             modifier = Modifier
                 .width(60.dp)
                 .height(30.dp),
-            enabled = esUser,
+            enabled = esUser && disponible,
             onClick = {
                 carritoViewModel.vibrar(context)
                 carritoViewModel.addAlCarrito(libroEspecifico)
@@ -385,7 +392,7 @@ fun BotonAddCarrito(
         val formatoDinero = NumberFormat.getCurrencyInstance(locale)
         Button(
             modifier = Modifier.fillMaxWidth(),
-            enabled = esUser,
+            enabled = esUser && disponible,
             onClick = {
                 carritoViewModel.vibrar(context)
                 carritoViewModel.addAlCarrito(libroEspecifico)

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface LibroRepository extends JpaRepository<Libro, Long> {
     @EntityGraph(attributePaths = {
@@ -41,6 +42,20 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
     List<Libro> findByAutor_Nombre(String autor);
     
     List<Libro> findByEditorial_Nombre(String editorial);
+
+    @Query("SELECT l FROM Libro l WHERE MONTH(l.fechaSalida) = :mes AND YEAR(l.fechaSalida) = :yearEnIngles")
+    List<Libro> findByMesActual(@Param("mes") int mes, @Param("yearEnIngles") int yearEnIngles);
+    
+    @Query(value = """
+        SELECT * FROM libro l
+        WHERE l.fecha_salida IS NULL OR NOT (
+            MONTH(l.fecha_salida) = :mes 
+            AND YEAR(l.fecha_salida) = :yearEnIngles
+        )
+        ORDER BY l.id DESC
+        LIMIT 10
+    """, nativeQuery = true)
+    List<Libro> findTop10ExcluyendoMesActual(@Param("mes") int mes, @Param("yearEnIngles") int yearEnIngles);
 
     boolean existsByTitulo(String titulo);
     

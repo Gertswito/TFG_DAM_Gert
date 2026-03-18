@@ -15,6 +15,7 @@ import com.gert.tfgdam.screens.HistorialCompraScreen
 import com.gert.tfgdam.screens.HomeAdminScreen
 import com.gert.tfgdam.screens.HomeScreen
 import com.gert.tfgdam.screens.LibroDetailsScreen
+import com.gert.tfgdam.screens.LibrosNovedadesScreen
 import com.gert.tfgdam.screens.LibrosPorAutorScreen
 import com.gert.tfgdam.screens.LibrosPorEditorialScreen
 import com.gert.tfgdam.screens.ListaDeseadosScreen
@@ -98,6 +99,8 @@ fun AppNavHost(navController: NavHostController, startDestination: String, order
 
             LibrosPorEditorialScreen(editorial = editorial, navController = navController)
         }
+
+        composable(Routes.LIBROS_NOVEDADES) { LibrosNovedadesScreen(navController = navController) }
 
         composable(Routes.CARRITO) { CarritoScreen(navController = navController) }
 

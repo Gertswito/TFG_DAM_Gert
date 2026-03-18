@@ -1,9 +1,8 @@
 package com.gert.tfgdam.screens
 
-import android.content.Context
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,10 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -105,17 +103,67 @@ fun HomeScreen(
             item {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 16.dp, bottom = 10.dp),
+                        .background(
+                            color = MaterialTheme.colorScheme.primary.copy(0.7f),
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(top = 25.dp, bottom = 25.dp)
+                        .fillMaxWidth(),
+                    contentAlignment = Alignment.TopCenter
+                ) {
+                    Column (
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Text(
+                            text = "Bienvenido",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                        Text(
+                            text = "a Librerías Gert",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 30.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
+            item {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = MaterialTheme.colorScheme.surface,
+                            shape = RoundedCornerShape(12.dp)
+                        )
+                        .padding(top = 20.dp, bottom = 19.dp)
+                        .fillMaxWidth()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) { navController.navigate(Routes.LIBROS_NOVEDADES) },
                     contentAlignment = Alignment.TopCenter
                 ) {
                     Text(
-                        text = "- Bienvenido :D -",
-                        fontSize = 30.sp,
+                        text = "Novedades del mes",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
                 }
+            }
+
+            item {
+                Spacer(modifier = Modifier.height(10.dp))
             }
 
             librosAgrupados.forEach { (tipo, librosDelTipo) ->
@@ -127,6 +175,7 @@ fun HomeScreen(
                         fontWeight = FontWeight.Bold,
                         textDecoration = TextDecoration.Underline,
                         modifier = Modifier
+                            .fillMaxWidth()
                             .padding(vertical = 8.dp)
                             .clickable { navController.navigate(Routes.TIPO_LIBRO_GENEROS.replace("{tipoLibro}", tipo?.nombre ?: "Sin nombre")) }
                     )
