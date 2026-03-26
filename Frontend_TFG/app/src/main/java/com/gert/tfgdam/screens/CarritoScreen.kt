@@ -1,5 +1,6 @@
 package com.gert.tfgdam.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
@@ -45,6 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.gert.tfgdam.R
 import com.gert.tfgdam.model.CarritoItem
 import com.gert.tfgdam.model.Libro
 import com.gert.tfgdam.routes.Routes
@@ -264,13 +267,24 @@ fun LibroItemCarrito(
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            AsyncImage(
-                model = item.libro.portada,
-                contentDescription = item.libro.titulo,
-                modifier = Modifier
-                    .height(100.dp),
-                contentScale = ContentScale.Fit
-            )
+            if (item.libro.portada != "") {
+                AsyncImage(
+                    model = item.libro.portada,
+                    contentDescription = item.libro.titulo,
+                    modifier = Modifier
+                        .height(100.dp),
+                    contentScale = ContentScale.Fit
+                )
+            } else {
+                Image(
+                    painter = painterResource(id = R.drawable.libro_no_encontrado),
+                    contentDescription = item.libro.titulo,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    contentScale = ContentScale.Fit
+                )
+            }
 
             Spacer(modifier = Modifier.width(10.dp))
 

@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 
 @RestController
@@ -34,7 +33,7 @@ public class EditorialController {
     }
 
     @GetMapping("/get")
-    public List<Editorial> getAllEditorial(@RequestParam String param) {
+    public List<Editorial> getAllEditorial() {
         return editorialService.getAllEditorial();
     }
 

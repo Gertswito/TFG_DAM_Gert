@@ -9,11 +9,15 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.gert.tfgdam.routes.Routes
+import com.gert.tfgdam.screens.AutorAdminScreen
 import com.gert.tfgdam.screens.CarritoScreen
+import com.gert.tfgdam.screens.ClienteAdminScreen
 import com.gert.tfgdam.screens.CompraFinalizadaScreen
+import com.gert.tfgdam.screens.EditorialAdminScreen
 import com.gert.tfgdam.screens.HistorialCompraScreen
 import com.gert.tfgdam.screens.HomeAdminScreen
 import com.gert.tfgdam.screens.HomeScreen
+import com.gert.tfgdam.screens.LibroAdminScreen
 import com.gert.tfgdam.screens.LibroDetailsScreen
 import com.gert.tfgdam.screens.LibrosNovedadesScreen
 import com.gert.tfgdam.screens.LibrosPorAutorScreen
@@ -22,9 +26,11 @@ import com.gert.tfgdam.screens.ListaDeseadosScreen
 import com.gert.tfgdam.screens.LoginScreen
 import com.gert.tfgdam.screens.PagoScreen
 import com.gert.tfgdam.screens.RegisterScreen
+import com.gert.tfgdam.screens.TipoLibroAdminScreen
 import com.gert.tfgdam.screens.TipoLibroGeneroSelectedScreen
 import com.gert.tfgdam.screens.TipoLibroGenerosScreen
 import com.gert.tfgdam.screens.UserSettingsScreen
+import com.gert.tfgdam.screens.VentaAdminScreen
 import com.gert.tfgdam.viewmodel.LibrosPorAutorViewModel
 
 @Composable
@@ -120,6 +126,18 @@ fun AppNavHost(navController: NavHostController, startDestination: String, order
 
             CompraFinalizadaScreen(navController = navController, orderId = orderId)
         }
+
+        composable(Routes.AUTOR_ADMIN) { AutorAdminScreen(navController = navController) }
+
+        composable(Routes.EDITORIAL_ADMIN) { EditorialAdminScreen(navController = navController) }
+
+        composable(Routes.TIPO_LIBRO_ADMIN) { TipoLibroAdminScreen(navController = navController) }
+
+        composable(Routes.CLIENTE_ADMIN) { ClienteAdminScreen(navController = navController) }
+
+        composable(Routes.LIBRO_ADMIN) { LibroAdminScreen(navController = navController) }
+
+        composable(Routes.VENTA_ADMIN) { VentaAdminScreen(navController = navController) }
     }
 
     LaunchedEffect(orderIdPaypal) {

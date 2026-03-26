@@ -33,7 +33,7 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
 
             try {
                 val cliente = Cliente(
-                    usuario = usuario.trim(),
+                    usuario = usuario.trim().lowercase(),
                     contrasenha = contrasenha.trim()
                 )
 

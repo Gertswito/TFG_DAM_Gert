@@ -106,7 +106,7 @@ fun HomeAdminScreen(
                     .padding(end = 4.dp, start = 8.dp)
                     .height(60.dp)
                     .weight(1f),
-                onClick = { navController.navigate(Routes.LISTA_DESEADOS) },
+                onClick = { navController.navigate(Routes.LIBRO_ADMIN) },
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -133,7 +133,7 @@ fun HomeAdminScreen(
                     .padding(end = 8.dp, start = 4.dp)
                     .height(60.dp)
                     .weight(1f),
-                onClick = { navController.navigate(Routes.HISTORIAL_COMPRA) },
+                onClick = { navController.navigate(Routes.TIPO_LIBRO_ADMIN) },
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -167,7 +167,7 @@ fun HomeAdminScreen(
                     .padding(end = 4.dp, start = 8.dp)
                     .height(60.dp)
                     .weight(1f),
-                onClick = { navController.navigate(Routes.LISTA_DESEADOS) },
+                onClick = { navController.navigate(Routes.AUTOR_ADMIN) },
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -194,7 +194,7 @@ fun HomeAdminScreen(
                     .padding(end = 8.dp, start = 4.dp)
                     .height(60.dp)
                     .weight(1f),
-                onClick = { navController.navigate(Routes.HISTORIAL_COMPRA) },
+                onClick = { navController.navigate(Routes.EDITORIAL_ADMIN) },
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -228,7 +228,7 @@ fun HomeAdminScreen(
                     .padding(end = 4.dp, start = 8.dp)
                     .height(60.dp)
                     .weight(1f),
-                onClick = { navController.navigate(Routes.LISTA_DESEADOS) },
+                onClick = { navController.navigate(Routes.CLIENTE_ADMIN) },
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -255,7 +255,7 @@ fun HomeAdminScreen(
                     .padding(end = 8.dp, start = 4.dp)
                     .height(60.dp)
                     .weight(1f),
-                onClick = { navController.navigate(Routes.HISTORIAL_COMPRA) },
+                onClick = { navController.navigate(Routes.VENTA_ADMIN) },
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface

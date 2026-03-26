@@ -34,7 +34,7 @@ class RegisterViewModel : ViewModel() {
 
             try {
                 val cliente = Cliente(
-                    usuario = usuario.trim(),
+                    usuario = usuario.trim().lowercase(),
                     nombre = nombre.trim(),
                     apellidos = apellidos.trim(),
                     email = email.trim(),
