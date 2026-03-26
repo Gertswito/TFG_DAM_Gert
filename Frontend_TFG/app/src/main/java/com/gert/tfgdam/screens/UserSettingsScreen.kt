@@ -21,6 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gert.tfgdam.model.Rol
 import com.gert.tfgdam.viewmodel.UserSettingsViewModel
 
 @Composable
@@ -90,22 +91,24 @@ fun UserSettingsScreen(
                         UserContrasenhaScreen(usuario, modifier)
                     }
 
-                    item {
-                        Spacer(modifier = Modifier.height(15.dp))
+                    if (usuario.rol == Rol.USER) {
+                        item {
+                            Spacer(modifier = Modifier.height(15.dp))
 
-                        HorizontalDivider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 16.dp, horizontal = 20.dp),
-                            thickness = 1.dp,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
+                            HorizontalDivider(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 16.dp, horizontal = 20.dp),
+                                thickness = 1.dp,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
 
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
 
-                    item  {
-                        UserDireccionesScreen(usuario, modifier)
+                        item  {
+                            UserDireccionesScreen(usuario, modifier)
+                        }
                     }
                 }
             }
