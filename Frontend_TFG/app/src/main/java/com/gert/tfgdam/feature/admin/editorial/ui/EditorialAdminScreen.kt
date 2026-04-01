@@ -48,7 +48,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun EditorialAdminScreen(
     viewModel: EditorialAdminViewModel = viewModel(),
-    navController: NavController
 ) {
     val editoriales = viewModel.editoriales
     var showEmpty by remember { mutableStateOf(false) }

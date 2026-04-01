@@ -14,6 +14,7 @@ import com.gert.tfgdam.feature.user.carrito.ui.CarritoScreen
 import com.gert.tfgdam.feature.admin.cliente.ui.ClienteAdminScreen
 import com.gert.tfgdam.feature.user.comprafinalizada.CompraFinalizadaScreen
 import com.gert.tfgdam.feature.admin.editorial.ui.EditorialAdminScreen
+import com.gert.tfgdam.feature.admin.genero.ui.GeneroAdminScreen
 import com.gert.tfgdam.feature.user.historialcompra.ui.HistorialCompraScreen
 import com.gert.tfgdam.feature.admin.homeadmin.ui.HomeAdminScreen
 import com.gert.tfgdam.feature.user.home.ui.HomeScreen
@@ -126,17 +127,19 @@ fun AppNavHost(navController: NavHostController, startDestination: String, order
             CompraFinalizadaScreen(navController = navController, orderId = orderId)
         }
 
-        composable(Routes.AUTOR_ADMIN) { AutorAdminScreen(navController = navController) }
+        composable(Routes.AUTOR_ADMIN) { AutorAdminScreen() }
 
-        composable(Routes.EDITORIAL_ADMIN) { EditorialAdminScreen(navController = navController) }
+        composable(Routes.EDITORIAL_ADMIN) { EditorialAdminScreen() }
 
-        composable(Routes.TIPO_LIBRO_ADMIN) { TipoLibroAdminScreen(navController = navController) }
+        composable(Routes.TIPO_LIBRO_ADMIN) { TipoLibroAdminScreen() }
 
-        composable(Routes.CLIENTE_ADMIN) { ClienteAdminScreen(navController = navController) }
+        composable(Routes.CLIENTE_ADMIN) { ClienteAdminScreen() }
 
-        composable(Routes.LIBRO_ADMIN) { LibroAdminScreen(navController = navController) }
+        composable(Routes.LIBRO_ADMIN) { LibroAdminScreen() }
 
-        composable(Routes.VENTA_ADMIN) { VentaAdminScreen(navController = navController) }
+        composable(Routes.VENTA_ADMIN) { VentaAdminScreen() }
+
+        composable(Routes.GENERO_ADMIN) { GeneroAdminScreen() }
     }
 
     LaunchedEffect(orderIdPaypal) {

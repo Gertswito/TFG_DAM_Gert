@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
 
 @RestController
 @RequestMapping("/api/genero")
@@ -34,7 +32,7 @@ public class GeneroController {
     }
 
     @GetMapping("/get")
-    public List<Genero> getAllGenero(@RequestParam String param) {
+    public List<Genero> getAllGenero() {
         return generoService.getAllGenero();
     }
 

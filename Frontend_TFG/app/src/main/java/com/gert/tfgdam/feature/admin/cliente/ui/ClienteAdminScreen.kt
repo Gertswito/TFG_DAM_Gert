@@ -52,7 +52,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun ClienteAdminScreen(
     viewModel: ClienteAdminViewModel = viewModel(),
-    navController: NavController
 ) {
     val clientes = viewModel.clientes
     var showEmpty by remember { mutableStateOf(false) }

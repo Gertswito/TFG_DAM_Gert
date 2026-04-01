@@ -62,7 +62,6 @@ import java.util.Locale
 @Composable
 fun LibroAdminScreen (
     viewModel: LibroAdminViewModel = viewModel(),
-    navController: NavController
 ) {
     val libros = viewModel.libros
     var showEmpty by remember { mutableStateOf(false) }

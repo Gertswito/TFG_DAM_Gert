@@ -1,4 +1,4 @@
-package com.gert.tfgdam.feature.admin.tipolibro.ui
+package com.gert.tfgdam.feature.admin.genero.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -39,22 +39,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
-import com.gert.tfgdam.feature.admin.tipolibro.model.TipoLibro
-import com.gert.tfgdam.feature.admin.tipolibro.viewmodel.TipoLibroAdminViewModel
+import com.gert.tfgdam.feature.admin.genero.model.Genero
+import com.gert.tfgdam.feature.admin.genero.viewmodel.GeneroAdminViewModel
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
 import kotlinx.coroutines.delay
 
 @Composable
-fun TipoLibroAdminScreen(
-    viewModel: TipoLibroAdminViewModel = viewModel(),
+fun GeneroAdminScreen(
+    viewModel: GeneroAdminViewModel = viewModel(),
 ) {
-    val tiposlibros = viewModel.tiposlibros
+    val generos = viewModel.generos
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
 
-    LaunchedEffect(tiposlibros) {
-        if (tiposlibros.isEmpty()) {
+    LaunchedEffect(generos) {
+        if (generos.isEmpty()) {
             delay(200)
             showEmpty = true
         } else {
@@ -78,7 +77,7 @@ fun TipoLibroAdminScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Tipos de libros",
+                    text = "Géneros",
                     fontSize = 30.sp,
                     textAlign = TextAlign.Center
                 )
@@ -94,7 +93,7 @@ fun TipoLibroAdminScreen(
                 }
 
                 if (abrirModal) {
-                    CrearEditarTipoLibro(
+                    CrearEditarGenero(
                         viewModel = viewModel,
                         showDialog = abrirModal,
                         onDismiss = { abrirModal = false },
@@ -105,9 +104,9 @@ fun TipoLibroAdminScreen(
                 }
             }
 
-            if(tiposlibros.isEmpty() && showEmpty) {
+            if(generos.isEmpty() && showEmpty) {
                 Text(
-                    text = "No hay tipos de libros disponibles",
+                    text = "No hay géneros disponibles",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onBackground
@@ -149,7 +148,7 @@ fun TipoLibroAdminScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                 ) {
-                    tiposlibros.forEach { tipolibro ->
+                    generos.forEach { genero ->
                         item{
                             Row(
                                 modifier = Modifier
@@ -158,7 +157,7 @@ fun TipoLibroAdminScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = tipolibro.id.toString() ?: "",
+                                    text = genero.id.toString() ?: "",
                                     textAlign = TextAlign.Start,
                                     modifier = Modifier
                                         .weight(1f)
@@ -166,7 +165,7 @@ fun TipoLibroAdminScreen(
                                 )
 
                                 Text(
-                                    text = tipolibro.nombre ?: "",
+                                    text = genero.nombre ?: "",
                                     textAlign = TextAlign.End,
                                     modifier = Modifier
                                         .weight(1f)
@@ -184,9 +183,9 @@ fun TipoLibroAdminScreen(
 }
 
 @Composable
-fun CrearEditarTipoLibro(
-    tipoLibro: TipoLibro? = null,
-    viewModel: TipoLibroAdminViewModel = viewModel(),
+fun CrearEditarGenero(
+    genero: Genero? = null,
+    viewModel: GeneroAdminViewModel = viewModel(),
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onSave: () -> Unit
@@ -206,7 +205,7 @@ fun CrearEditarTipoLibro(
                             .padding(top = 35.dp, bottom = 20.dp, start = 8.dp, end = 8.dp)
                             .fillMaxWidth(),
                     ) {
-                        if (tipoLibro != null) {
+                        if (genero != null) {
                             Text(
                                 text = "Editar",
                                 color = MaterialTheme.colorScheme.onBackground,
@@ -222,8 +221,8 @@ fun CrearEditarTipoLibro(
                             Spacer(modifier = Modifier.height(10.dp))
 
                             TextFieldEstiloAlternativo(
-                                value = viewModel.idTipoLibro,
-                                onValueChange = { viewModel.idTipoLibro = it },
+                                value = viewModel.idGenero,
+                                onValueChange = { viewModel.idGenero = it },
                                 label = "Id",
                                 isPassword = false,
                                 modifier = Modifier
@@ -248,8 +247,8 @@ fun CrearEditarTipoLibro(
                         }
 
                         TextFieldEstiloAlternativo(
-                            value = viewModel.nombreTipoLibro,
-                            onValueChange = { viewModel.nombreTipoLibro = it },
+                            value = viewModel.nombreGenero,
+                            onValueChange = { viewModel.nombreGenero = it },
                             label = "Nombre",
                             isPassword = false,
                             modifier = Modifier
@@ -269,13 +268,13 @@ fun CrearEditarTipoLibro(
                             )
                         }
 
-                        if (tipoLibro != null) {
+                        if (genero != null) {
                             Button(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .padding(horizontal = 8.dp),
                                 onClick = {
-                                    viewModel.editarTipoLibro {
+                                    viewModel.editarGenero {
                                         onSave()
                                     }
                                 },
@@ -300,7 +299,7 @@ fun CrearEditarTipoLibro(
                                     .fillMaxWidth()
                                     .padding(horizontal = 8.dp),
                                 onClick = {
-                                    viewModel.crearTipoLibro {
+                                    viewModel.crearGenero {
                                         onSave()
                                     }
                                 },

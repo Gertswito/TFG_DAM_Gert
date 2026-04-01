@@ -78,6 +78,35 @@ fun HomeAdminScreen(
             fontWeight = FontWeight.Bold
         )
 
+        Card (
+            modifier = Modifier
+                .padding(end = 8.dp, start = 8.dp)
+                .height(60.dp)
+                .fillMaxWidth(),
+            onClick = { navController.navigate(Routes.LIBRO_ADMIN) },
+            elevation = CardDefaults.cardElevation(4.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        ){
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Libros",
+                    color = MaterialTheme.colorScheme.onBackground,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
         Row (
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween
@@ -87,7 +116,7 @@ fun HomeAdminScreen(
                     .padding(end = 4.dp, start = 8.dp)
                     .height(60.dp)
                     .weight(1f),
-                onClick = { navController.navigate(Routes.LIBRO_ADMIN) },
+                onClick = { navController.navigate(Routes.GENERO_ADMIN) },
                 elevation = CardDefaults.cardElevation(4.dp),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surface
@@ -99,7 +128,7 @@ fun HomeAdminScreen(
                     verticalArrangement = Arrangement.Center
                 ) {
                     Text(
-                        text = "Libros",
+                        text = "Géneros",
                         color = MaterialTheme.colorScheme.onBackground,
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,
@@ -317,7 +346,7 @@ fun HomeAdminScreen(
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .heightIn(max = 325.dp)
+                        .heightIn(max = 275.dp)
                         .border(
                             width = 1.dp,
                             color = MaterialTheme.colorScheme.primary

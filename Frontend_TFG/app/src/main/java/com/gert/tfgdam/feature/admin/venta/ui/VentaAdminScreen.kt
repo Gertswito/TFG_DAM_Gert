@@ -63,7 +63,6 @@ import kotlin.collections.get
 @Composable
 fun VentaAdminScreen(
     viewModel: VentaAdminViewModel = viewModel(),
-    navController: NavController
 ) {
     val ventas = viewModel.ventas
     var showEmpty by remember { mutableStateOf(false) }

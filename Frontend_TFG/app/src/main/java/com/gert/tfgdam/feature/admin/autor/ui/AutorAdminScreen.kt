@@ -48,7 +48,6 @@ import kotlinx.coroutines.delay
 @Composable
 fun AutorAdminScreen(
     viewModel: AutorAdminViewModel = viewModel(),
-    navController: NavController
 ) {
     val autores = viewModel.autores
     var showEmpty by remember { mutableStateOf(false) }

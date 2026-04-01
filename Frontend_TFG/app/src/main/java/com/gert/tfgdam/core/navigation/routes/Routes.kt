@@ -18,9 +18,10 @@ object Routes {
     const val PAGO = "pago"
     const val COMPRA_FINALIZADA = "compra_finalizada/{orderId}"
     const val AUTOR_ADMIN = "autor_admin"
-    const val  EDITORIAL_ADMIN = "editorial_admin"
+    const val EDITORIAL_ADMIN = "editorial_admin"
     const val TIPO_LIBRO_ADMIN = "tipo_libro_admin"
     const val CLIENTE_ADMIN = "cliente_admin"
     const val LIBRO_ADMIN = "libro_admin"
     const val VENTA_ADMIN = "venta_admin"
+    const val GENERO_ADMIN = "genero_admin"
 }
