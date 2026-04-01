@@ -22,6 +22,10 @@ public class DireccionService {
         return direccionRepository.findAll();
     }
 
+    public List<Direccion> getAllDireccionPorClienteId(Long clienteId) {
+        return direccionRepository.findByClienteId(clienteId);
+    }
+
     public Direccion getDireccionPorId(Long id) {
         return direccionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la dirección"));
     }

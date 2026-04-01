@@ -37,6 +37,11 @@ public class DireccionController {
         return direccionService.getAllDireccion();
     }
 
+    @GetMapping("/get/cliente/{clienteId}")
+    public List<Direccion> getAllDireccionPorClienteId(@PathVariable Long clienteId) {
+        return direccionService.getAllDireccionPorClienteId(clienteId);
+    }
+
     @GetMapping("/get/{id}")
     public ResponseEntity<Direccion> getDireccionPorId(@PathVariable Long id) {
         try {

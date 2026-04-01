@@ -18,6 +18,7 @@ composeMaterial = "1.7.8"
 appcompat = "1.7.1"
 browser = "1.9.0"
 uiText = "1.10.5"
+material3 = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,6 +46,7 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 androidx-browser = { group = "androidx.browser", name = "browser", version.ref = "browser" }
 androidx-compose-ui-text = { group = "androidx.compose.ui", name = "ui-text", version.ref = "uiText" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

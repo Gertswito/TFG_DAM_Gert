@@ -14,6 +14,10 @@ class DireccionRepository {
         return api.getAll()
     }
 
+    suspend fun getAllPorClienteId(clienteId: Long): Response<List<Direccion>> {
+        return api.getAllPorClienteId(clienteId)
+    }
+
     suspend fun getPorId(id: Long): Response<Direccion> {
         return api.getPorId(id)
     }

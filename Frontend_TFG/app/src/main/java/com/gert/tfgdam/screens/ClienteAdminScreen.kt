@@ -2,26 +2,39 @@ package com.gert.tfgdam.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,9 +47,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.gert.tfgdam.routes.Routes
+import com.gert.tfgdam.model.Cliente
+import com.gert.tfgdam.model.Rol
 import com.gert.tfgdam.viewmodel.ClienteAdminViewModel
 import kotlinx.coroutines.delay
 
@@ -48,6 +63,7 @@ fun ClienteAdminScreen(
     val clientes = viewModel.clientes
     var showEmpty by remember { mutableStateOf(false) }
     val horizontalScrollState = rememberScrollState()
+    var abrirModal by remember { mutableStateOf(false) }
 
     LaunchedEffect(clientes) {
         if (clientes.isEmpty()) {
@@ -80,7 +96,7 @@ fun ClienteAdminScreen(
                 )
 
                 Button (
-                    onClick = { navController.navigate(Routes.AUTOR_ADMIN) },
+                    onClick = { abrirModal = true },
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -89,6 +105,16 @@ fun ClienteAdminScreen(
                     )
                 }
 
+                if (abrirModal) {
+                    CrearEditarCliente(
+                        viewModel = viewModel,
+                        showDialog = abrirModal,
+                        onDismiss = { abrirModal = false },
+                        onSave = {
+                            abrirModal = false
+                        }
+                    )
+                }
             }
 
             if(clientes.isEmpty() && showEmpty) {
@@ -120,6 +146,15 @@ fun ClienteAdminScreen(
                         text = "Usuario",
                         modifier = Modifier
                             .width(viewModel.cambiarDeCharacteresADp(viewModel.usuarioWidth))
+                            .padding(8.dp),
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Text(
+                        text = "Rol",
+                        modifier = Modifier
+                            .width(100.dp)
                             .padding(8.dp),
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -182,6 +217,13 @@ fun ClienteAdminScreen(
                                 )
 
                                 Text(
+                                    text = cliente.rol.toString() ?: "",
+                                    modifier = Modifier
+                                        .width(100.dp)
+                                        .padding(8.dp),
+                                )
+
+                                Text(
                                     text = cliente.nombre ?: "",
                                     modifier = Modifier
                                         .width(viewModel.cambiarDeCharacteresADp(viewModel.nombreWidth))
@@ -205,6 +247,220 @@ fun ClienteAdminScreen(
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.primary)
                         }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CrearEditarCliente(
+    cliente: Cliente? = null,
+    viewModel: ClienteAdminViewModel = viewModel(),
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit
+) {
+    if (showDialog) {
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.background,
+                tonalElevation = 8.dp
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 35.dp, bottom = 20.dp, start = 8.dp, end = 8.dp)
+                            .fillMaxWidth(),
+                    ) {
+                        if (cliente != null) {
+                            Text(
+                                text = "Editar",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = 40.sp,
+                                lineHeight = 40.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 15.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+
+                            TextFieldEstiloAlternativo(
+                                value = viewModel.idCliente,
+                                onValueChange = { viewModel.idCliente = it },
+                                label = "Id",
+                                isPassword = false,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp),
+                                isEnabled = false
+                            )
+                        } else {
+                            Text(
+                                text = "Crear",
+                                color = MaterialTheme.colorScheme.onBackground,
+                                fontSize = 40.sp,
+                                lineHeight = 40.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 15.dp)
+                            )
+
+                            Spacer(modifier = Modifier.height(10.dp))
+                        }
+
+                        TextFieldEstiloAlternativo(
+                            value = viewModel.usuarioCliente,
+                            onValueChange = { viewModel.usuarioCliente = it },
+                            label = "Usuario",
+                            isPassword = false,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                            horizontalArrangement = Arrangement.spacedBy(20.dp)
+                        ) {
+                            TextFieldEstiloAlternativo(
+                                value = viewModel.nombreCliente,
+                                onValueChange = { viewModel.nombreCliente = it },
+                                label = "Nombre",
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            TextFieldEstiloAlternativo(
+                                value = viewModel.apellidoCliente,
+                                onValueChange = { viewModel.apellidoCliente = it },
+                                label = "Apellidos",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        TextFieldEstiloAlternativo(
+                            value = viewModel.emailCliente,
+                            onValueChange = { viewModel.emailCliente = it },
+                            label = "Email",
+                            isPassword = false,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        TextFieldEstiloAlternativo(
+                            value = viewModel.contrasenhaCliente,
+                            onValueChange = { viewModel.contrasenhaCliente = it },
+                            label = "Contraseña",
+                            isPassword = true,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        TextFieldDropdownEstiloAlternativo(
+                            selectedItem = viewModel.rolCliente,
+                            items = viewModel.listaRoles,
+                            onItemSelected = { viewModel.rolCliente = it },
+                            label = "Rol",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                        )
+
+                        Spacer(modifier = Modifier.height(20.dp))
+
+                        if (viewModel.errorMessage !== "") {
+                            Text(
+                                text = viewModel.errorMessage,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp
+                            )
+                        }
+
+                        if (cliente != null) {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp),
+                                onClick = {
+                                    viewModel.editarCliente {
+                                        onSave()
+                                    }
+                                },
+                                enabled = !viewModel.isLoading
+                            ) {
+                                if (viewModel.isLoading) {
+                                    CircularProgressIndicator(
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                } else {
+                                    Text(
+                                        text = "EDITAR",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+                        } else {
+                            Button(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp),
+                                onClick = {
+                                    viewModel.crearCliente {
+                                        onSave()
+                                    }
+                                },
+                                enabled = !viewModel.isLoading
+                            ) {
+                                if (viewModel.isLoading) {
+                                    CircularProgressIndicator(
+                                        color = MaterialTheme.colorScheme.onPrimary,
+                                        modifier = Modifier.size(24.dp)
+                                    )
+                                } else {
+                                    Text(
+                                        text = "GUARDAR",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    IconButton(
+                        onClick = { onDismiss() },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar"
+                        )
                     }
                 }
             }

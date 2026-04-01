@@ -13,6 +13,9 @@ interface DireccionApi {
     @GET("api/direccion/get")
     suspend fun getAll(): Response<List<Direccion>>
 
+    @GET("api/direccion/get/cliente/{clienteId}")
+    suspend fun getAllPorClienteId(@Path("clienteId") clienteId: Long): Response<List<Direccion>>
+
     @GET("api/direccion/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Direccion>
 

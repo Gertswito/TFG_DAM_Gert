@@ -8,13 +8,26 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.gert.tfgdam.api.ApiError
+import com.gert.tfgdam.model.Autor
 import com.gert.tfgdam.model.Libro
+import com.gert.tfgdam.model.TipoLibro
+import com.gert.tfgdam.model.Editorial
+import com.gert.tfgdam.repository.AutorRepository
+import com.gert.tfgdam.repository.EditorialRepository
 import com.gert.tfgdam.repository.LibroRepository
+import com.gert.tfgdam.repository.TipoLibroRepository
+import com.google.gson.Gson
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 import java.io.IOException
 
 class LibroAdminViewModel : ViewModel() {
     private val repository = LibroRepository()
+    private val editorialRepository = EditorialRepository()
+    private val autorRepository = AutorRepository()
+    private val tipoLibroRepository = TipoLibroRepository()
 
     var idWidth by mutableIntStateOf(0)
         private set
@@ -29,8 +42,28 @@ class LibroAdminViewModel : ViewModel() {
     var tipoLibroWidth by mutableIntStateOf(0)
         private set
 
+    var idLibro by mutableStateOf("")
+    var tituloLibro by mutableStateOf("")
+    var isbnLibro by mutableStateOf("")
+    var portadaLibro by mutableStateOf("")
+    var editorialLibro by mutableStateOf<Editorial?>(null)
+    var autorLibro by mutableStateOf<Autor?>(null)
+    var tipoLibroLibro by mutableStateOf<TipoLibro?>(null)
+    var fechaSalidaLibro by mutableStateOf("")
+    var descripcionLibro by mutableStateOf("")
+    var precioLibro by mutableStateOf("")
+    var stockLibro by mutableStateOf("")
+
+    var isLoading by mutableStateOf(false)
+    var errorMessage by mutableStateOf("")
 
     var libros by mutableStateOf<List<Libro>>(emptyList())
+        private set
+    var listaEditoriales by mutableStateOf<List<Editorial>>(emptyList())
+        private set
+    var listaAutores by mutableStateOf<List<Autor>>(emptyList())
+        private set
+   var listaTipoLibros by mutableStateOf<List<TipoLibro>>(emptyList())
         private set
 
     init {
@@ -43,7 +76,7 @@ class LibroAdminViewModel : ViewModel() {
                 val response = repository.getAll()
 
                 if (response.isSuccessful) {
-                    libros = response.body() ?: emptyList()
+                    libros = (response.body() ?: emptyList()).sortedBy { it.id }
                     calcularAnchuras()
                 } else {
                     libros = emptyList()
@@ -51,6 +84,209 @@ class LibroAdminViewModel : ViewModel() {
             } catch (e: IOException) {
                 libros = emptyList()
             }
+        }
+    }
+
+    private fun cargarAutores() {
+        viewModelScope.launch {
+            try {
+                val response = autorRepository.getAll()
+
+                if (response.isSuccessful) {
+                    listaAutores = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    listaAutores = emptyList()
+                }
+            } catch (e: IOException) {
+                listaAutores = emptyList()
+            }
+        }
+    }
+
+    private fun cargarEditoriales() {
+        viewModelScope.launch {
+            try {
+                val response = editorialRepository.getAll()
+
+                if (response.isSuccessful) {
+                    listaEditoriales = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    listaEditoriales = emptyList()
+                }
+            } catch (e: IOException) {
+                listaEditoriales = emptyList()
+            }
+        }
+    }
+
+    private fun cargarTipoLibros() {
+        viewModelScope.launch {
+            try {
+                val response = tipoLibroRepository.getAll()
+
+                if (response.isSuccessful) {
+                    listaTipoLibros = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    listaTipoLibros = emptyList()
+                }
+            } catch (e: IOException) {
+                listaTipoLibros = emptyList()
+            }
+        }
+    }
+
+    fun cargarListasEditarYCrear() {
+        cargarEditoriales()
+        cargarAutores()
+        cargarTipoLibros()
+    }
+
+    fun crearLibro(onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = ""
+
+            try {
+                val libroNuevo = Libro (
+                    isbn = isbnLibro.trim(),
+                    portada = portadaLibro.trim(),
+                    titulo = tituloLibro.trim(),
+                    editorial = editorialLibro,
+                    autor = autorLibro,
+                    tipoLibro = tipoLibroLibro,
+                    fechaSalida = fechaSalidaLibro.trim(),
+                    descripcion = descripcionLibro.trim(),
+                    precio = precioLibro.trim().toDoubleOrNull(),
+                    stock = stockLibro.trim().toIntOrNull()
+                )
+
+                if (precioLibro.toDoubleOrNull() == null || stockLibro.toIntOrNull() == null) {
+                    errorMessage = "Por favor, introduzca un número válido en el campo correspondiente"
+                    isLoading = false
+                    return@launch
+                }
+
+                if (isbnLibro.isEmpty() || tituloLibro.isEmpty() || editorialLibro == null || autorLibro == null || tipoLibroLibro == null || fechaSalidaLibro.isEmpty() || descripcionLibro.isEmpty() || precioLibro.isEmpty()) {
+                    errorMessage = "Por favor, rellene todos los campos"
+                    isLoading = false
+                    return@launch
+                }
+
+                val response = repository.create(libroNuevo)
+                if (response.isSuccessful) {
+                    cargarLibros()
+                    restaurarCamposLibro(null)
+
+                    delay(500)
+                    onSuccess()
+                } else {
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("error")
+                    } catch (e: Exception) {
+                        "Error al crear el libro"
+                    }
+                }
+            } catch (e: Exception) {
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
+
+                restaurarCamposLibro(null)
+                errorMessage = apiError.message ?: "Error desconocido"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun editarLibro(onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = ""
+
+            try {
+                val libroActualizado = Libro (
+                    id = idLibro.toLong(),
+                    isbn = isbnLibro.trim(),
+                    portada = portadaLibro.trim(),
+                    titulo = tituloLibro.trim(),
+                    editorial = editorialLibro,
+                    autor = autorLibro,
+                    tipoLibro = tipoLibroLibro,
+                    fechaSalida = fechaSalidaLibro.trim(),
+                    descripcion = descripcionLibro.trim(),
+                    precio = precioLibro.trim().toDoubleOrNull(),
+                    stock = stockLibro.trim().toIntOrNull()
+                )
+
+                if (precioLibro.toDoubleOrNull() == null || stockLibro.toIntOrNull() == null) {
+                    errorMessage = "Por favor, introduzca un número válido en el campo correspondiente"
+                    isLoading = false
+                    return@launch
+                }
+
+                if (isbnLibro.isEmpty() || tituloLibro.isEmpty() || editorialLibro == null || autorLibro == null || tipoLibroLibro == null || fechaSalidaLibro.isEmpty() || descripcionLibro.isEmpty() || precioLibro.isEmpty()) {
+                    errorMessage = "Por favor, rellene todos los campos"
+                    isLoading = false
+                    return@launch
+                }
+
+                val response = repository.update(idLibro.toLong(), libroActualizado)
+                if (response.isSuccessful) {
+                    cargarLibros()
+                    restaurarCamposLibro(null)
+
+                    delay(500)
+                    onSuccess()
+                } else {
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("error")
+                    } catch (e: Exception) {
+                        "Error al editar el libro"
+                    }
+                }
+            } catch (e: Exception) {
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
+
+                restaurarCamposLibro(null)
+                errorMessage = apiError.message ?: "Error desconocido"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun restaurarCamposLibro(libro: Libro? = null) {
+        if (libro != null) {
+            idLibro = libro.id.toString() ?: ""
+            isbnLibro = libro.isbn ?: ""
+            portadaLibro = libro.portada ?: ""
+            tituloLibro = libro.titulo ?: ""
+            editorialLibro = libro.editorial
+            autorLibro = libro.autor
+            tipoLibroLibro = libro.tipoLibro
+            fechaSalidaLibro = libro.fechaSalida ?: ""
+            descripcionLibro = libro.descripcion ?: ""
+            precioLibro = libro.precio.toString() ?: ""
+            stockLibro = libro.stock.toString() ?: ""
+        } else {
+            idLibro = ""
+            isbnLibro = ""
+            portadaLibro = ""
+            tituloLibro = ""
+            editorialLibro = null
+            autorLibro = null
+            tipoLibroLibro = null
+            fechaSalidaLibro = ""
+            descripcionLibro = ""
+            precioLibro = ""
+            stockLibro = ""
         }
     }
 
