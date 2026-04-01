@@ -11,22 +11,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.gert.tfgdam.navigation.AppNavHost
-import com.gert.tfgdam.navigation.TopNavBar
-import com.gert.tfgdam.routes.Routes
+import com.gert.tfgdam.core.navigation.AppNavHost
+import com.gert.tfgdam.core.navigation.TopNavBar
+import com.gert.tfgdam.core.navigation.routes.Routes
 import com.gert.tfgdam.ui.theme.TFGDAMGertTheme
-import com.gert.tfgdam.util.JwtManager
-import com.gert.tfgdam.viewmodel.CarritoViewModel
-import com.gert.tfgdam.viewmodel.PagoViewModel
+import com.gert.tfgdam.core.util.Jwt.JwtManager
 import kotlinx.coroutines.flow.firstOrNull
 
 class MainActivity : ComponentActivity() {
