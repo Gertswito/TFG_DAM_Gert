@@ -73,7 +73,7 @@ class TipoLibroAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al crear el tipo de libro"
                     }
@@ -119,7 +119,7 @@ class TipoLibroAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al editar el tipo de libro"
                     }

@@ -121,7 +121,7 @@ class ClienteAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al crear el cliente"
                     }
@@ -177,7 +177,7 @@ class ClienteAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al editar el cliente"
                     }

@@ -73,7 +73,7 @@ class GeneroAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al crear el género"
                     }
@@ -119,7 +119,7 @@ class GeneroAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al editar el género"
                     }

@@ -73,7 +73,7 @@ class AutorAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al crear el autor"
                     }
@@ -119,7 +119,7 @@ class AutorAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al editar el autor"
                     }

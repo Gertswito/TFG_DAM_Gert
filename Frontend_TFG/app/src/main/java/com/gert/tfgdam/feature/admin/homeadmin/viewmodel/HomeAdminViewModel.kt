@@ -76,7 +76,7 @@ class HomeAdminViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
                         "Error al actualizar el stock"
                     }
