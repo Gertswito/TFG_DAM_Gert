@@ -15,6 +15,8 @@ import com.gert.tfgdam.feature.admin.libro.model.Libro
 import com.gert.tfgdam.feature.admin.tipolibro.model.TipoLibro
 import com.gert.tfgdam.feature.admin.autor.repository.AutorRepository
 import com.gert.tfgdam.feature.admin.editorial.repository.EditorialRepository
+import com.gert.tfgdam.feature.admin.genero.model.Genero
+import com.gert.tfgdam.feature.admin.genero.repository.GeneroRepository
 import com.gert.tfgdam.feature.admin.libro.repository.LibroRepository
 import com.gert.tfgdam.feature.admin.tipolibro.repository.TipoLibroRepository
 import com.google.gson.Gson
@@ -28,6 +30,7 @@ class LibroAdminViewModel : ViewModel() {
     private val editorialRepository = EditorialRepository()
     private val autorRepository = AutorRepository()
     private val tipoLibroRepository = TipoLibroRepository()
+    private val generoRepository = GeneroRepository()
 
     var idWidth by mutableIntStateOf(0)
         private set
@@ -53,6 +56,7 @@ class LibroAdminViewModel : ViewModel() {
     var descripcionLibro by mutableStateOf("")
     var precioLibro by mutableStateOf("")
     var stockLibro by mutableStateOf("")
+    var generosLibro by mutableStateOf<List<Genero>>(emptyList())
 
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
@@ -63,8 +67,11 @@ class LibroAdminViewModel : ViewModel() {
         private set
     var listaAutores by mutableStateOf<List<Autor>>(emptyList())
         private set
-   var listaTipoLibros by mutableStateOf<List<TipoLibro>>(emptyList())
+    var listaTipoLibros by mutableStateOf<List<TipoLibro>>(emptyList())
         private set
+    var listaGeneros by mutableStateOf<List<Genero>>(emptyList())
+        private set
+
 
     init {
         cargarLibros()
@@ -141,6 +148,22 @@ class LibroAdminViewModel : ViewModel() {
         cargarTipoLibros()
     }
 
+    fun cargarGeneros() {
+        viewModelScope.launch {
+            try {
+                val response = generoRepository.getAll()
+
+                if (response.isSuccessful) {
+                    listaGeneros = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    listaGeneros = emptyList()
+                }
+            } catch (e: IOException) {
+                listaGeneros = emptyList()
+            }
+        }
+    }
+
     fun crearLibro(onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             isLoading = true
@@ -157,7 +180,8 @@ class LibroAdminViewModel : ViewModel() {
                     fechaSalida = fechaSalidaLibro.trim(),
                     descripcion = descripcionLibro.trim(),
                     precio = precioLibro.trim().toDoubleOrNull(),
-                    stock = stockLibro.trim().toIntOrNull()
+                    stock = stockLibro.trim().toIntOrNull(),
+                    generos = generosLibro
                 )
 
                 if (precioLibro.toDoubleOrNull() == null || stockLibro.toIntOrNull() == null) {
@@ -218,7 +242,8 @@ class LibroAdminViewModel : ViewModel() {
                     fechaSalida = fechaSalidaLibro.trim(),
                     descripcion = descripcionLibro.trim(),
                     precio = precioLibro.trim().toDoubleOrNull(),
-                    stock = stockLibro.trim().toIntOrNull()
+                    stock = stockLibro.trim().toIntOrNull(),
+                    generos = generosLibro
                 )
 
                 if (precioLibro.toDoubleOrNull() == null || stockLibro.toIntOrNull() == null) {
@@ -275,6 +300,7 @@ class LibroAdminViewModel : ViewModel() {
             descripcionLibro = libro.descripcion ?: ""
             precioLibro = libro.precio.toString() ?: ""
             stockLibro = libro.stock.toString() ?: ""
+            generosLibro = libro.generos ?: emptyList()
         } else {
             idLibro = ""
             isbnLibro = ""
@@ -287,6 +313,7 @@ class LibroAdminViewModel : ViewModel() {
             descripcionLibro = ""
             precioLibro = ""
             stockLibro = ""
+            generosLibro = emptyList()
         }
     }
 

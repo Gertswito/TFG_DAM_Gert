@@ -3,10 +3,12 @@ package com.gert.tfgdam.feature.admin.libro.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -377,8 +379,11 @@ fun CrearEditarLibro(
     onSave: () -> Unit
 ) {
     if (showDialog) {
+        var showListaGeneros by remember { mutableStateOf(false) }
+
         LaunchedEffect(Unit) {
             viewModel.cargarListasEditarYCrear()
+            showListaGeneros = false
 
             if(libro != null) {
                 viewModel.restaurarCamposLibro(libro)
@@ -618,6 +623,71 @@ fun CrearEditarLibro(
 
                             Spacer(modifier = Modifier.height(20.dp))
 
+                            Text(
+                                text = "Géneros",
+                                fontWeight = FontWeight.Medium,
+                                fontSize = 16.sp,
+                                modifier = Modifier.padding(start = 22.dp, bottom = 8.dp)
+                            )
+
+                            if (!showListaGeneros) {
+                                Button(
+                                    modifier = Modifier
+                                        .padding(horizontal = 8.dp)
+                                        .fillMaxWidth(),
+                                    onClick = {
+                                        showListaGeneros = !showListaGeneros
+                                        viewModel.cargarGeneros()
+                                    }
+                                ) {
+                                    Text(
+                                        text = "VER GÉNEROS",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                }
+                            } else {
+                                Spacer(modifier = Modifier.height(5.dp))
+
+                                FlowRow(
+                                    modifier = Modifier.fillMaxWidth().padding(horizontal = 4.dp),
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                                ) {
+                                    viewModel.listaGeneros.forEach { genero ->
+
+                                        val isSelected = viewModel.generosLibro.contains(genero)
+
+                                        Box(
+                                            modifier = Modifier
+                                                .background(
+                                                    color = if (isSelected)
+                                                        MaterialTheme.colorScheme.primary
+                                                    else
+                                                        MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+                                                    shape = RoundedCornerShape(20.dp)
+                                                )
+                                                .clickable {
+                                                    viewModel.generosLibro = if (isSelected) {
+                                                        viewModel.generosLibro - genero
+                                                    } else {
+                                                        viewModel.generosLibro + genero
+                                                    }
+                                                }
+                                                .padding(horizontal = 14.dp, vertical = 8.dp)
+                                        ) {
+                                            Text(
+                                                text = genero.nombre ?: "N/A",
+                                                color =
+                                                    if (isSelected) MaterialTheme.colorScheme.onPrimary
+                                                    else MaterialTheme.colorScheme.secondary,
+                                                fontSize = 14.sp
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+
                             if (viewModel.errorMessage !== "") {
                                 Text(
                                     text = viewModel.errorMessage,
@@ -689,6 +759,7 @@ fun CrearEditarLibro(
                     IconButton(
                         onClick = {
                             viewModel.restaurarCamposLibro(null)
+                            showListaGeneros = false
                             onDismiss()
                         },
                         modifier = Modifier
