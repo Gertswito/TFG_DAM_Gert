@@ -21,11 +21,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -67,6 +69,7 @@ fun LibroAdminScreen (
     var showEmpty by remember { mutableStateOf(false) }
     val horizontalScrollState = rememberScrollState()
     var abrirModal by remember { mutableStateOf(false) }
+    var libroSeleccionado by remember { mutableStateOf<Libro?>(null) }
 
     LaunchedEffect(libros) {
         if (libros.isEmpty()) {
@@ -112,7 +115,10 @@ fun LibroAdminScreen (
                     CrearEditarLibro(
                         viewModel = viewModel,
                         showDialog = abrirModal,
-                        onDismiss = { abrirModal = false },
+                        onDismiss = {
+                            viewModel.restaurarCamposLibro(null)
+                            abrirModal = false
+                        },
                         onSave = {
                             abrirModal = false
                         }
@@ -216,6 +222,11 @@ fun LibroAdminScreen (
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
+
+                    Text(
+                        text = "",
+                        modifier = Modifier.width(70.dp)
+                    )
                 }
 
                 LazyColumn(
@@ -311,11 +322,45 @@ fun LibroAdminScreen (
                                         .width(100.dp)
                                         .padding(8.dp),
                                 )
+
+                                Box(
+                                    modifier = Modifier
+                                        .width(70.dp)
+                                        .padding(horizontal = 8.dp),
+                                ) {
+                                    IconButton(
+                                        onClick = { libroSeleccionado = libro },
+                                        modifier = Modifier.width(50.dp),
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Editar"
+                                        )
+                                    }
+                                }
                             }
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.primary)
                         }
                     }
+                }
+
+                if (libroSeleccionado != null) {
+                    CrearEditarLibro(viewModel = viewModel,
+                        libro = libroSeleccionado,
+                        showDialog = true,
+                        onDismiss = {
+                            viewModel.restaurarCamposLibro(null)
+                            libroSeleccionado = null
+                        },
+                        onSave = {
+                            libroSeleccionado = null
+                        }
+                    )
                 }
             }
         }
@@ -332,7 +377,14 @@ fun CrearEditarLibro(
     onSave: () -> Unit
 ) {
     if (showDialog) {
-        viewModel.cargarListasEditarYCrear()
+        LaunchedEffect(Unit) {
+            viewModel.cargarListasEditarYCrear()
+
+            if(libro != null) {
+                viewModel.restaurarCamposLibro(libro)
+            }
+        }
+
         Dialog(onDismissRequest = { onDismiss() }) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
@@ -635,7 +687,10 @@ fun CrearEditarLibro(
                     }
 
                     IconButton(
-                        onClick = { onDismiss() },
+                        onClick = {
+                            viewModel.restaurarCamposLibro(null)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                     ) {

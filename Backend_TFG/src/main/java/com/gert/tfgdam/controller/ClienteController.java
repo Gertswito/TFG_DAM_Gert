@@ -115,4 +115,18 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    @PutMapping("/update/usuario/{id}")
+    public ResponseEntity<Cliente> updateUsuario(@PathVariable Long id, @RequestBody Cliente cliente) {
+        try {
+            if (clienteService.getClientePorId(id) != null) {
+                clienteService.update(cliente);
+                return ResponseEntity.ok(cliente);
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

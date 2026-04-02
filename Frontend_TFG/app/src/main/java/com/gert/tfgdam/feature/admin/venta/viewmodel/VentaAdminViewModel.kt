@@ -190,7 +190,7 @@ class VentaAdminViewModel : ViewModel() {
                 val response = ventaRepository.create(ventaNueva)
                 if (response.isSuccessful) {
                     cargarVentas()
-                    restaurarCamposVenta(null)
+                    restaurarCamposVenta()
 
                     delay(500)
                     onSuccess()
@@ -208,7 +208,7 @@ class VentaAdminViewModel : ViewModel() {
                 val errorJson = e.message.toString()
                 val apiError = Gson().fromJson(errorJson, ApiError::class.java)
 
-                restaurarCamposVenta(null)
+                restaurarCamposVenta()
                 errorMessage = apiError.message ?: "Error desconocido"
             } finally {
                 isLoading = false
@@ -216,72 +216,13 @@ class VentaAdminViewModel : ViewModel() {
         }
     }
 
-    fun editarVenta(onSuccess: () -> Unit = {}) {
-        viewModelScope.launch {
-            isLoading = true
-            errorMessage = ""
-
-            try {
-                val ventaActualizada = Venta(
-                    id = idVenta.toLong(),
-                    cliente = clienteVenta,
-                    direccion = direccionVenta,
-                    fecha = fechaVenta,
-                    hora = horaVenta,
-                    precioFinal = precioFinalVenta.toDoubleOrNull()
-                )
-
-                if (clienteVenta == null || direccionVenta == null || fechaVenta.isEmpty() || horaVenta.isEmpty()) {
-                    errorMessage = "Por favor, rellene todos los campos"
-                    isLoading = false
-                    return@launch
-                }
-
-                val response = ventaRepository.update(idVenta.toLong(), ventaActualizada)
-                if (response.isSuccessful) {
-                    cargarVentas()
-                    restaurarCamposVenta(null)
-
-                    delay(500)
-                    onSuccess()
-                } else {
-                    val errorJson = response.errorBody()?.string()
-
-                    errorMessage = try {
-                        val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
-                    } catch (e: Exception) {
-                        "Error al editar la venta"
-                    }
-                }
-            } catch (e: Exception) {
-                val errorJson = e.message.toString()
-                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
-
-                restaurarCamposVenta(null)
-                errorMessage = apiError.message ?: "Error desconocido"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    fun restaurarCamposVenta(venta: Venta? = null) {
-        if (venta != null) {
-            idVenta = venta.id.toString() ?: ""
-            clienteVenta = venta.cliente
-            direccionVenta = venta.direccion
-            fechaVenta = venta.fecha ?: ""
-            horaVenta = venta.hora ?: ""
-            precioFinalVenta = venta.precioFinal.toString() ?: ""
-        } else {
-            idVenta = ""
-            clienteVenta = null
-            direccionVenta = null
-            fechaVenta = ""
-            horaVenta = ""
-            precioFinalVenta = ""
-        }
+    fun restaurarCamposVenta() {
+        idVenta = ""
+        clienteVenta = null
+        direccionVenta = null
+        fechaVenta = ""
+        horaVenta = ""
+        precioFinalVenta = ""
     }
 
     fun crearLineaVenta(venta: Venta, onSuccess: () -> Unit = {}) {
@@ -308,7 +249,7 @@ class VentaAdminViewModel : ViewModel() {
                 if (response.isSuccessful) {
                     cargarVentas()
                     limpiarLineasVenta(venta.id ?: 0)
-                    restaurarCamposLineaVenta(null)
+                    restaurarCamposLineaVenta()
 
                     delay(500)
                     onSuccess()
@@ -326,7 +267,7 @@ class VentaAdminViewModel : ViewModel() {
                 val errorJson = e.message.toString()
                 val apiError = Gson().fromJson(errorJson, ApiError::class.java)
 
-                restaurarCamposVenta(null)
+                restaurarCamposVenta()
                 errorMessage = apiError.message ?: "Error desconocido"
             } finally {
                 isLoading = false
@@ -334,71 +275,12 @@ class VentaAdminViewModel : ViewModel() {
         }
     }
 
-    fun editarLineaVenta(venta: Venta, onSuccess: () -> Unit = {}) {
-        viewModelScope.launch {
-            isLoading = true
-            errorMessage = ""
-
-            try {
-                val lineaVentaActualizada = LineaVenta(
-                    id = idLineaVenta.toLong(),
-                    venta = venta,
-                    libro = libroLineaVenta,
-                    cantidad = cantidadLineaVenta.toIntOrNull(),
-                    precioParcial = precioParcialLineaVenta.toDoubleOrNull(),
-                    precioTotal = precioTotalLineaVenta.toDoubleOrNull()
-                )
-
-                if (libroLineaVenta == null || cantidadLineaVenta.isEmpty() || precioParcialLineaVenta.isEmpty() || precioTotalLineaVenta.isEmpty()) {
-                    errorMessage = "Por favor, rellene todos los campos"
-                    isLoading = false
-                    return@launch
-                }
-
-                val response = lineaVentaRepository.update(idVenta.toLong(), lineaVentaActualizada)
-                if (response.isSuccessful) {
-                    cargarVentas()
-                    limpiarLineasVenta(venta.id ?: 0)
-                    restaurarCamposLineaVenta(null)
-
-                    delay(500)
-                    onSuccess()
-                } else {
-                    val errorJson = response.errorBody()?.string()
-
-                    errorMessage = try {
-                        val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
-                    } catch (e: Exception) {
-                        "Error al editar la línea de venta"
-                    }
-                }
-            } catch (e: Exception) {
-                val errorJson = e.message.toString()
-                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
-
-                restaurarCamposVenta(null)
-                errorMessage = apiError.message ?: "Error desconocido"
-            } finally {
-                isLoading = false
-            }
-        }
-    }
-
-    fun restaurarCamposLineaVenta(lineaVenta: LineaVenta? = null) {
-        if (lineaVenta != null) {
-            idLineaVenta = lineaVenta.id.toString() ?: ""
-            libroLineaVenta = lineaVenta.libro
-            cantidadLineaVenta = lineaVenta.cantidad.toString() ?: ""
-            precioParcialLineaVenta = lineaVenta.precioParcial.toString() ?: ""
-            precioTotalLineaVenta = lineaVenta.precioTotal.toString() ?: ""
-        } else {
-            idLineaVenta = ""
-            libroLineaVenta = null
-            cantidadLineaVenta = ""
-            precioParcialLineaVenta = ""
-            precioTotalLineaVenta = ""
-        }
+    fun restaurarCamposLineaVenta() {
+        idLineaVenta = ""
+        libroLineaVenta = null
+        cantidadLineaVenta = ""
+        precioParcialLineaVenta = ""
+        precioTotalLineaVenta = ""
     }
 
     fun calcularPreciosLineaVenta(libro: Libro?) {

@@ -12,16 +12,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -51,6 +54,7 @@ fun GeneroAdminScreen(
     val generos = viewModel.generos
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
+    var generoSeleccionado by remember { mutableStateOf<Genero?>(null) }
 
     LaunchedEffect(generos) {
         if (generos.isEmpty()) {
@@ -96,7 +100,10 @@ fun GeneroAdminScreen(
                     CrearEditarGenero(
                         viewModel = viewModel,
                         showDialog = abrirModal,
-                        onDismiss = { abrirModal = false },
+                        onDismiss = {
+                            viewModel.restaurarCamposGenero(null)
+                            abrirModal = false
+                        },
                         onSave = {
                             abrirModal = false
                         }
@@ -122,7 +129,7 @@ fun GeneroAdminScreen(
                     Text(
                         text = "Id",
                         modifier = Modifier
-                            .weight(3f)
+                            .weight(1f)
                             .padding(start = 8.dp, top = 8.dp),
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -136,6 +143,11 @@ fun GeneroAdminScreen(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Text(
+                        text = "",
+                        modifier = Modifier.width(70.dp)
                     )
                 }
 
@@ -171,11 +183,46 @@ fun GeneroAdminScreen(
                                         .weight(1f)
                                         .padding(end = 8.dp)
                                 )
+
+                                Box(
+                                    modifier = Modifier
+                                        .width(70.dp)
+                                        .padding(horizontal = 8.dp),
+                                ) {
+                                    IconButton(
+                                        onClick = { generoSeleccionado = genero },
+                                        modifier = Modifier.width(50.dp),
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Editar"
+                                        )
+                                    }
+                                }
                             }
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.primary)
                         }
                     }
+                }
+
+                if (generoSeleccionado != null) {
+                    CrearEditarGenero(
+                        viewModel = viewModel,
+                        genero = generoSeleccionado,
+                        showDialog = true,
+                        onDismiss = {
+                            viewModel.restaurarCamposGenero(null)
+                            generoSeleccionado = null
+                        },
+                        onSave = {
+                            generoSeleccionado = null
+                        }
+                    )
                 }
             }
         }
@@ -191,6 +238,12 @@ fun CrearEditarGenero(
     onSave: () -> Unit
 ) {
     if (showDialog) {
+        LaunchedEffect(Unit) {
+            if (genero != null) {
+                viewModel.restaurarCamposGenero(genero)
+            }
+        }
+
         Dialog(onDismissRequest = { onDismiss() }) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
@@ -230,6 +283,8 @@ fun CrearEditarGenero(
                                     .padding(horizontal = 8.dp),
                                 isEnabled = false
                             )
+
+                            Spacer(modifier = Modifier.height(20.dp))
                         } else {
                             Text(
                                 text = "Crear",
@@ -322,7 +377,10 @@ fun CrearEditarGenero(
                     }
 
                     IconButton(
-                        onClick = { onDismiss() },
+                        onClick = {
+                            viewModel.restaurarCamposGenero(null)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                     ) {

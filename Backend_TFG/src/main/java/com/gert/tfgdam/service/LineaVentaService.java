@@ -1,7 +1,10 @@
 package com.gert.tfgdam.service;
 
 import com.gert.tfgdam.repository.TipoLibroRepository;
+
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -55,17 +58,49 @@ public class LineaVentaService {
     @Transactional
     public LineaVenta save(LineaVenta lineaVenta) {
         Libro libro = libroRepository.findById(lineaVenta.getLibro().getId().longValue()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro"));
-        if ((libro.getStock() - lineaVenta.getCantidad()) < 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para el libro: " + libro.getTitulo());
-        }
-        libro.setStock(libro.getStock() - lineaVenta.getCantidad());
-        libroRepository.save(libro);
 
         Venta venta = ventaRepository.findById(lineaVenta.getVenta().getId().longValue()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la venta"));
-        venta.setPrecioFinal(venta.getPrecioFinal().add(lineaVenta.getPrecioTotal()));
-        ventaRepository.save(venta);
+        if (venta.getPrecioFinal() == null) {
+            venta.setPrecioFinal(BigDecimal.ZERO);
+        }
+        
+        Optional<LineaVenta> lineaYaExistente = lineaVentaRepository.findByVentaIdAndLibroId(venta.getId().longValue(), libro.getId().longValue());
 
-        return lineaVentaRepository.save(lineaVenta);
+        if (lineaYaExistente.isPresent()) {
+            LineaVenta existente = lineaYaExistente.get();
+
+            int nuevaCantidad = existente.getCantidad() + lineaVenta.getCantidad();
+
+            if ((libro.getStock() - lineaVenta.getCantidad()) < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para el libro: " + libro.getTitulo());
+            }
+
+            libro.setStock(libro.getStock() - lineaVenta.getCantidad());
+            libroRepository.save(libro);
+
+            venta.setPrecioFinal(venta.getPrecioFinal().subtract(existente.getPrecioTotal()));
+
+            existente.setCantidad(nuevaCantidad);
+            existente.setPrecioTotal(existente.getPrecioParcial().multiply(BigDecimal.valueOf(nuevaCantidad)));
+
+            venta.setPrecioFinal(venta.getPrecioFinal().add(existente.getPrecioTotal()));
+
+            ventaRepository.save(venta);
+            return lineaVentaRepository.save(existente);
+
+        } else {
+            if ((libro.getStock() - lineaVenta.getCantidad()) < 0) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Stock insuficiente para el libro: " + libro.getTitulo());
+            }
+
+            libro.setStock(libro.getStock() - lineaVenta.getCantidad());
+            libroRepository.save(libro);
+
+            venta.setPrecioFinal(venta.getPrecioFinal().add(lineaVenta.getPrecioTotal()));
+            ventaRepository.save(venta);
+
+            return lineaVentaRepository.save(lineaVenta);
+        }
     }
 
     public LineaVenta update(LineaVenta lineaVenta) {

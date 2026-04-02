@@ -20,11 +20,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -57,6 +59,7 @@ fun ClienteAdminScreen(
     var showEmpty by remember { mutableStateOf(false) }
     val horizontalScrollState = rememberScrollState()
     var abrirModal by remember { mutableStateOf(false) }
+    var clienteSeleccionado by remember { mutableStateOf<Cliente?>(null) }
 
     LaunchedEffect(clientes) {
         if (clientes.isEmpty()) {
@@ -102,7 +105,10 @@ fun ClienteAdminScreen(
                     CrearEditarCliente(
                         viewModel = viewModel,
                         showDialog = abrirModal,
-                        onDismiss = { abrirModal = false },
+                        onDismiss = {
+                            viewModel.restaurarCamposCliente(null)
+                            abrirModal = false
+                        },
                         onSave = {
                             abrirModal = false
                         }
@@ -179,6 +185,11 @@ fun ClienteAdminScreen(
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
                     )
+
+                    Text(
+                        text = "",
+                        modifier = Modifier.width(70.dp)
+                    )
                 }
 
                 LazyColumn(
@@ -236,11 +247,46 @@ fun ClienteAdminScreen(
                                         .width(viewModel.cambiarDeCharacteresADp(viewModel.emailWidth))
                                         .padding(8.dp),
                                 )
+
+                                Box(
+                                    modifier = Modifier
+                                        .width(70.dp)
+                                        .padding(horizontal = 8.dp),
+                                ) {
+                                    IconButton(
+                                        onClick = { clienteSeleccionado = cliente },
+                                        modifier = Modifier.width(50.dp),
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Editar"
+                                        )
+                                    }
+                                }
                             }
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.primary)
                         }
                     }
+                }
+
+                if (clienteSeleccionado != null) {
+                    CrearEditarCliente(
+                        viewModel = viewModel,
+                        cliente = clienteSeleccionado,
+                        showDialog = true,
+                        onDismiss = {
+                            viewModel.restaurarCamposCliente(null)
+                            clienteSeleccionado = null
+                        },
+                        onSave = {
+                            clienteSeleccionado = null
+                        }
+                    )
                 }
             }
         }
@@ -256,6 +302,12 @@ fun CrearEditarCliente(
     onSave: () -> Unit
 ) {
     if (showDialog) {
+        LaunchedEffect(Unit) {
+            if (cliente != null) {
+                viewModel.restaurarCamposCliente(cliente)
+            }
+        }
+
         Dialog(onDismissRequest = { onDismiss() }) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
@@ -358,17 +410,19 @@ fun CrearEditarCliente(
 
                         Spacer(modifier = Modifier.height(20.dp))
 
-                        TextFieldEstiloAlternativo(
-                            value = viewModel.contrasenhaCliente,
-                            onValueChange = { viewModel.contrasenhaCliente = it },
-                            label = "Contraseña",
-                            isPassword = true,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 8.dp)
-                        )
+                        if (cliente == null) {
+                            TextFieldEstiloAlternativo(
+                                value = viewModel.contrasenhaCliente,
+                                onValueChange = { viewModel.contrasenhaCliente = it },
+                                label = "Contraseña",
+                                isPassword = true,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 8.dp)
+                            )
 
-                        Spacer(modifier = Modifier.height(20.dp))
+                            Spacer(modifier = Modifier.height(20.dp))
+                        }
 
                         TextFieldDropdownEstiloAlternativo(
                             selectedItem = viewModel.rolCliente,
@@ -446,7 +500,10 @@ fun CrearEditarCliente(
                     }
 
                     IconButton(
-                        onClick = { onDismiss() },
+                        onClick = {
+                            viewModel.restaurarCamposCliente(null)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                     ) {

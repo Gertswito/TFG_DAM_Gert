@@ -100,7 +100,7 @@ class UserSettingsViewModel() : ViewModel() {
                     return@launch
                 }
 
-                val response = repository.update(usuarioId, clienteActualizado)
+                val response = repository.updateUsuario(usuarioId, clienteActualizado)
                 if(response.isSuccessful) {
                     successMessageEditar = "Usuario actualizado exitosamente"
 

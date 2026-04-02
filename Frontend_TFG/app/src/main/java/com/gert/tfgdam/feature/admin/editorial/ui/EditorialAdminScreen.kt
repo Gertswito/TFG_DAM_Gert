@@ -12,16 +12,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,6 +55,7 @@ fun EditorialAdminScreen(
     val editoriales = viewModel.editoriales
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
+    var editorialSeleccionada by remember { mutableStateOf<Editorial?>(null) }
 
     LaunchedEffect(editoriales) {
         if (editoriales.isEmpty()) {
@@ -97,7 +101,10 @@ fun EditorialAdminScreen(
                     CrearEditarEditorial(
                         viewModel = viewModel,
                         showDialog = abrirModal,
-                        onDismiss = { abrirModal = false },
+                        onDismiss = {
+                            viewModel.restaurarCamposEditorial(null)
+                            abrirModal = false
+                        },
                         onSave = {
                             abrirModal = false
                         }
@@ -123,7 +130,7 @@ fun EditorialAdminScreen(
                     Text(
                         text = "Id",
                         modifier = Modifier
-                            .weight(3f)
+                            .weight(1f)
                             .padding(start = 8.dp, top = 8.dp),
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -137,6 +144,11 @@ fun EditorialAdminScreen(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Text(
+                        text = "",
+                        modifier = Modifier.width(70.dp)
                     )
                 }
 
@@ -172,11 +184,46 @@ fun EditorialAdminScreen(
                                         .weight(1f)
                                         .padding(end = 8.dp)
                                 )
+
+                                Box(
+                                    modifier = Modifier
+                                        .width(70.dp)
+                                        .padding(horizontal = 8.dp),
+                                ) {
+                                    IconButton(
+                                        onClick = { editorialSeleccionada = editorial },
+                                        modifier = Modifier.width(50.dp),
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Editar"
+                                        )
+                                    }
+                                }
                             }
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.primary)
                         }
                     }
+                }
+
+                if (editorialSeleccionada != null) {
+                    CrearEditarEditorial(
+                        viewModel = viewModel,
+                        editorial = editorialSeleccionada,
+                        showDialog = true,
+                        onDismiss = {
+                            viewModel.restaurarCamposEditorial(null)
+                            editorialSeleccionada = null
+                        },
+                        onSave = {
+                            editorialSeleccionada = null
+                        }
+                    )
                 }
             }
         }
@@ -192,6 +239,12 @@ fun CrearEditarEditorial(
     onSave: () -> Unit
 ) {
     if (showDialog) {
+        LaunchedEffect(Unit) {
+            if (editorial != null) {
+                viewModel.restaurarCamposEditorial(editorial)
+            }
+        }
+
         Dialog(onDismissRequest = { onDismiss() }) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
@@ -231,6 +284,8 @@ fun CrearEditarEditorial(
                                     .padding(horizontal = 8.dp),
                                 isEnabled = false
                             )
+
+                            Spacer(modifier = Modifier.height(20.dp))
                         } else {
                             Text(
                                 text = "Crear",
@@ -323,7 +378,10 @@ fun CrearEditarEditorial(
                     }
 
                     IconButton(
-                        onClick = { onDismiss() },
+                        onClick = {
+                            viewModel.restaurarCamposEditorial(null)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                     ) {

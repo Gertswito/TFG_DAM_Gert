@@ -1,6 +1,7 @@
 package com.gert.tfgdam.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -8,6 +9,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.gert.tfgdam.entity.Autor;
 import com.gert.tfgdam.entity.Cliente;
 import com.gert.tfgdam.entity.Rol;
 import com.gert.tfgdam.repository.ClienteRepository;
@@ -94,6 +96,23 @@ public class ClienteService {
     }
 
     public Cliente update(Cliente cliente) {
+        Cliente existente = clienteRepository.findById(cliente.getId().longValue()).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));
+
+        Cliente otroConMismoUsuario = clienteRepository.findByUsuario(cliente.getUsuario());
+        if (otroConMismoUsuario != null && !otroConMismoUsuario.getId().equals(cliente.getId())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre ya está registrado");
+        }
+
+        existente.setNombre(cliente.getNombre());
+        existente.setApellidos(cliente.getApellidos());
+        existente.setUsuario(cliente.getUsuario());
+        existente.setEmail(cliente.getEmail());
+        existente.setRol(cliente.getRol());
+        
+        return clienteRepository.save(existente);
+    }
+
+    public Cliente updateUsuario(Cliente cliente) {
         Cliente clienteExistente = clienteRepository.findByUsuario(cliente.getUsuario());
         if (clienteExistente != null && !clienteExistente.getId().equals(cliente.getId())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de usuario ya está en uso");

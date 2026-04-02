@@ -112,7 +112,7 @@ class ClienteAdminViewModel : ViewModel() {
                 val response = repository.create(clienteNuevo)
                 if (response.isSuccessful) {
                     cargarClientes()
-                    restaurarCamposAutor(null)
+                    restaurarCamposCliente(null)
 
                     delay(500)
                     onSuccess()
@@ -130,7 +130,7 @@ class ClienteAdminViewModel : ViewModel() {
                 val errorJson = e.message.toString()
                 val apiError = Gson().fromJson(errorJson, ApiError::class.java)
 
-                restaurarCamposAutor(null)
+                restaurarCamposCliente(null)
                 errorMessage = apiError.message ?: "Error desconocido"
             } finally {
                 isLoading = false
@@ -147,14 +147,13 @@ class ClienteAdminViewModel : ViewModel() {
                 val clienteActualizado = Cliente(
                     id = idCliente.toLong(),
                     usuario = usuarioCliente.trim(),
-                    contrasenha = contrasenhaCliente.trim(),
                     nombre = nombreCliente.trim(),
                     apellidos = apellidoCliente.trim(),
                     email = emailCliente.trim(),
                     rol = rolCliente
                 )
 
-                if (idCliente.isEmpty() || usuarioCliente.isEmpty() || nombreCliente.isEmpty() || apellidoCliente.isEmpty() || emailCliente.isEmpty() || contrasenhaCliente.isEmpty()) {
+                if (idCliente.isEmpty() || usuarioCliente.isEmpty() || nombreCliente.isEmpty() || apellidoCliente.isEmpty() || emailCliente.isEmpty()) {
                     errorMessage = "Por favor, rellene todos los campos"
                     isLoading = false
                     return@launch
@@ -169,7 +168,7 @@ class ClienteAdminViewModel : ViewModel() {
                 val response = repository.update(idCliente.toLong(), clienteActualizado)
                 if (response.isSuccessful) {
                     cargarClientes()
-                    restaurarCamposAutor(null)
+                    restaurarCamposCliente(null)
 
                     delay(500)
                     onSuccess()
@@ -187,7 +186,7 @@ class ClienteAdminViewModel : ViewModel() {
                 val errorJson = e.message.toString()
                 val apiError = Gson().fromJson(errorJson, ApiError::class.java)
 
-                restaurarCamposAutor(null)
+                restaurarCamposCliente(null)
                 errorMessage = apiError.message ?: "Error desconocido"
             } finally {
                 isLoading = false
@@ -200,7 +199,7 @@ class ClienteAdminViewModel : ViewModel() {
         return email.matches(emailRegex)
     }
 
-    fun restaurarCamposAutor(cliente: Cliente? = null) {
+    fun restaurarCamposCliente(cliente: Cliente? = null) {
         if (cliente != null) {
             usuarioCliente = cliente.usuario ?: ""
             contrasenhaCliente = cliente.contrasenha ?: ""

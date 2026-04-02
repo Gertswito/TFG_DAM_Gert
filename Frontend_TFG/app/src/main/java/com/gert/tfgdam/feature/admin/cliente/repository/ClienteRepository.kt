@@ -44,6 +44,10 @@ class ClienteRepository {
         return api.update(id, cliente)
     }
 
+    suspend fun updateUsuario(id: Long, cliente: Cliente): Response<Cliente> {
+        return api.updateUsuario(id, cliente)
+    }
+
     suspend fun delete(id: Long): Response<Unit> {
         return api.delete(id)
     }

@@ -35,6 +35,12 @@ interface ClienteApi {
         @Body cliente: Cliente
     ): Response<Cliente>
 
+    @PUT("api/cliente/update/usuario/{id}")
+    suspend fun updateUsuario(
+        @Path("id") id: Long,
+        @Body cliente: Cliente
+    ): Response<Cliente>
+
     @DELETE("api/cliente/delete/{id}")
     suspend fun delete(@Path("id") id: Long): Response<Unit>
 }

@@ -12,16 +12,19 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -40,6 +43,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.gert.tfgdam.feature.admin.autor.model.Autor
+import com.gert.tfgdam.feature.admin.autor.ui.CrearEditarAutor
 import com.gert.tfgdam.feature.admin.tipolibro.model.TipoLibro
 import com.gert.tfgdam.feature.admin.tipolibro.viewmodel.TipoLibroAdminViewModel
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
@@ -52,6 +57,7 @@ fun TipoLibroAdminScreen(
     val tiposlibros = viewModel.tiposlibros
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
+    var tipoLibroSeleccionado by remember { mutableStateOf<TipoLibro?>(null) }
 
     LaunchedEffect(tiposlibros) {
         if (tiposlibros.isEmpty()) {
@@ -97,7 +103,10 @@ fun TipoLibroAdminScreen(
                     CrearEditarTipoLibro(
                         viewModel = viewModel,
                         showDialog = abrirModal,
-                        onDismiss = { abrirModal = false },
+                        onDismiss = {
+                            viewModel.restaurarCamposTipoLibro(null)
+                            abrirModal = false
+                        },
                         onSave = {
                             abrirModal = false
                         }
@@ -123,7 +132,7 @@ fun TipoLibroAdminScreen(
                     Text(
                         text = "Id",
                         modifier = Modifier
-                            .weight(3f)
+                            .weight(1f)
                             .padding(start = 8.dp, top = 8.dp),
                         fontWeight = FontWeight.Bold,
                         color = MaterialTheme.colorScheme.onPrimary
@@ -137,6 +146,11 @@ fun TipoLibroAdminScreen(
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
                         color = MaterialTheme.colorScheme.onPrimary
+                    )
+
+                    Text(
+                        text = "",
+                        modifier = Modifier.width(70.dp)
                     )
                 }
 
@@ -172,11 +186,46 @@ fun TipoLibroAdminScreen(
                                         .weight(1f)
                                         .padding(end = 8.dp)
                                 )
+
+                                Box(
+                                    modifier = Modifier
+                                        .width(70.dp)
+                                        .padding(horizontal = 8.dp),
+                                ) {
+                                    IconButton(
+                                        onClick = { tipoLibroSeleccionado = tipolibro },
+                                        modifier = Modifier.width(50.dp),
+                                        colors = IconButtonDefaults.iconButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        )
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "Editar"
+                                        )
+                                    }
+                                }
                             }
 
                             HorizontalDivider(color = MaterialTheme.colorScheme.primary)
                         }
                     }
+                }
+
+                if (tipoLibroSeleccionado != null) {
+                    CrearEditarTipoLibro(
+                        viewModel = viewModel,
+                        tipoLibro = tipoLibroSeleccionado,
+                        showDialog = true,
+                        onDismiss = {
+                            viewModel.restaurarCamposTipoLibro(null)
+                            tipoLibroSeleccionado = null
+                        },
+                        onSave = {
+                            tipoLibroSeleccionado = null
+                        }
+                    )
                 }
             }
         }
@@ -192,6 +241,12 @@ fun CrearEditarTipoLibro(
     onSave: () -> Unit
 ) {
     if (showDialog) {
+        LaunchedEffect(Unit) {
+            if (tipoLibro != null) {
+                viewModel.restaurarCamposTipoLibro(tipoLibro)
+            }
+        }
+
         Dialog(onDismissRequest = { onDismiss() }) {
             Surface(
                 shape = RoundedCornerShape(12.dp),
@@ -231,6 +286,8 @@ fun CrearEditarTipoLibro(
                                     .padding(horizontal = 8.dp),
                                 isEnabled = false
                             )
+
+                            Spacer(modifier = Modifier.height(20.dp))
                         } else {
                             Text(
                                 text = "Crear",
@@ -323,7 +380,10 @@ fun CrearEditarTipoLibro(
                     }
 
                     IconButton(
-                        onClick = { onDismiss() },
+                        onClick = {
+                            viewModel.restaurarCamposTipoLibro(null)
+                            onDismiss()
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                     ) {
