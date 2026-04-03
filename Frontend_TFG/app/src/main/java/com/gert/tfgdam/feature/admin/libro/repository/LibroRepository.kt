@@ -59,6 +59,10 @@ class LibroRepository {
         return api.getLibroEnListaDeseados(id, usuario)
     }
 
+    suspend fun getAllPorBusqueda(texto: String): Response<List<Libro>> {
+        return api.getAllPorBusqueda(texto)
+    }
+
     suspend fun create(libro: Libro): Response<Libro> {
         return api.create(libro)
     }

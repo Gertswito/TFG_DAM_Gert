@@ -26,6 +26,10 @@ public class GeneroService {
         return generoRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el género"));
     }
 
+    public List<Genero> getAllGeneroPorBusqueda(String texto) {
+        return generoRepository.findAllPorBusqueda(texto);
+    }
+
     public void delete(Long id) {
         if (!generoRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el género");

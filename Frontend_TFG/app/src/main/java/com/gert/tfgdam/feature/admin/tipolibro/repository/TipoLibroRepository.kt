@@ -18,6 +18,10 @@ class TipoLibroRepository {
         return api.getPorId(id)
     }
 
+    suspend fun getAllPorBusqueda(texto: String): Response<List<TipoLibro>> {
+        return api.getAllPorBusqueda(texto)
+    }
+
     suspend fun create(tipoLibro: TipoLibro): Response<TipoLibro> {
         return api.create(tipoLibro)
     }

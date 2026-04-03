@@ -26,6 +26,10 @@ public class TipoLibroService {
         return tipoLibroRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el tipo de libro"));
     }
 
+    public List<TipoLibro> getAllTipoLibroPorBusqueda(String texto) {
+        return tipoLibroRepository.findAllPorBusqueda(texto);
+    }
+
     public void delete(Long id) {
         if (!tipoLibroRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el tipo de libro");

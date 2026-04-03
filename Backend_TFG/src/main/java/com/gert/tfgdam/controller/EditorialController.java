@@ -46,6 +46,11 @@ public class EditorialController {
         }
     }
 
+    @GetMapping("/get/busqueda/{texto}")
+    public List<Editorial> getAllEditorialPorBusqueda(@PathVariable String texto) {
+        return editorialService.getAllEditorialPorBusqueda(texto);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

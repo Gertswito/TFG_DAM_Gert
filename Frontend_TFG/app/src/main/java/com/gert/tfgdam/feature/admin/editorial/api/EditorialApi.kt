@@ -16,6 +16,9 @@ interface EditorialApi {
     @GET("api/editorial/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Editorial>
 
+    @GET("api/editorial/get/busqueda/{texto}")
+    suspend fun getAllPorBusqueda(@Path("texto") texto: String): Response<List<Editorial>>
+
     @POST("api/editorial/new")
     suspend fun create(@Body editorial: Editorial): Response<Editorial>
 

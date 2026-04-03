@@ -46,6 +46,11 @@ public class AutorController {
         }
     }
 
+    @GetMapping("/get/busqueda/{texto}")
+    public List<Autor> getAllAutorPorBusqueda(@PathVariable String texto) {
+        return this.autorService.getAllAutorPorBusqueda(texto);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

@@ -56,6 +56,7 @@ import coil.compose.AsyncImage
 import com.gert.tfgdam.R
 import com.gert.tfgdam.feature.admin.libro.model.Libro
 import com.gert.tfgdam.feature.admin.libro.viewmodel.LibroAdminViewModel
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldDatePickerEstiloAlternativo
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldDropdownEstiloAlternativo
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
@@ -68,6 +69,7 @@ fun LibroAdminScreen (
     viewModel: LibroAdminViewModel = viewModel(),
 ) {
     val libros = viewModel.libros
+    val librosFiltrados = viewModel.librosFiltrados
     var showEmpty by remember { mutableStateOf(false) }
     val horizontalScrollState = rememberScrollState()
     var abrirModal by remember { mutableStateOf(false) }
@@ -93,7 +95,7 @@ fun LibroAdminScreen (
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 20.dp),
+                    .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -128,9 +130,34 @@ fun LibroAdminScreen (
                 }
             }
 
-            if(libros.isEmpty() && showEmpty) {
+            TextFieldBuscador(
+                value = viewModel.buscador,
+                onValueChange = { viewModel.onBuscadorChange(it) },
+                placeholder = "Buscar libro",
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if(viewModel.isLoadingBusqueda) {
                 Text(
-                    text = "No hay clientes disponibles",
+                    text = "Buscando...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            } else if (viewModel.buscador.isNotEmpty() && librosFiltrados.isEmpty() && !viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "No hay resultados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            } else if (libros.isEmpty() && showEmpty) {
+                Text(
+                    text = "No hay libros disponibles",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onBackground
@@ -237,116 +264,231 @@ fun LibroAdminScreen (
                         .padding(start = 10.dp, end = 10.dp, bottom = 15.dp)
                         .border(1.dp, MaterialTheme.colorScheme.primary)
                 ) {
-                    libros.forEach { libro ->
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .horizontalScroll(horizontalScrollState),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = libro.id.toString(),
+                    if (viewModel.buscador.isEmpty()) {
+                        libros.forEach { libro ->
+                            item {
+                                Row(
                                     modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
-                                        .padding(8.dp),
-                                )
-
-                                if (libro.portada != "") {
-                                    AsyncImage(
-                                        model = libro.portada,
-                                        contentDescription = libro.titulo,
-                                        modifier = Modifier
-                                            .width(100.dp)
-                                            .height(160.dp)
-                                            .padding(5.dp),
-                                        contentScale = ContentScale.Fit
-                                    )
-                                } else {
-                                    Image(
-                                        painter = painterResource(id = R.drawable.libro_no_encontrado),
-                                        contentDescription = libro.titulo,
-                                        modifier = Modifier
-                                            .width(100.dp)
-                                            .height(160.dp)
-                                            .padding(8.dp),
-                                        contentScale = ContentScale.Fit
-                                    )
-                                }
-
-                                Text(
-                                    text = libro.titulo ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.tituloWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = libro.autor?.nombre ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.autorWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = libro.editorial?.nombre ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.editorialWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = libro.isbn ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.isbnWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = libro.fechaSalida ?: "",
-                                    modifier = Modifier
-                                        .width(150.dp)
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = (libro.stock.toString() + " uds") ?: "",
-                                    modifier = Modifier
-                                        .width(100.dp)
-                                        .padding(8.dp),
-                                )
-
-                                val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
-                                val formatoDinero = NumberFormat.getCurrencyInstance(locale)
-                                Text(
-                                    text = formatoDinero.format(libro.precio ?: 0.00),
-                                    modifier = Modifier
-                                        .width(100.dp)
-                                        .padding(8.dp),
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(70.dp)
-                                        .padding(horizontal = 8.dp),
+                                        .fillMaxWidth()
+                                        .horizontalScroll(horizontalScrollState),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    IconButton(
-                                        onClick = { libroSeleccionado = libro },
-                                        modifier = Modifier.width(50.dp),
-                                        colors = IconButtonDefaults.iconButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                    Text(
+                                        text = libro.id.toString(),
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    if (libro.portada != "") {
+                                        AsyncImage(
+                                            model = libro.portada,
+                                            contentDescription = libro.titulo,
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(160.dp)
+                                                .padding(5.dp),
+                                            contentScale = ContentScale.Fit
                                         )
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar"
+                                    } else {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.libro_no_encontrado),
+                                            contentDescription = libro.titulo,
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(160.dp)
+                                                .padding(8.dp),
+                                            contentScale = ContentScale.Fit
                                         )
                                     }
-                                }
-                            }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                    Text(
+                                        text = libro.titulo ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.tituloWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = libro.autor?.nombre ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.autorWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = libro.editorial?.nombre ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.editorialWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = libro.isbn ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.isbnWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = libro.fechaSalida ?: "",
+                                        modifier = Modifier
+                                            .width(150.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = (libro.stock.toString() + " uds") ?: "",
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
+                                    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+                                    Text(
+                                        text = formatoDinero.format(libro.precio ?: 0.00),
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
+                                    ) {
+                                        IconButton(
+                                            onClick = { libroSeleccionado = libro },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
+                                    }
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    } else {
+                        librosFiltrados.forEach { libro ->
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .horizontalScroll(horizontalScrollState),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = libro.id.toString(),
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    if (libro.portada != "") {
+                                        AsyncImage(
+                                            model = libro.portada,
+                                            contentDescription = libro.titulo,
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(160.dp)
+                                                .padding(5.dp),
+                                            contentScale = ContentScale.Fit
+                                        )
+                                    } else {
+                                        Image(
+                                            painter = painterResource(id = R.drawable.libro_no_encontrado),
+                                            contentDescription = libro.titulo,
+                                            modifier = Modifier
+                                                .width(100.dp)
+                                                .height(160.dp)
+                                                .padding(8.dp),
+                                            contentScale = ContentScale.Fit
+                                        )
+                                    }
+
+                                    Text(
+                                        text = libro.titulo ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.tituloWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = libro.autor?.nombre ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.autorWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = libro.editorial?.nombre ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.editorialWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = libro.isbn ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.isbnWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = libro.fechaSalida ?: "",
+                                        modifier = Modifier
+                                            .width(150.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = (libro.stock.toString() + " uds") ?: "",
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
+                                    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+                                    Text(
+                                        text = formatoDinero.format(libro.precio ?: 0.00),
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
+                                    ) {
+                                        IconButton(
+                                            onClick = { libroSeleccionado = libro },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
+                                    }
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
                         }
                     }
                 }

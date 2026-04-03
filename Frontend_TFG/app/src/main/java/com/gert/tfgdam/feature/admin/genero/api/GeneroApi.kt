@@ -16,6 +16,9 @@ interface GeneroApi {
     @GET("api/genero/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Genero>
 
+    @GET("api/genero/get/busqueda/{texto}")
+    suspend fun getAllPorBusqueda(@Path("texto") texto: String): Response<List<Genero>>
+
     @POST("api/genero/new")
     suspend fun create(@Body genero: Genero): Response<Genero>
 

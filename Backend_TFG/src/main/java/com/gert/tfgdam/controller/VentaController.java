@@ -66,6 +66,11 @@ public class VentaController {
         }
     }
 
+    @GetMapping("/get/busqueda/{texto}")
+    public List<Venta> getAllVentaPorBusqueda(@PathVariable String texto) {
+        return ventaService.getAllVentaPorBusqueda(texto);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

@@ -60,4 +60,19 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
     boolean existsByTitulo(String titulo);
     
     Libro findByTitulo(String titulo);
+
+    @Query("""
+        SELECT l FROM Libro l
+        WHERE 
+            CAST(l.id AS string) LIKE CONCAT('%', :texto, '%')
+            OR LOWER(l.isbn) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.tipoLibro.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR CAST(l.fechaSalida AS string) LIKE CONCAT('%', :texto, '%')
+            OR CAST(l.precio AS string) LIKE CONCAT('%', :texto, '%')
+            OR CAST(l.stock AS string) LIKE CONCAT('%', :texto, '%')
+    """)
+    List<Libro> findAllPorBusqueda(@Param("texto") String texto);
 }

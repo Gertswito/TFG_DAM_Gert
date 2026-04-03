@@ -47,6 +47,9 @@ interface LibroApi {
     @GET("api/libro/get/lista-deseados/{id}/{usuario}")
     suspend fun getLibroEnListaDeseados(@Path("id") id: Long, @Path("usuario") usuario: String): Response<Libro>
 
+    @GET("api/libro/get/busqueda/{texto}")
+    suspend fun getAllPorBusqueda(@Path("texto") texto: String): Response<List<Libro>>
+
     @POST("api/libro/new")
     suspend fun create(@Body libro: Libro): Response<Libro>
 

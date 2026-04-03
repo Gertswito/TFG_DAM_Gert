@@ -21,6 +21,9 @@ interface VentaApi {
     @GET("api/venta/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Venta>
 
+    @GET("api/venta/get/busqueda/{texto}")
+    suspend fun getAllPorBusqueda(@Path("texto") texto: String): Response<List<Venta>>
+
     @POST("api/venta/new")
     suspend fun create(@Body venta: Venta): Response<Venta>
 

@@ -17,6 +17,9 @@ interface AutorApi {
     @GET("api/autor/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<Autor>
 
+    @GET("api/autor/get/busqueda/{texto}")
+    suspend fun getAllPorBusqueda(@Path("texto") texto: String): Response<List<Autor>>
+
     @POST("api/autor/new")
     suspend fun create(@Body autor: Autor): Response<Autor>
 

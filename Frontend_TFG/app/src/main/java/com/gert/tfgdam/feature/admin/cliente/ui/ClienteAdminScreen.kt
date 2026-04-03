@@ -47,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.feature.admin.cliente.model.Cliente
 import com.gert.tfgdam.feature.admin.cliente.viewmodel.ClienteAdminViewModel
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldDropdownEstiloAlternativo
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
 import kotlinx.coroutines.delay
@@ -56,6 +57,7 @@ fun ClienteAdminScreen(
     viewModel: ClienteAdminViewModel = viewModel(),
 ) {
     val clientes = viewModel.clientes
+    val clientesFiltrados = viewModel.clientesFiltrados
     var showEmpty by remember { mutableStateOf(false) }
     val horizontalScrollState = rememberScrollState()
     var abrirModal by remember { mutableStateOf(false) }
@@ -81,7 +83,7 @@ fun ClienteAdminScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 20.dp),
+                    .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -116,7 +118,32 @@ fun ClienteAdminScreen(
                 }
             }
 
-            if(clientes.isEmpty() && showEmpty) {
+            TextFieldBuscador(
+                value = viewModel.buscador,
+                onValueChange = { viewModel.onBuscadorChange(it) },
+                placeholder = "Buscar cliente",
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if(viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "Buscando...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            } else if (viewModel.buscador.isNotEmpty() && clientesFiltrados.isEmpty() && !viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "No hay resultados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            } else if (clientes.isEmpty() && showEmpty) {
                 Text(
                     text = "No hay clientes disponibles",
                     fontSize = 20.sp,
@@ -198,78 +225,155 @@ fun ClienteAdminScreen(
                         .padding(start = 10.dp, end = 10.dp, bottom = 15.dp)
                         .border(1.dp, MaterialTheme.colorScheme.primary)
                 ) {
-                    clientes.forEach { cliente ->
-                        item {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .horizontalScroll(horizontalScrollState),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = cliente.id.toString(),
+                    if (viewModel.buscador.isEmpty()) {
+                        clientes.forEach { cliente ->
+                            item {
+                                Row(
                                     modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = cliente.usuario ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.usuarioWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = cliente.rol.toString() ?: "",
-                                    modifier = Modifier
-                                        .width(100.dp)
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = cliente.nombre ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.nombreWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = cliente.apellidos ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.apellidosWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = cliente.email ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.emailWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(70.dp)
-                                        .padding(horizontal = 8.dp),
+                                        .fillMaxWidth()
+                                        .horizontalScroll(horizontalScrollState),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    IconButton(
-                                        onClick = { clienteSeleccionado = cliente },
-                                        modifier = Modifier.width(50.dp),
-                                        colors = IconButtonDefaults.iconButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        )
+                                    Text(
+                                        text = cliente.id.toString(),
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.usuario ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.usuarioWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.rol.toString() ?: "",
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.nombre ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.nombreWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.apellidos ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.apellidosWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.email ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.emailWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar"
-                                        )
+                                        IconButton(
+                                            onClick = { clienteSeleccionado = cliente },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
                                     }
                                 }
-                            }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    } else {
+                        clientesFiltrados.forEach { cliente ->
+                            item {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .horizontalScroll(horizontalScrollState),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = cliente.id.toString(),
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.usuario ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.usuarioWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.rol.toString() ?: "",
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.nombre ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.nombreWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.apellidos ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.apellidosWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = cliente.email ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.emailWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
+                                    ) {
+                                        IconButton(
+                                            onClick = { clienteSeleccionado = cliente },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
+                                    }
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
                         }
                     }
                 }

@@ -20,6 +20,9 @@ interface ClienteApi {
     @GET("api/cliente/get/usuario/{usuario}")
     suspend fun getPorUsuario(@Path("usuario") usuario: String): Response<Cliente>
 
+    @GET("api/cliente/get/busqueda/{texto}")
+    suspend fun getAllPorBusqueda(@Path("texto") texto: String): Response<List<Cliente>>
+
     @POST("api/cliente/login")
     suspend fun login(@Body cliente: Cliente): Response<JwtResponse>
 

@@ -98,6 +98,11 @@ public class LibroController {
         return ResponseEntity.ok(libro);
     }
 
+    @GetMapping("/get/busqueda/{texto}")
+    public List<Libro> getAllLibroPorBusqueda(@PathVariable String texto) {
+        return libroService.getAllLibroPorBusqueda(texto);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

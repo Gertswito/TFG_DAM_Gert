@@ -56,6 +56,11 @@ public class ClienteController {
         }
     }
 
+    @GetMapping("/get/busqueda/{texto}")
+    public List<Cliente> getAllClientePorBusqueda(@PathVariable String texto) {
+        return clienteService.getAllClientePorBusqueda(texto);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Cliente cliente) {
         String token = clienteService.login(cliente);

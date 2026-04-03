@@ -16,6 +16,9 @@ interface TipoLibroApi {
     @GET("api/tipo-libro/get/{id}")
     suspend fun getPorId(@Path("id") id: Long): Response<TipoLibro>
 
+    @GET("api/tipo-libro/get/busqueda/{texto}")
+    suspend fun getAllPorBusqueda(@Path("texto") texto: String): Response<List<TipoLibro>>
+
     @POST("api/tipo-libro/new")
     suspend fun create(@Body tipoLibro: TipoLibro): Response<TipoLibro>
 

@@ -18,6 +18,10 @@ class EditorialRepository {
         return api.getPorId(id)
     }
 
+    suspend fun getAllPorBusqueda(texto: String): Response<List<Editorial>> {
+        return api.getAllPorBusqueda(texto)
+    }
+
     suspend fun create(editorial: Editorial): Response<Editorial> {
         return api.create(editorial)
     }

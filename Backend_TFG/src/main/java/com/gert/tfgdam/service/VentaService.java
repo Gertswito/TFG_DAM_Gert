@@ -50,6 +50,10 @@ public class VentaService {
         return ventaRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la venta"));
     }
 
+    public List<Venta> getAllVentaPorBusqueda(String texto) {
+        return ventaRepository.findAllPorBusqueda(texto);
+    }
+
     public void delete(Long id) {
         if (!ventaRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la venta");

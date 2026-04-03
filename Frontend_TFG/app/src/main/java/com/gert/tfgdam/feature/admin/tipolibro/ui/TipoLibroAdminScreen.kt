@@ -47,6 +47,7 @@ import com.gert.tfgdam.feature.admin.autor.model.Autor
 import com.gert.tfgdam.feature.admin.autor.ui.CrearEditarAutor
 import com.gert.tfgdam.feature.admin.tipolibro.model.TipoLibro
 import com.gert.tfgdam.feature.admin.tipolibro.viewmodel.TipoLibroAdminViewModel
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
 import kotlinx.coroutines.delay
 
@@ -55,6 +56,7 @@ fun TipoLibroAdminScreen(
     viewModel: TipoLibroAdminViewModel = viewModel(),
 ) {
     val tiposlibros = viewModel.tiposlibros
+    val tiposlibrosFiltrados = viewModel.tiposlibrosFiltrados
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
     var tipoLibroSeleccionado by remember { mutableStateOf<TipoLibro?>(null) }
@@ -79,7 +81,7 @@ fun TipoLibroAdminScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 20.dp),
+                    .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -89,7 +91,7 @@ fun TipoLibroAdminScreen(
                     textAlign = TextAlign.Center
                 )
 
-                Button (
+                Button(
                     onClick = { abrirModal = true },
                 ) {
                     Icon(
@@ -114,7 +116,32 @@ fun TipoLibroAdminScreen(
                 }
             }
 
-            if(tiposlibros.isEmpty() && showEmpty) {
+            TextFieldBuscador(
+                value = viewModel.buscador,
+                onValueChange = { viewModel.onBuscadorChange(it) },
+                placeholder = "Buscar tipos de libro",
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if (viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "Buscando...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            } else if (viewModel.buscador.isNotEmpty() && tiposlibrosFiltrados.isEmpty() && !viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "No hay resultados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            } else if (tiposlibros.isEmpty() && showEmpty) {
                 Text(
                     text = "No hay tipos de libros disponibles",
                     fontSize = 20.sp,
@@ -141,7 +168,7 @@ fun TipoLibroAdminScreen(
                     Text(
                         text = "Nombre",
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(3f)
                             .padding(end = 8.dp, top = 8.dp),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
@@ -163,52 +190,103 @@ fun TipoLibroAdminScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                 ) {
-                    tiposlibros.forEach { tipolibro ->
-                        item{
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = tipolibro.id.toString() ?: "",
-                                    textAlign = TextAlign.Start,
+                    if (viewModel.buscador.isEmpty()) {
+                        tiposlibros.forEach { tipolibro ->
+                            item{
+                                Row(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 8.dp)
-                                )
-
-                                Text(
-                                    text = tipolibro.nombre ?: "",
-                                    textAlign = TextAlign.End,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 8.dp)
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(70.dp)
-                                        .padding(horizontal = 8.dp),
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    IconButton(
-                                        onClick = { tipoLibroSeleccionado = tipolibro },
-                                        modifier = Modifier.width(50.dp),
-                                        colors = IconButtonDefaults.iconButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        )
+                                    Text(
+                                        text = tipolibro.id.toString() ?: "",
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = tipolibro.nombre ?: "",
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier
+                                            .weight(3f)
+                                            .padding(end = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar"
-                                        )
+                                        IconButton(
+                                            onClick = { tipoLibroSeleccionado = tipolibro },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
                                     }
                                 }
-                            }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    } else {
+                        tiposlibrosFiltrados.forEach { tipolibro ->
+                            item{
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = tipolibro.id.toString() ?: "",
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = tipolibro.nombre ?: "",
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier
+                                            .weight(3f)
+                                            .padding(end = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
+                                    ) {
+                                        IconButton(
+                                            onClick = { tipoLibroSeleccionado = tipolibro },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
+                                    }
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
                         }
                     }
                 }

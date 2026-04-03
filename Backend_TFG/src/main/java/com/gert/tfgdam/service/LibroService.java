@@ -1,10 +1,7 @@
 package com.gert.tfgdam.service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -104,6 +101,10 @@ public class LibroService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el usuario");
         }
         return cliente.getLibrosDeseados().stream().filter(libro -> libro.getId().equals(id)).findFirst().orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Libro no está en lista de deseados"));
+    }
+
+    public List<Libro> getAllLibroPorBusqueda(String texto) {
+        return libroRepository.findAllPorBusqueda(texto);
     }
 
     public void delete(Long id) {

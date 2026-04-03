@@ -45,6 +45,11 @@ public class GeneroController {
         }
     }
 
+    @GetMapping("/get/busqueda/{texto}")
+    public List<Genero> getAllGeneroPorBusqueda(@PathVariable String texto) {
+        return generoService.getAllGeneroPorBusqueda(texto);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

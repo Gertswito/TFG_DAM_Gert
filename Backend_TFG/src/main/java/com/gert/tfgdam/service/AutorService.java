@@ -26,6 +26,10 @@ public class AutorService {
         return autorRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al autor"));
     }
 
+    public List<Autor> getAllAutorPorBusqueda(String texto) {
+        return autorRepository.findAllPorBusqueda(texto);
+    }
+
     public void delete(Long id) {
         if (!autorRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al autor");

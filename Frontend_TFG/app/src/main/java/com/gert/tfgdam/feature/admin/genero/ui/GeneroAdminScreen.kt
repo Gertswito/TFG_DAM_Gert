@@ -44,6 +44,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.gert.tfgdam.feature.admin.genero.model.Genero
 import com.gert.tfgdam.feature.admin.genero.viewmodel.GeneroAdminViewModel
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
 import kotlinx.coroutines.delay
 
@@ -52,6 +53,7 @@ fun GeneroAdminScreen(
     viewModel: GeneroAdminViewModel = viewModel(),
 ) {
     val generos = viewModel.generos
+    val generosFiltrados = viewModel.generosFiltrados
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
     var generoSeleccionado by remember { mutableStateOf<Genero?>(null) }
@@ -76,7 +78,7 @@ fun GeneroAdminScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 20.dp),
+                    .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -111,7 +113,32 @@ fun GeneroAdminScreen(
                 }
             }
 
-            if(generos.isEmpty() && showEmpty) {
+            TextFieldBuscador(
+                value = viewModel.buscador,
+                onValueChange = { viewModel.onBuscadorChange(it) },
+                placeholder = "Buscar género",
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if(viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "Buscando...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            } else if (viewModel.buscador.isNotEmpty() && generosFiltrados.isEmpty() && !viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "No hay resultados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            } else if (generos.isEmpty() && showEmpty) {
                 Text(
                     text = "No hay géneros disponibles",
                     fontSize = 20.sp,
@@ -138,7 +165,7 @@ fun GeneroAdminScreen(
                     Text(
                         text = "Nombre",
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(3f)
                             .padding(end = 8.dp, top = 8.dp),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
@@ -160,52 +187,103 @@ fun GeneroAdminScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                 ) {
-                    generos.forEach { genero ->
-                        item{
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = genero.id.toString() ?: "",
-                                    textAlign = TextAlign.Start,
+                    if (viewModel.buscador.isEmpty()) {
+                        generos.forEach { genero ->
+                            item{
+                                Row(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 8.dp)
-                                )
-
-                                Text(
-                                    text = genero.nombre ?: "",
-                                    textAlign = TextAlign.End,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 8.dp)
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(70.dp)
-                                        .padding(horizontal = 8.dp),
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    IconButton(
-                                        onClick = { generoSeleccionado = genero },
-                                        modifier = Modifier.width(50.dp),
-                                        colors = IconButtonDefaults.iconButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        )
+                                    Text(
+                                        text = genero.id.toString() ?: "",
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = genero.nombre ?: "",
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier
+                                            .weight(3f)
+                                            .padding(end = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar"
-                                        )
+                                        IconButton(
+                                            onClick = { generoSeleccionado = genero },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
                                     }
                                 }
-                            }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    } else {
+                        generosFiltrados.forEach { genero ->
+                            item{
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = genero.id.toString() ?: "",
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = genero.nombre ?: "",
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier
+                                            .weight(3f)
+                                            .padding(end = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
+                                    ) {
+                                        IconButton(
+                                            onClick = { generoSeleccionado = genero },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
+                                    }
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
                         }
                     }
                 }

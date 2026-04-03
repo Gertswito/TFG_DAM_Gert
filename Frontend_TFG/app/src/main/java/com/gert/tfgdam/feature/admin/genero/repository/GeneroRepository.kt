@@ -18,6 +18,10 @@ class GeneroRepository {
         return api.getPorId(id)
     }
 
+    suspend fun getAllPorBusqueda(texto: String): Response<List<Genero>> {
+        return api.getAllPorBusqueda(texto)
+    }
+
     suspend fun create(genero: Genero): Response<Genero> {
         return api.create(genero)
     }

@@ -20,7 +20,11 @@ import com.gert.tfgdam.feature.admin.genero.repository.GeneroRepository
 import com.gert.tfgdam.feature.admin.libro.repository.LibroRepository
 import com.gert.tfgdam.feature.admin.tipolibro.repository.TipoLibroRepository
 import com.google.gson.Gson
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.IOException
@@ -61,7 +65,14 @@ class LibroAdminViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
 
+    var buscador by mutableStateOf("")
+        private set
+    private val buscadorFlow = MutableStateFlow("")
+    var isLoadingBusqueda by mutableStateOf(false)
+
     var libros by mutableStateOf<List<Libro>>(emptyList())
+        private set
+    var librosFiltrados by mutableStateOf<List<Libro>>(emptyList())
         private set
     var listaEditoriales by mutableStateOf<List<Editorial>>(emptyList())
         private set
@@ -75,6 +86,7 @@ class LibroAdminViewModel : ViewModel() {
 
     init {
         cargarLibros()
+        observarBuscador()
     }
 
     private fun cargarLibros() {
@@ -90,6 +102,44 @@ class LibroAdminViewModel : ViewModel() {
                 }
             } catch (e: IOException) {
                 libros = emptyList()
+            }
+        }
+    }
+
+    fun onBuscadorChange(texto: String) {
+        buscador = texto
+        buscadorFlow.value = texto
+        if (texto.isNotEmpty()) {
+            isLoadingBusqueda = true
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observarBuscador() {
+        viewModelScope.launch {
+            buscadorFlow
+                .debounce(500)
+                .distinctUntilChanged()
+                .collect { texto ->
+                    buscarLibros(texto)
+                }
+        }
+    }
+
+    private fun buscarLibros(texto: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getAllPorBusqueda(texto)
+
+                if (response.isSuccessful) {
+                    librosFiltrados = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    librosFiltrados = emptyList()
+                }
+            } catch (e: IOException) {
+                librosFiltrados = emptyList()
+            } finally {
+                isLoadingBusqueda = false
             }
         }
     }

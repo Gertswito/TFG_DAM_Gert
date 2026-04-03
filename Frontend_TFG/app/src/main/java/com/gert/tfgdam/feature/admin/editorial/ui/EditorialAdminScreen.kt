@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.feature.admin.editorial.model.Editorial
 import com.gert.tfgdam.feature.admin.editorial.viewmodel.EditorialAdminViewModel
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
 import kotlinx.coroutines.delay
 
@@ -53,6 +54,7 @@ fun EditorialAdminScreen(
     viewModel: EditorialAdminViewModel = viewModel(),
 ) {
     val editoriales = viewModel.editoriales
+    val editorialesFiltradas = viewModel.editorialesFiltradas
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
     var editorialSeleccionada by remember { mutableStateOf<Editorial?>(null) }
@@ -77,7 +79,7 @@ fun EditorialAdminScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 20.dp),
+                    .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -112,7 +114,32 @@ fun EditorialAdminScreen(
                 }
             }
 
-            if(editoriales.isEmpty() && showEmpty) {
+            TextFieldBuscador(
+                value = viewModel.buscador,
+                onValueChange = { viewModel.onBuscadorChange(it) },
+                placeholder = "Buscar editorial",
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if(viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "Buscando...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            } else if (viewModel.buscador.isNotEmpty() && editorialesFiltradas.isEmpty() && !viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "No hay resultados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            } else if (editoriales.isEmpty() && showEmpty) {
                 Text(
                     text = "No hay editoriales disponibles",
                     fontSize = 20.sp,
@@ -139,7 +166,7 @@ fun EditorialAdminScreen(
                     Text(
                         text = "Nombre",
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(3f)
                             .padding(end = 8.dp, top = 8.dp),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
@@ -161,52 +188,103 @@ fun EditorialAdminScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                 ) {
-                    editoriales.forEach { editorial ->
-                        item{
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = editorial.id.toString() ?: "",
-                                    textAlign = TextAlign.Start,
+                    if (viewModel.buscador.isEmpty()) {
+                        editoriales.forEach { editorial ->
+                            item{
+                                Row(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 8.dp)
-                                )
-
-                                Text(
-                                    text = editorial.nombre ?: "",
-                                    textAlign = TextAlign.End,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 8.dp)
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(70.dp)
-                                        .padding(horizontal = 8.dp),
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    IconButton(
-                                        onClick = { editorialSeleccionada = editorial },
-                                        modifier = Modifier.width(50.dp),
-                                        colors = IconButtonDefaults.iconButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        )
+                                    Text(
+                                        text = editorial.id.toString() ?: "",
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = editorial.nombre ?: "",
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier
+                                            .weight(3f)
+                                            .padding(end = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar"
-                                        )
+                                        IconButton(
+                                            onClick = { editorialSeleccionada = editorial },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
                                     }
                                 }
-                            }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    } else {
+                        editorialesFiltradas.forEach { editorial ->
+                            item{
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = editorial.id.toString() ?: "",
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = editorial.nombre ?: "",
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier
+                                            .weight(3f)
+                                            .padding(end = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
+                                    ) {
+                                        IconButton(
+                                            onClick = { editorialSeleccionada = editorial },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
+                                    }
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
                         }
                     }
                 }

@@ -26,6 +26,10 @@ public class EditorialService {
         return editorialRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la editorial"));
     }
 
+    public List<Editorial> getAllEditorialPorBusqueda(String texto) {
+        return editorialRepository.findAllPorBusqueda(texto);
+    }
+
     public void delete(Long id) {
         if (!editorialRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la editorial");

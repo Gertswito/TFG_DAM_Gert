@@ -20,7 +20,11 @@ import com.gert.tfgdam.feature.admin.libro.repository.LibroRepository
 import com.gert.tfgdam.feature.admin.lineaventa.repository.LineaVentaRepository
 import com.gert.tfgdam.feature.admin.venta.repository.VentaRepository
 import com.google.gson.Gson
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.IOException
@@ -55,7 +59,14 @@ class VentaAdminViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
 
+    var buscador by mutableStateOf("")
+        private set
+    private val buscadorFlow = MutableStateFlow("")
+    var isLoadingBusqueda by mutableStateOf(false)
+
     var ventas by mutableStateOf<List<Venta>>(emptyList())
+        private set
+    var ventasFiltradas by mutableStateOf<List<Venta>>(emptyList())
         private set
     var lineasPorVenta by mutableStateOf<Map<Long, List<LineaVenta>>>(emptyMap())
         private set
@@ -68,6 +79,7 @@ class VentaAdminViewModel : ViewModel() {
 
     init {
         cargarVentas()
+        observarBuscador()
     }
 
     private fun cargarVentas() {
@@ -83,6 +95,44 @@ class VentaAdminViewModel : ViewModel() {
                 }
             } catch (e: IOException) {
                 ventas = emptyList()
+            }
+        }
+    }
+
+    fun onBuscadorChange(texto: String) {
+        buscador = texto
+        buscadorFlow.value = texto
+        if (texto.isNotEmpty()) {
+            isLoadingBusqueda = true
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observarBuscador() {
+        viewModelScope.launch {
+            buscadorFlow
+                .debounce(500)
+                .distinctUntilChanged()
+                .collect { texto ->
+                    buscarVentas(texto)
+                }
+        }
+    }
+
+    private fun buscarVentas(texto: String) {
+        viewModelScope.launch {
+            try {
+                val response = ventaRepository.getAllPorBusqueda(texto)
+
+                if (response.isSuccessful) {
+                    ventasFiltradas = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    ventasFiltradas = emptyList()
+                }
+            } catch (e: IOException) {
+                ventasFiltradas = emptyList()
+            } finally {
+                isLoadingBusqueda = false
             }
         }
     }

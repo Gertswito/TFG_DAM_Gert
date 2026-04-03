@@ -45,6 +45,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.feature.admin.autor.model.Autor
 import com.gert.tfgdam.feature.admin.autor.viewmodel.AutorAdminViewModel
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
 import kotlinx.coroutines.delay
 
@@ -53,6 +54,7 @@ fun AutorAdminScreen(
     viewModel: AutorAdminViewModel = viewModel(),
 ) {
     val autores = viewModel.autores
+    val autoresFiltrados = viewModel.autoresFiltrados
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
     var autorSeleccionado by remember { mutableStateOf<Autor?>(null) }
@@ -77,7 +79,7 @@ fun AutorAdminScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 20.dp),
+                    .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -87,7 +89,7 @@ fun AutorAdminScreen(
                     textAlign = TextAlign.Center
                 )
 
-                Button (
+                Button(
                     onClick = { abrirModal = true },
                 ) {
                     Icon(
@@ -112,7 +114,32 @@ fun AutorAdminScreen(
                 }
             }
 
-            if(autores.isEmpty() && showEmpty) {
+            TextFieldBuscador(
+                value = viewModel.buscador,
+                onValueChange = { viewModel.onBuscadorChange(it) },
+                placeholder = "Buscar autor",
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if (viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "Buscando...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            } else if (viewModel.buscador.isNotEmpty() && autoresFiltrados.isEmpty() && !viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "No hay resultados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            } else if (autores.isEmpty() && showEmpty) {
                 Text(
                     text = "No hay autores disponibles",
                     fontSize = 20.sp,
@@ -139,7 +166,7 @@ fun AutorAdminScreen(
                     Text(
                         text = "Nombre",
                         modifier = Modifier
-                            .weight(1f)
+                            .weight(3f)
                             .padding(end = 8.dp, top = 8.dp),
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.End,
@@ -161,52 +188,103 @@ fun AutorAdminScreen(
                             color = MaterialTheme.colorScheme.primary
                         )
                 ) {
-                    autores.forEach { autor ->
-                        item{
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Text(
-                                    text = autor.id.toString() ?: "",
-                                    textAlign = TextAlign.Start,
+                    if (viewModel.buscador.isEmpty()) {
+                        autores.forEach { autor ->
+                            item{
+                                Row(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 8.dp)
-                                )
-
-                                Text(
-                                    text = autor.nombre ?: "",
-                                    textAlign = TextAlign.End,
-                                    modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 8.dp)
-                                )
-
-                                Box(
-                                    modifier = Modifier
-                                        .width(70.dp)
-                                        .padding(horizontal = 8.dp),
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    IconButton(
-                                        onClick = { autorSeleccionado = autor },
-                                        modifier = Modifier.width(50.dp),
-                                        colors = IconButtonDefaults.iconButtonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                            contentColor = MaterialTheme.colorScheme.onPrimary
-                                        )
+                                    Text(
+                                        text = autor.id.toString() ?: "",
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = autor.nombre ?: "",
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier
+                                            .weight(3f)
+                                            .padding(end = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "Editar"
-                                        )
+                                        IconButton(
+                                            onClick = { autorSeleccionado = autor },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
                                     }
                                 }
-                            }
 
-                            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
+                    } else {
+                        autoresFiltrados.forEach { autor ->
+                            item{
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 8.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Text(
+                                        text = autor.id.toString() ?: "",
+                                        textAlign = TextAlign.Start,
+                                        modifier = Modifier
+                                            .weight(1f)
+                                            .padding(start = 8.dp)
+                                    )
+
+                                    Text(
+                                        text = autor.nombre ?: "",
+                                        textAlign = TextAlign.End,
+                                        modifier = Modifier
+                                            .weight(3f)
+                                            .padding(end = 8.dp)
+                                    )
+
+                                    Box(
+                                        modifier = Modifier
+                                            .width(70.dp)
+                                            .padding(horizontal = 8.dp),
+                                    ) {
+                                        IconButton(
+                                            onClick = { autorSeleccionado = autor },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Edit,
+                                                contentDescription = "Editar"
+                                            )
+                                        }
+                                    }
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                            }
                         }
                     }
                 }

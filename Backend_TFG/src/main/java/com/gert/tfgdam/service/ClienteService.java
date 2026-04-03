@@ -1,7 +1,6 @@
 package com.gert.tfgdam.service;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -9,7 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.gert.tfgdam.entity.Autor;
 import com.gert.tfgdam.entity.Cliente;
 import com.gert.tfgdam.entity.Rol;
 import com.gert.tfgdam.repository.ClienteRepository;
@@ -42,6 +40,10 @@ public class ClienteService {
 
     public Cliente getClientePorUsuario(String usuario) { 
         return clienteRepository.findWithDireccionesByUsuario(usuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));    
+    }
+
+    public List<Cliente> getAllClientePorBusqueda(String texto) {
+        return clienteRepository.findAllPorBusqueda(texto);
     }
 
     public String login(Cliente cliente) {

@@ -18,6 +18,10 @@ class AutorRepository {
         return api.getPorId(id)
     }
 
+    suspend fun getAllPorBusqueda(texto: String): Response<List<Autor>> {
+        return api.getAllPorBusqueda(texto)
+    }
+
     suspend fun create(autor: Autor): Response<Autor> {
         return api.create(autor)
     }

@@ -24,6 +24,10 @@ class VentaRepository {
         return api.getPorId(id)
     }
 
+    suspend fun getAllPorBusqueda(texto: String): Response<List<Venta>> {
+        return api.getAllPorBusqueda(texto)
+    }
+
     suspend fun create(venta: Venta): Response<Venta> {
         return api.create(venta)
     }

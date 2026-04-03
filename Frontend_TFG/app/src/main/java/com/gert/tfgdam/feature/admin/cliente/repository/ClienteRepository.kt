@@ -22,6 +22,10 @@ class ClienteRepository {
         return api.getPorUsuario(usuario)
     }
 
+    suspend fun getAllPorBusqueda(texto: String): Response<List<Cliente>> {
+        return api.getAllPorBusqueda(texto)
+    }
+
     suspend fun login(cliente: Cliente): String {
         val response = api.login(cliente)
         if (response.isSuccessful) {

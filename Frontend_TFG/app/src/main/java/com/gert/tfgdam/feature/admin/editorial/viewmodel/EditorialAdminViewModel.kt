@@ -9,7 +9,11 @@ import com.gert.tfgdam.core.network.ApiError
 import com.gert.tfgdam.feature.admin.editorial.model.Editorial
 import com.gert.tfgdam.feature.admin.editorial.repository.EditorialRepository
 import com.google.gson.Gson
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.IOException
@@ -23,10 +27,18 @@ class EditorialAdminViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
 
+    var buscador by mutableStateOf("")
+        private set
+    private val buscadorFlow = MutableStateFlow("")
+    var isLoadingBusqueda by mutableStateOf(false)
+
     var editoriales by mutableStateOf<List<Editorial>>(emptyList())
+        private set
+    var editorialesFiltradas by mutableStateOf<List<Editorial>>(emptyList())
         private set
     init {
         cargarEditoriales()
+        observarBuscador()
     }
 
     private fun cargarEditoriales() {
@@ -41,6 +53,44 @@ class EditorialAdminViewModel : ViewModel() {
                 }
             } catch (e: IOException) {
                 editoriales = emptyList()
+            }
+        }
+    }
+
+    fun onBuscadorChange(texto: String) {
+        buscador = texto
+        buscadorFlow.value = texto
+        if (texto.isNotEmpty()) {
+            isLoadingBusqueda = true
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observarBuscador() {
+        viewModelScope.launch {
+            buscadorFlow
+                .debounce(500)
+                .distinctUntilChanged()
+                .collect { texto ->
+                    buscarEditoriales(texto)
+                }
+        }
+    }
+
+    private fun buscarEditoriales(texto: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getAllPorBusqueda(texto)
+
+                if (response.isSuccessful) {
+                    editorialesFiltradas = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    editorialesFiltradas = emptyList()
+                }
+            } catch (e: IOException) {
+                editorialesFiltradas = emptyList()
+            } finally {
+                isLoadingBusqueda = false
             }
         }
     }

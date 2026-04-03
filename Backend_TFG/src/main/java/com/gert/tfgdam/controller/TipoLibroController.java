@@ -46,6 +46,11 @@ public class TipoLibroController {
         }
     }
 
+    @GetMapping("/get/busqueda/{texto}")
+    public List<TipoLibro> getAllTipoLibroPorBusqueda(@PathVariable String texto) {
+        return tipoLibroService.getAllTipoLibroPorBusqueda(texto);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

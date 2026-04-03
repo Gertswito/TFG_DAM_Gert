@@ -13,7 +13,11 @@ import com.gert.tfgdam.feature.admin.cliente.model.Cliente
 import com.gert.tfgdam.feature.admin.cliente.model.Rol
 import com.gert.tfgdam.feature.admin.cliente.repository.ClienteRepository
 import com.google.gson.Gson
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.IOException
@@ -43,13 +47,20 @@ class ClienteAdminViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
 
+    var buscador by mutableStateOf("")
+        private set
+    private val buscadorFlow = MutableStateFlow("")
+    var isLoadingBusqueda by mutableStateOf(false)
+
     var clientes by mutableStateOf<List<Cliente>>(emptyList())
         private set
-
+    var clientesFiltrados by mutableStateOf<List<Cliente>>(emptyList())
+        private set
     val listaRoles = listOf(Rol.USER, Rol.ADMIN)
 
     init {
         cargarClientes()
+        observarBuscador()
     }
 
     private fun cargarClientes() {
@@ -66,6 +77,44 @@ class ClienteAdminViewModel : ViewModel() {
                 }
             } catch (e: IOException) {
                 clientes = emptyList()
+            }
+        }
+    }
+
+    fun onBuscadorChange(texto: String) {
+        buscador = texto
+        buscadorFlow.value = texto
+        if (texto.isNotEmpty()) {
+            isLoadingBusqueda = true
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observarBuscador() {
+        viewModelScope.launch {
+            buscadorFlow
+                .debounce(500)
+                .distinctUntilChanged()
+                .collect { texto ->
+                    buscarClientes(texto)
+                }
+        }
+    }
+
+    private fun buscarClientes(texto: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getAllPorBusqueda(texto)
+
+                if (response.isSuccessful) {
+                    clientesFiltrados = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    clientesFiltrados = emptyList()
+                }
+            } catch (e: IOException) {
+                clientesFiltrados = emptyList()
+            } finally {
+                isLoadingBusqueda = false
             }
         }
     }

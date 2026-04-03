@@ -51,6 +51,7 @@ import androidx.navigation.NavController
 import com.gert.tfgdam.feature.admin.lineaventa.model.LineaVenta
 import com.gert.tfgdam.feature.admin.venta.model.Venta
 import com.gert.tfgdam.feature.admin.venta.viewmodel.VentaAdminViewModel
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldDatePickerEstiloAlternativo
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldDropdownEstiloAlternativo
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstiloAlternativo
@@ -65,6 +66,7 @@ fun VentaAdminScreen(
     viewModel: VentaAdminViewModel = viewModel(),
 ) {
     val ventas = viewModel.ventas
+    val ventasFiltradas = viewModel.ventasFiltradas
     var showEmpty by remember { mutableStateOf(false) }
     var verLineasVentaPorVenta by remember { mutableStateOf<Venta?>(null) }
 
@@ -94,7 +96,7 @@ fun VentaAdminScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 10.dp, vertical = 20.dp),
+                    .padding(start = 10.dp, end = 10.dp, top = 20.dp, bottom = 10.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -129,7 +131,32 @@ fun VentaAdminScreen(
                 }
             }
 
-            if(ventas.isEmpty() && showEmpty) {
+            TextFieldBuscador(
+                value = viewModel.buscador,
+                onValueChange = { viewModel.onBuscadorChange(it) },
+                placeholder = "Buscar autor",
+                modifier = Modifier.padding(horizontal = 8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            if(viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "Buscando...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            } else if (viewModel.buscador.isNotEmpty() && ventasFiltradas.isEmpty() && !viewModel.isLoadingBusqueda) {
+                Text(
+                    text = "No hay resultados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground
+                )
+            } else if (ventas.isEmpty() && showEmpty) {
                 Text(
                     text = "No hay ventas disponibles",
                     fontSize = 20.sp,
@@ -215,263 +242,526 @@ fun VentaAdminScreen(
                         .padding(start = 10.dp, end = 10.dp, bottom = 15.dp)
                         .border(1.dp, MaterialTheme.colorScheme.primary)
                 ) {
-                    ventas.forEach { venta ->
-                        item {
-                            val lineas = viewModel.lineasPorVenta[venta.id] ?: emptyList()
+                    if (viewModel.buscador.isEmpty()) {
+                        ventas.forEach { venta ->
+                            item {
+                                val lineas = viewModel.lineasPorVenta[venta.id] ?: emptyList()
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .horizontalScroll(horizontalScrollState),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Box (
-                                    modifier = Modifier
-                                        .width(50.dp)
-                                        .padding(8.dp)
-                                        .clickable(
-                                            indication = null,
-                                            interactionSource = remember { MutableInteractionSource() }
-                                        ) {
-                                            if (verLineasVentaPorVenta == venta) {
-                                                verLineasVentaPorVenta = null
-                                                venta.id?.let { viewModel.cargarLineasVentasPorVenta(it) }
-                                            } else {
-                                                verLineasVentaPorVenta = venta
-                                                venta.id?.let { viewModel.limpiarLineasVenta(it) }
-                                            }
-                                        }
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.ArrowDropDown,
-                                        contentDescription = "Desplegar"
-                                    )
-                                }
-
-                                Text(
-                                    text = venta.id.toString(),
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = venta.cliente?.usuario ?: "",
-                                    modifier = Modifier
-                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.usuarioWidth))
-                                        .padding(8.dp),
-                                )
-
-                                Column (
-                                    modifier = Modifier.width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
-                                ) {
-                                    Text(
-                                        text = (venta.direccion?.calle + " " + venta.direccion?.numero.toString() + ", " + venta.direccion?.piso) ?: "",
-                                        modifier = Modifier
-                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
-                                            .padding(top = 8.dp, end = 8.dp, start = 8.dp),
-                                    )
-
-                                    Text(
-                                        text = (venta.direccion?.ciudad + " " + venta.direccion?.provincia) ?: "",
-                                        modifier = Modifier
-                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
-                                            .padding(end = 8.dp, start = 8.dp),
-                                    )
-
-                                    Text(
-                                        text = (venta.direccion?.codigoPostal) ?: "",
-                                        modifier = Modifier
-                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
-                                            .padding(bottom = 8.dp, end = 8.dp, start = 8.dp),
-                                    )
-                                }
-
-                                Text(
-                                    text = venta.fecha ?: "",
-                                    modifier = Modifier
-                                        .width(150.dp)
-                                        .padding(8.dp),
-                                )
-
-                                Text(
-                                    text = venta.hora ?: "",
-                                    modifier = Modifier
-                                        .width(100.dp)
-                                        .padding(8.dp),
-                                )
-
-                                val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
-                                val formatoDinero = NumberFormat.getCurrencyInstance(locale)
-                                Text(
-                                    text = formatoDinero.format(venta.precioFinal ?: 0.0),
-                                    modifier = Modifier
-                                        .width(120.dp)
-                                        .padding(8.dp),
-                                )
-                            }
-
-                            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
-
-                            if (verLineasVentaPorVenta == venta) {
-                                if (lineas.isNotEmpty()) {
-                                    Row(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(40.dp)
-                                            .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-                                            .horizontalScroll(horizontalScrollStateLineasVentas)
-                                    ) {
-                                        Text(
-                                            text = "Id",
-                                            modifier = Modifier
-                                                .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
-                                                .padding(8.dp),
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-
-                                        Text(
-                                            text = "Libro",
-                                            modifier = Modifier
-                                                .width(250.dp)
-                                                .padding(8.dp),
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-
-                                        Text(
-                                            text = "Cantidad",
-                                            modifier = Modifier
-                                                .width(100.dp)
-                                                .padding(8.dp),
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-
-                                        Text(
-                                            text = "P. Unit.",
-                                            modifier = Modifier
-                                                .width(100.dp)
-                                                .padding(8.dp),
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-
-                                        Text(
-                                            text = "P. Total",
-                                            modifier = Modifier
-                                                .width(100.dp)
-                                                .padding(8.dp),
-                                            fontWeight = FontWeight.Bold,
-                                            color = MaterialTheme.colorScheme.onPrimary
-                                        )
-                                    }
-
-                                    Column(
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
-                                            .background(MaterialTheme.colorScheme.background)
-                                    ) {
-                                        lineas.forEachIndexed { index, linea ->
-                                            Row(
-                                                modifier = Modifier
-                                                    .fillMaxWidth()
-                                                    .horizontalScroll(horizontalScrollStateLineasVentas),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Text(
-                                                    text = linea.id.toString(),
-                                                    modifier = Modifier
-                                                        .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
-                                                        .padding(8.dp),
-                                                )
-
-                                                Text(
-                                                    text = linea.libro?.titulo ?: "",
-                                                    modifier = Modifier
-                                                        .width(250.dp)
-                                                        .padding(8.dp),
-                                                    maxLines = 1,
-                                                    overflow = TextOverflow.Ellipsis
-                                                )
-
-                                                Text(
-                                                    text = (linea.cantidad.toString() + " uds") ?: "",
-                                                    modifier = Modifier
-                                                        .width(100.dp)
-                                                        .padding(8.dp),
-                                                )
-
-                                                val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
-                                                val formatoDinero = NumberFormat.getCurrencyInstance(locale)
-                                                Text(
-                                                    text = formatoDinero.format(linea.precioParcial ?: 0.0),
-                                                    modifier = Modifier
-                                                        .width(100.dp)
-                                                        .padding(8.dp),
-                                                )
-
-                                                Text(
-                                                    text = formatoDinero.format(linea.precioTotal ?: 0.0),
-                                                    modifier = Modifier
-                                                        .width(100.dp)
-                                                        .padding(8.dp),
-                                                )
-                                            }
-
-                                            HorizontalDivider(color = MaterialTheme.colorScheme.primary)
-                                        }
-                                    }
-                                }
-
-                                Button (
-                                    onClick = { abrirModalLineaVenta = true },
+                                Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(8.dp),
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                                        contentColor = MaterialTheme.colorScheme.onPrimary
-                                    )
-
+                                        .horizontalScroll(horizontalScrollState),
+                                    verticalAlignment = Alignment.CenterVertically
                                 ) {
-                                    Row (
-                                        verticalAlignment = Alignment.CenterVertically
+                                    Box (
+                                        modifier = Modifier
+                                            .width(50.dp)
+                                            .padding(8.dp)
+                                            .clickable(
+                                                indication = null,
+                                                interactionSource = remember { MutableInteractionSource() }
+                                            ) {
+                                                if (verLineasVentaPorVenta == venta) {
+                                                    verLineasVentaPorVenta = null
+                                                    venta.id?.let { viewModel.cargarLineasVentasPorVenta(it) }
+                                                } else {
+                                                    verLineasVentaPorVenta = venta
+                                                    venta.id?.let { viewModel.limpiarLineasVenta(it) }
+                                                }
+                                            }
                                     ) {
-                                        Text(
-                                            text = "Añadir línea",
-                                            modifier = Modifier.padding(start = 8.dp),
-                                            fontSize = 16.sp
-                                        )
-
-                                        Spacer(modifier = Modifier.width(8.dp))
-
                                         Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "Añadir",
-                                            tint = MaterialTheme.colorScheme.onPrimary
+                                            imageVector = Icons.Default.ArrowDropDown,
+                                            contentDescription = "Desplegar"
                                         )
                                     }
-                                }
 
-                                if (abrirModalLineaVenta) {
-                                    CrearEditarLineaVenta(
-                                        viewModel = viewModel,
-                                        venta = venta,
-                                        showDialog = abrirModalLineaVenta,
-                                        onDismiss = {
-                                            viewModel.restaurarCamposLineaVenta()
-                                            abrirModalLineaVenta = false
-                                        },
-                                        onSave = {
-                                            abrirModalLineaVenta = false
-                                        }
+                                    Text(
+                                        text = venta.id.toString(),
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = venta.cliente?.usuario ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.usuarioWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Column (
+                                        modifier = Modifier.width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
+                                    ) {
+                                        Text(
+                                            text = (venta.direccion?.calle + " " + venta.direccion?.numero.toString() + ", " + venta.direccion?.piso) ?: "",
+                                            modifier = Modifier
+                                                .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
+                                                .padding(top = 8.dp, end = 8.dp, start = 8.dp),
+                                        )
+
+                                        Text(
+                                            text = (venta.direccion?.ciudad + " " + venta.direccion?.provincia) ?: "",
+                                            modifier = Modifier
+                                                .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
+                                                .padding(end = 8.dp, start = 8.dp),
+                                        )
+
+                                        Text(
+                                            text = (venta.direccion?.codigoPostal) ?: "",
+                                            modifier = Modifier
+                                                .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
+                                                .padding(bottom = 8.dp, end = 8.dp, start = 8.dp),
+                                        )
+                                    }
+
+                                    Text(
+                                        text = venta.fecha ?: "",
+                                        modifier = Modifier
+                                            .width(150.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = venta.hora ?: "",
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
+                                    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+                                    Text(
+                                        text = formatoDinero.format(venta.precioFinal ?: 0.0),
+                                        modifier = Modifier
+                                            .width(120.dp)
+                                            .padding(8.dp),
                                     )
                                 }
 
                                 HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+
+                                if (verLineasVentaPorVenta == venta) {
+                                    if (lineas.isNotEmpty()) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(40.dp)
+                                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                                                .horizontalScroll(horizontalScrollStateLineasVentas)
+                                        ) {
+                                            Text(
+                                                text = "Id",
+                                                modifier = Modifier
+                                                    .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+
+                                            Text(
+                                                text = "Libro",
+                                                modifier = Modifier
+                                                    .width(250.dp)
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+
+                                            Text(
+                                                text = "Cantidad",
+                                                modifier = Modifier
+                                                    .width(100.dp)
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+
+                                            Text(
+                                                text = "P. Unit.",
+                                                modifier = Modifier
+                                                    .width(100.dp)
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+
+                                            Text(
+                                                text = "P. Total",
+                                                modifier = Modifier
+                                                    .width(100.dp)
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        }
+
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                                                .background(MaterialTheme.colorScheme.background)
+                                        ) {
+                                            lineas.forEachIndexed { index, linea ->
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .horizontalScroll(horizontalScrollStateLineasVentas),
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(
+                                                        text = linea.id.toString(),
+                                                        modifier = Modifier
+                                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                                            .padding(8.dp),
+                                                    )
+
+                                                    Text(
+                                                        text = linea.libro?.titulo ?: "",
+                                                        modifier = Modifier
+                                                            .width(250.dp)
+                                                            .padding(8.dp),
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+
+                                                    Text(
+                                                        text = (linea.cantidad.toString() + " uds") ?: "",
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .padding(8.dp),
+                                                    )
+
+                                                    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
+                                                    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+                                                    Text(
+                                                        text = formatoDinero.format(linea.precioParcial ?: 0.0),
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .padding(8.dp),
+                                                    )
+
+                                                    Text(
+                                                        text = formatoDinero.format(linea.precioTotal ?: 0.0),
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .padding(8.dp),
+                                                    )
+                                                }
+
+                                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                            }
+                                        }
+                                    }
+
+                                    Button (
+                                        onClick = { abrirModalLineaVenta = true },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        )
+
+                                    ) {
+                                        Row (
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "Añadir línea",
+                                                modifier = Modifier.padding(start = 8.dp),
+                                                fontSize = 16.sp
+                                            )
+
+                                            Spacer(modifier = Modifier.width(8.dp))
+
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Añadir",
+                                                tint = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        }
+                                    }
+
+                                    if (abrirModalLineaVenta) {
+                                        CrearEditarLineaVenta(
+                                            viewModel = viewModel,
+                                            venta = venta,
+                                            showDialog = abrirModalLineaVenta,
+                                            onDismiss = {
+                                                viewModel.restaurarCamposLineaVenta()
+                                                abrirModalLineaVenta = false
+                                            },
+                                            onSave = {
+                                                abrirModalLineaVenta = false
+                                            }
+                                        )
+                                    }
+
+                                    HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                }
+                            }
+                        }
+                    } else {
+                        ventasFiltradas.forEach { venta ->
+                            item {
+                                val lineas = viewModel.lineasPorVenta[venta.id] ?: emptyList()
+
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .horizontalScroll(horizontalScrollState),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box (
+                                        modifier = Modifier
+                                            .width(50.dp)
+                                            .padding(8.dp)
+                                            .clickable(
+                                                indication = null,
+                                                interactionSource = remember { MutableInteractionSource() }
+                                            ) {
+                                                if (verLineasVentaPorVenta == venta) {
+                                                    verLineasVentaPorVenta = null
+                                                    venta.id?.let { viewModel.cargarLineasVentasPorVenta(it) }
+                                                } else {
+                                                    verLineasVentaPorVenta = venta
+                                                    venta.id?.let { viewModel.limpiarLineasVenta(it) }
+                                                }
+                                            }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.ArrowDropDown,
+                                            contentDescription = "Desplegar"
+                                        )
+                                    }
+
+                                    Text(
+                                        text = venta.id.toString(),
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = venta.cliente?.usuario ?: "",
+                                        modifier = Modifier
+                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.usuarioWidth))
+                                            .padding(8.dp),
+                                    )
+
+                                    Column (
+                                        modifier = Modifier.width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
+                                    ) {
+                                        Text(
+                                            text = (venta.direccion?.calle + " " + venta.direccion?.numero.toString() + ", " + venta.direccion?.piso) ?: "",
+                                            modifier = Modifier
+                                                .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
+                                                .padding(top = 8.dp, end = 8.dp, start = 8.dp),
+                                        )
+
+                                        Text(
+                                            text = (venta.direccion?.ciudad + " " + venta.direccion?.provincia) ?: "",
+                                            modifier = Modifier
+                                                .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
+                                                .padding(end = 8.dp, start = 8.dp),
+                                        )
+
+                                        Text(
+                                            text = (venta.direccion?.codigoPostal) ?: "",
+                                            modifier = Modifier
+                                                .width(viewModel.cambiarDeCharacteresADp(viewModel.direccionWidth))
+                                                .padding(bottom = 8.dp, end = 8.dp, start = 8.dp),
+                                        )
+                                    }
+
+                                    Text(
+                                        text = venta.fecha ?: "",
+                                        modifier = Modifier
+                                            .width(150.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    Text(
+                                        text = venta.hora ?: "",
+                                        modifier = Modifier
+                                            .width(100.dp)
+                                            .padding(8.dp),
+                                    )
+
+                                    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
+                                    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+                                    Text(
+                                        text = formatoDinero.format(venta.precioFinal ?: 0.0),
+                                        modifier = Modifier
+                                            .width(120.dp)
+                                            .padding(8.dp),
+                                    )
+                                }
+
+                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+
+                                if (verLineasVentaPorVenta == venta) {
+                                    if (lineas.isNotEmpty()) {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(40.dp)
+                                                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                                                .horizontalScroll(horizontalScrollStateLineasVentas)
+                                        ) {
+                                            Text(
+                                                text = "Id",
+                                                modifier = Modifier
+                                                    .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+
+                                            Text(
+                                                text = "Libro",
+                                                modifier = Modifier
+                                                    .width(250.dp)
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+
+                                            Text(
+                                                text = "Cantidad",
+                                                modifier = Modifier
+                                                    .width(100.dp)
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+
+                                            Text(
+                                                text = "P. Unit.",
+                                                modifier = Modifier
+                                                    .width(100.dp)
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+
+                                            Text(
+                                                text = "P. Total",
+                                                modifier = Modifier
+                                                    .width(100.dp)
+                                                    .padding(8.dp),
+                                                fontWeight = FontWeight.Bold,
+                                                color = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        }
+
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .border(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f))
+                                                .background(MaterialTheme.colorScheme.background)
+                                        ) {
+                                            lineas.forEachIndexed { index, linea ->
+                                                Row(
+                                                    modifier = Modifier
+                                                        .fillMaxWidth()
+                                                        .horizontalScroll(horizontalScrollStateLineasVentas),
+                                                    verticalAlignment = Alignment.CenterVertically
+                                                ) {
+                                                    Text(
+                                                        text = linea.id.toString(),
+                                                        modifier = Modifier
+                                                            .width(viewModel.cambiarDeCharacteresADp(viewModel.idWidth))
+                                                            .padding(8.dp),
+                                                    )
+
+                                                    Text(
+                                                        text = linea.libro?.titulo ?: "",
+                                                        modifier = Modifier
+                                                            .width(250.dp)
+                                                            .padding(8.dp),
+                                                        maxLines = 1,
+                                                        overflow = TextOverflow.Ellipsis
+                                                    )
+
+                                                    Text(
+                                                        text = (linea.cantidad.toString() + " uds") ?: "",
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .padding(8.dp),
+                                                    )
+
+                                                    val locale = Locale.Builder().setLanguage("es").setRegion("ES").build()
+                                                    val formatoDinero = NumberFormat.getCurrencyInstance(locale)
+                                                    Text(
+                                                        text = formatoDinero.format(linea.precioParcial ?: 0.0),
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .padding(8.dp),
+                                                    )
+
+                                                    Text(
+                                                        text = formatoDinero.format(linea.precioTotal ?: 0.0),
+                                                        modifier = Modifier
+                                                            .width(100.dp)
+                                                            .padding(8.dp),
+                                                    )
+                                                }
+
+                                                HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                            }
+                                        }
+                                    }
+
+                                    Button (
+                                        onClick = { abrirModalLineaVenta = true },
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(8.dp),
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        )
+
+                                    ) {
+                                        Row (
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                text = "Añadir línea",
+                                                modifier = Modifier.padding(start = 8.dp),
+                                                fontSize = 16.sp
+                                            )
+
+                                            Spacer(modifier = Modifier.width(8.dp))
+
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Añadir",
+                                                tint = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        }
+                                    }
+
+                                    if (abrirModalLineaVenta) {
+                                        CrearEditarLineaVenta(
+                                            viewModel = viewModel,
+                                            venta = venta,
+                                            showDialog = abrirModalLineaVenta,
+                                            onDismiss = {
+                                                viewModel.restaurarCamposLineaVenta()
+                                                abrirModalLineaVenta = false
+                                            },
+                                            onSave = {
+                                                abrirModalLineaVenta = false
+                                            }
+                                        )
+                                    }
+
+                                    HorizontalDivider(color = MaterialTheme.colorScheme.primary)
+                                }
                             }
                         }
                     }

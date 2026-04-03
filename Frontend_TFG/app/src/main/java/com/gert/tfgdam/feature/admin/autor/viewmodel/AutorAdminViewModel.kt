@@ -9,7 +9,11 @@ import com.gert.tfgdam.core.network.ApiError
 import com.gert.tfgdam.feature.admin.autor.model.Autor
 import com.gert.tfgdam.feature.admin.autor.repository.AutorRepository
 import com.google.gson.Gson
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import java.io.IOException
@@ -23,10 +27,18 @@ class AutorAdminViewModel : ViewModel() {
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
 
+    var buscador by mutableStateOf("")
+        private set
+    private val buscadorFlow = MutableStateFlow("")
+    var isLoadingBusqueda by mutableStateOf(false)
+
     var autores by mutableStateOf<List<Autor>>(emptyList())
+        private set
+    var autoresFiltrados by mutableStateOf<List<Autor>>(emptyList())
         private set
     init {
         cargarAutores()
+        observarBuscador()
     }
 
     private fun cargarAutores() {
@@ -41,6 +53,44 @@ class AutorAdminViewModel : ViewModel() {
                 }
             } catch (e: IOException) {
                 autores = emptyList()
+            }
+        }
+    }
+
+    fun onBuscadorChange(texto: String) {
+        buscador = texto
+        buscadorFlow.value = texto
+        if (texto.isNotEmpty()) {
+            isLoadingBusqueda = true
+        }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun observarBuscador() {
+        viewModelScope.launch {
+            buscadorFlow
+                .debounce(500)
+                .distinctUntilChanged()
+                .collect { texto ->
+                    buscarAutores(texto)
+                }
+        }
+    }
+
+    private fun buscarAutores(texto: String) {
+        viewModelScope.launch {
+            try {
+                val response = repository.getAllPorBusqueda(texto)
+
+                if (response.isSuccessful) {
+                    autoresFiltrados = (response.body() ?: emptyList()).sortedBy { it.id }
+                } else {
+                    autoresFiltrados = emptyList()
+                }
+            } catch (e: IOException) {
+                autoresFiltrados = emptyList()
+            } finally {
+                isLoadingBusqueda = false
             }
         }
     }
