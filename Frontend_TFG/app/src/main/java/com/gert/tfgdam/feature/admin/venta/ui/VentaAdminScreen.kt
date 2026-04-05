@@ -263,10 +263,10 @@ fun VentaAdminScreen(
                                             ) {
                                                 if (verLineasVentaPorVenta == venta) {
                                                     verLineasVentaPorVenta = null
-                                                    venta.id?.let { viewModel.cargarLineasVentasPorVenta(it) }
+                                                    venta.id?.let { viewModel.limpiarLineasVenta(it) }
                                                 } else {
                                                     verLineasVentaPorVenta = venta
-                                                    venta.id?.let { viewModel.limpiarLineasVenta(it) }
+                                                    venta.id?.let { viewModel.cargarLineasVentasPorVenta(it) }
                                                 }
                                             }
                                     ) {
@@ -524,10 +524,10 @@ fun VentaAdminScreen(
                                             ) {
                                                 if (verLineasVentaPorVenta == venta) {
                                                     verLineasVentaPorVenta = null
-                                                    venta.id?.let { viewModel.cargarLineasVentasPorVenta(it) }
+                                                    venta.id?.let { viewModel.limpiarLineasVenta(it) }
                                                 } else {
                                                     verLineasVentaPorVenta = venta
-                                                    venta.id?.let { viewModel.limpiarLineasVenta(it) }
+                                                    venta.id?.let { viewModel.cargarLineasVentasPorVenta(it) }
                                                 }
                                             }
                                     ) {
