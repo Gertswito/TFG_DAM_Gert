@@ -40,6 +40,7 @@ import com.gert.tfgdam.feature.admin.tipolibro.model.TipoLibro
 import com.gert.tfgdam.core.navigation.routes.Routes
 import com.gert.tfgdam.feature.user.home.viewmodel.HomeViewModel
 import com.gert.tfgdam.ui.theme.estiloreutilizable.item.LibroItem
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 import kotlinx.coroutines.delay
 
 @Composable
@@ -49,6 +50,7 @@ fun HomeScreen(
     navController: NavController
 ) {
     val libros = viewModel.libros
+    val librosFiltrados = viewModel.librosFiltrados
     var showEmpty by remember { mutableStateOf(false) }
 
     LaunchedEffect(libros) {
@@ -60,100 +62,138 @@ fun HomeScreen(
         }
     }
 
-    if (libros.isEmpty() && showEmpty) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "No hay libros disponibles",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground
-            )
-        }
-    } else {
-        val librosAgrupados: Map<TipoLibro?, List<Libro>> = libros
-            .groupBy { it.tipoLibro }
-            .toList()
-            .sortedBy { it.first?.id }
-            .toMap()
-
-        LazyColumn(
-            modifier = modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            item {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.primary.copy(0.7f),
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .padding(top = 25.dp, bottom = 25.dp)
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.TopCenter
-                ) {
-                    Column (
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        Text(
-                            text = "Bienvenido",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                        Text(
-                            text = "a Librerías Gert",
-                            color = MaterialTheme.colorScheme.onBackground,
-                            fontSize = 30.sp,
-                            fontWeight = FontWeight.Bold,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-            }
-
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-
-            item {
-                Box(
-                    modifier = Modifier
-                        .background(
-                            color = MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(12.dp)
-                        )
-                        .padding(top = 20.dp, bottom = 19.dp)
-                        .fillMaxWidth()
-                        .clickable(
-                            indication = null,
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) { navController.navigate(Routes.LIBROS_NOVEDADES) },
-                    contentAlignment = Alignment.TopCenter
+    LazyColumn(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(16.dp)
+    ) {
+        item {
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.primary.copy(0.7f),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(top = 25.dp, bottom = 25.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Column (
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Text(
-                        text = "Novedades del mes",
+                        text = "Bienvenido",
                         color = MaterialTheme.colorScheme.onBackground,
-                        fontSize = 20.sp,
+                        fontSize = 30.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    Text(
+                        text = "a Librerías Gert",
+                        color = MaterialTheme.colorScheme.onBackground,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Center
                     )
                 }
             }
+        }
 
+        item {
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        item {
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    .padding(top = 20.dp, bottom = 19.dp)
+                    .fillMaxWidth()
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() }
+                    ) { navController.navigate(Routes.LIBROS_NOVEDADES) },
+                contentAlignment = Alignment.TopCenter
+            ) {
+                Text(
+                    text = "Novedades del mes",
+                    color = MaterialTheme.colorScheme.secondary,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            }
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(15.dp))
+        }
+
+        item {
+            TextFieldBuscador(
+                value = viewModel.buscador,
+                onValueChange = { viewModel.onBuscadorChange(it) },
+                placeholder = "Buscar libros",
+            )
+        }
+
+        item {
+            Spacer(modifier = Modifier.height(10.dp))
+        }
+
+        if (viewModel.isLoadingBusqueda) {
             item {
-                Spacer(modifier = Modifier.height(10.dp))
+                Text(
+                    text = "Buscando...",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else if (viewModel.buscador.isNotEmpty() && librosFiltrados.isEmpty() && !viewModel.isLoadingBusqueda) {
+            item {
+                Text(
+                    text = "No hay resultados",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else if (libros.isEmpty() && showEmpty) {
+            item {
+                Text(
+                    text = "No hay libros disponibles, vuelve a intentarlo más tarde",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onBackground,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    textAlign = TextAlign.Center
+                )
+            }
+        } else {
+            val librosAgrupados: Map<TipoLibro?, List<Libro>>
+
+            if (viewModel.buscador.isEmpty()) {
+                librosAgrupados = libros.groupBy { it.tipoLibro }.toList().sortedBy { it.first?.id }.toMap()
+            } else {
+                librosAgrupados = librosFiltrados.groupBy { it.tipoLibro }.toList().sortedBy { it.first?.id }.toMap()
             }
 
             librosAgrupados.forEach { (tipo, librosDelTipo) ->
-
                 item {
                     Text(
                         text = tipo?.nombre ?: "Sin nombre",
@@ -171,7 +211,6 @@ fun HomeScreen(
                     LazyRow(
                         horizontalArrangement = Arrangement.spacedBy(1.dp)
                     ) {
-
                         items(librosDelTipo) { libro ->
                             LibroItem(libro, false, navController)
                         }

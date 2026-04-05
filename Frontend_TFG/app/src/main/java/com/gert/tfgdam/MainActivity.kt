@@ -19,7 +19,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.gert.tfgdam.core.navigation.AppNavHost
-import com.gert.tfgdam.core.navigation.TopNavBar
+import com.gert.tfgdam.feature.navbar.ui.TopNavBar
 import com.gert.tfgdam.core.navigation.routes.Routes
 import com.gert.tfgdam.ui.theme.TFGDAMGertTheme
 import com.gert.tfgdam.core.util.Jwt.JwtManager

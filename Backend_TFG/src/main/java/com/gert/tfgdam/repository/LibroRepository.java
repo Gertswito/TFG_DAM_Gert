@@ -75,4 +75,42 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
             OR CAST(l.stock AS string) LIKE CONCAT('%', :texto, '%')
     """)
     List<Libro> findAllPorBusqueda(@Param("texto") String texto);
+
+        @Query("""
+        SELECT l FROM Libro l
+        WHERE 
+            LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.tipoLibro.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+    """)
+    List<Libro> findAllPorBusquedaUser(@Param("texto") String texto);
+
+    @Query("""
+        SELECT DISTINCT l FROM Libro l
+        LEFT JOIN l.generos g
+        WHERE 
+            LOWER(l.tipoLibro.nombre) = LOWER(:tipoLibroNombre)
+            AND (
+                LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(g.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            )
+    """)
+    List<Libro> findAllPorBusquedaTipo(@Param("tipoLibroNombre") String tipoLibroNombre, @Param("texto") String texto);
+
+    @Query("""
+        SELECT DISTINCT l FROM Libro l
+        LEFT JOIN l.generos g
+        WHERE 
+            LOWER(l.tipoLibro.nombre) = LOWER(:tipoLibroNombre)
+            AND LOWER(g.nombre) = LOWER(:generoNombre)
+            AND (
+                LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            )
+    """)
+    List<Libro> findAllPorBusquedaTipoGenero(@Param("tipoLibroNombre") String tipoLibroNombre, @Param("generoNombre") String generoNombre, @Param("texto") String texto);
 }

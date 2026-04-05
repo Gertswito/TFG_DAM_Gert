@@ -1,4 +1,4 @@
-package com.gert.tfgdam.core.navigation
+package com.gert.tfgdam.feature.navbar.ui
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.R
+import com.gert.tfgdam.feature.navbar.navitem.NavItemList
 import com.gert.tfgdam.core.navigation.routes.Routes
 import com.gert.tfgdam.core.util.Jwt.JwtManager
 import com.gert.tfgdam.feature.user.carrito.viewmodel.CarritoViewModel

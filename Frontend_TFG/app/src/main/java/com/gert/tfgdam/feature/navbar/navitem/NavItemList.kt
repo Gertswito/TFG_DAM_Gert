@@ -1,4 +1,4 @@
-package com.gert.tfgdam.core.navigation
+package com.gert.tfgdam.feature.navbar.navitem
 
 import android.content.Context
 import androidx.compose.material.icons.Icons

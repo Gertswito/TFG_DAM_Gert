@@ -1,4 +1,4 @@
-package com.gert.tfgdam.core.navigation
+package com.gert.tfgdam.feature.navbar.navitem
 
 import androidx.compose.ui.graphics.vector.ImageVector
 
