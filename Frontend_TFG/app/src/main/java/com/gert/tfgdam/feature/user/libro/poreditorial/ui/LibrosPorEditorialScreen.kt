@@ -3,9 +3,12 @@ package com.gert.tfgdam.feature.user.libro.poreditorial.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -22,12 +25,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.feature.user.libro.poreditorial.viewmodel.LibrosPorEditorialViewModel
 import com.gert.tfgdam.ui.theme.estiloreutilizable.item.LibroItem
+import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
 
 @Composable
 fun LibrosPorEditorialScreen (
@@ -36,50 +41,92 @@ fun LibrosPorEditorialScreen (
     navController: NavController
 ) {
     val librosPorEditorial = viewModel.librosPorEditorial
+    val librosPorEditorialFiltrados = viewModel.librosPorEditorialFiltrados
     var showEmpty by remember (librosPorEditorial) { mutableStateOf(librosPorEditorial.isEmpty()) }
 
     LaunchedEffect(editorial) {
         viewModel.cargarLibrosPorEditorial(editorial)
     }
 
-    if (librosPorEditorial.isEmpty() && showEmpty) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background),
-            contentAlignment = Alignment.Center
-        ) {
+    Column (modifier = Modifier.fillMaxSize()) {
+        Spacer(modifier = Modifier.height(10.dp))
+
+        Text(
+            text = ("De ") + (editorial),
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp,
+            modifier = Modifier.padding(top = 10.dp, start = 15.dp, end = 15.dp)
+        )
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        TextFieldBuscador(
+            value = viewModel.buscador,
+            onValueChange = { viewModel.onBuscadorChange(it) },
+            placeholder = "Buscar libros",
+            modifier = Modifier.padding(horizontal = 15.dp)
+        )
+
+        if (viewModel.isLoadingBusqueda) {
             Text(
-                text = "No hay libros disponibles",
+                text = "Buscando...",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                textAlign = TextAlign.Center
             )
-        }
-    } else {
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 140.dp),
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(8.dp),
-            contentPadding = PaddingValues(0.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            item(span = { GridItemSpan(maxLineSpan) }) {
-                Text(
-                    text = ("De ") + (editorial),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp,
-                    modifier = Modifier.padding(top = 10.dp, bottom = 8.dp, start = 8.dp)
-                )
-            }
-
-            items(librosPorEditorial) { libro ->
-                Box(
-                    modifier = Modifier.fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    LibroItem(libro, false, navController)
+        } else if (viewModel.buscador.isNotEmpty() && librosPorEditorialFiltrados.isEmpty() && !viewModel.isLoadingBusqueda) {
+            Text(
+                text = "No hay resultados",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 15.dp),
+                textAlign = TextAlign.Center
+            )
+        } else if (librosPorEditorial.isEmpty() && showEmpty) {
+            Text(
+                text = "No hay libros disponibles, vuelve a intentarlo más tarde",
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onBackground,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 15.dp),
+                textAlign = TextAlign.Center
+            )
+        } else {
+            LazyVerticalGrid(
+                columns = GridCells.Adaptive(minSize = 140.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(8.dp),
+                contentPadding = PaddingValues(0.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                if (viewModel.buscador.isEmpty()) {
+                    items(librosPorEditorial) { libro ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LibroItem(libro, false, navController)
+                        }
+                    }
+                } else {
+                    items(librosPorEditorialFiltrados) { libro ->
+                        Box(
+                            modifier = Modifier.fillMaxWidth(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            LibroItem(libro, false, navController)
+                        }
+                    }
                 }
             }
         }

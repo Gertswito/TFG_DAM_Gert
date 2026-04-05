@@ -75,6 +75,14 @@ class LibroRepository {
         return api.getAllPorBusquedaTipoGenero(tipoLibro, genero, texto)
     }
 
+    suspend fun getAllPorNombreDeAutorBusqueda(autor: String, texto: String): Response<List<Libro>> {
+        return api.getAllPorNombreDeAutorBusqueda(autor, texto)
+    }
+
+    suspend fun getAllPorNombreDeEditorialBusqueda(editorial: String, texto: String): Response<List<Libro>> {
+        return api.getAllPorNombreDeEditorialBusqueda(editorial, texto)
+    }
+
     suspend fun create(libro: Libro): Response<Libro> {
         return api.create(libro)
     }

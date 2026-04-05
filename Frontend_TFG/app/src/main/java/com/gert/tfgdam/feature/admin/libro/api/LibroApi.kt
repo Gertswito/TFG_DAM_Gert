@@ -59,6 +59,13 @@ interface LibroApi {
     @GET("api/libro/get/tipo/{tipo-libro}/genero/{genero}/busqueda/{texto}")
     suspend fun getAllPorBusquedaTipoGenero(@Path("tipo-libro") tipoLibro: String, @Path("genero") genero: String, @Path("texto") texto: String): Response<List<Libro>>
 
+    @GET("api/libro/get/autor/{autor}/busqueda/{texto}")
+    suspend fun getAllPorNombreDeAutorBusqueda(@Path("autor") autor: String, @Path("texto") texto: String): Response<List<Libro>>
+
+    @GET("api/libro/get/editorial/{editorial}/busqueda/{texto}")
+    suspend fun getAllPorNombreDeEditorialBusqueda(@Path("editorial") editorial: String, @Path("texto") texto: String): Response<List<Libro>>
+
+
     @POST("api/libro/new")
     suspend fun create(@Body libro: Libro): Response<Libro>
 

@@ -118,6 +118,16 @@ public class LibroController {
         return libroService.getAllLibroPorBusquedaTipoGenero(tipoLibro, genero, texto);
     }
 
+    @GetMapping("/get/autor/{autor}/busqueda/{texto}")
+    public List<Libro> getAllPorNombreDeAutor(@PathVariable("autor") String autor, @PathVariable("texto") String texto) {
+        return libroService.getAllPorNombreDeAutorBusqueda(autor, texto);
+    }
+
+    @GetMapping("/get/editorial/{editorial}/busqueda/{texto}")
+    public List<Libro> getAllPorNombreDeEditorial(@PathVariable("editorial") String editorial, @PathVariable("texto") String texto) {
+        return libroService.getAllPorNombreDeEditorialBusqueda(editorial, texto);
+    }
+
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {

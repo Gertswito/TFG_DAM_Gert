@@ -119,6 +119,14 @@ public class LibroService {
         return libroRepository.findAllPorBusquedaTipoGenero(tipoLibro, genero, texto);
     }
 
+    public List<Libro> getAllPorNombreDeAutorBusqueda(String autor, String texto) {
+        return libroRepository.findAllPorAutorBusqueda(autor, texto);
+    }
+
+    public List<Libro> getAllPorNombreDeEditorialBusqueda(String editorial, String texto) {
+        return libroRepository.findAllPorEditorialBusqueda(editorial, texto);
+    }
+
     public void delete(Long id) {
         if (!libroRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado el libro");

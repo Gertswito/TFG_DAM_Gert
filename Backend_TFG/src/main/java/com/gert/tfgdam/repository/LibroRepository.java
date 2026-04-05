@@ -76,7 +76,7 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
     """)
     List<Libro> findAllPorBusqueda(@Param("texto") String texto);
 
-        @Query("""
+    @Query("""
         SELECT l FROM Libro l
         WHERE 
             LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
@@ -113,4 +113,28 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
             )
     """)
     List<Libro> findAllPorBusquedaTipoGenero(@Param("tipoLibroNombre") String tipoLibroNombre, @Param("generoNombre") String generoNombre, @Param("texto") String texto);
+
+    @Query("""
+        SELECT l FROM Libro l
+        WHERE 
+            LOWER(l.autor.nombre) = LOWER(:autor)
+            AND (
+                LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            )
+    """)
+    List<Libro> findAllPorAutorBusqueda(@Param("autor") String autor, @Param("texto") String texto);
+
+    @Query("""
+        SELECT l FROM Libro l
+        WHERE 
+            LOWER(l.editorial.nombre) = LOWER(:editorial)
+            AND (
+                LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+                OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            )
+    """)
+    List<Libro> findAllPorEditorialBusqueda(@Param("editorial") String editorial, @Param("texto") String texto);
 }
