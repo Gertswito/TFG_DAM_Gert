@@ -45,12 +45,16 @@ class UserDireccionesViewModel : ViewModel() {
         private set
 
     fun setDireccionesIniciales(usuarioScreenAnterior: Cliente, listaDirecciones: List<Direccion>) {
-        direcciones = listaDirecciones
+        direcciones = listaDirecciones.filter { it.activo == true }
         usuario = usuarioScreenAnterior
     }
 
     fun agregarDireccion(direccion: Direccion) {
         direcciones = direcciones + direccion
+    }
+
+    fun quitarDireccion(direccion: Direccion) {
+        direcciones = direcciones - direccion
     }
 
     fun actualizarDireccion(direccionActualizada: Direccion) {
@@ -74,6 +78,7 @@ class UserDireccionesViewModel : ViewModel() {
                     ciudad = ciudadEditar.trim(),
                     provincia = provinciaEditar.trim(),
                     codigoPostal = codigoPostalEditar.trim(),
+                    activo = true,
                     cliente = usuarioSinDireccion
                 )
 
@@ -142,6 +147,7 @@ class UserDireccionesViewModel : ViewModel() {
                     ciudad = ciudadEditar.trim(),
                     provincia = provinciaEditar.trim(),
                     codigoPostal = codigoPostalEditar.trim(),
+                    activo = true,
                     cliente = usuarioSinDireccion
                 )
 
@@ -192,6 +198,37 @@ class UserDireccionesViewModel : ViewModel() {
                 val apiError = Gson().fromJson(errorJson, ApiError::class.java)
 
                 restaurarCamposDireccion(null)
+                errorMessage = apiError.message ?: "Error desconocido"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
+    fun eliminarDireccion (direccion: Direccion, onSuccess: (Direccion) -> Unit = {}) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = ""
+
+            try {
+                val idDireccion = direccion.id ?: return@launch
+                val response = repository.delete(idDireccion)
+                if(response.isSuccessful) {
+                    delay(500)
+                    onSuccess(direccion)
+                } else {
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("error")
+                    } catch (e: Exception) {
+                        "Error al eliminar la dirección"
+                    }
+                }
+            } catch (e: IOException) {
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
                 errorMessage = apiError.message ?: "Error desconocido"
             } finally {
                 isLoading = false

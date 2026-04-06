@@ -40,15 +40,18 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.window.Dialog
+import com.gert.tfgdam.feature.admin.autor.viewmodel.AutorAdminViewModel
 import com.gert.tfgdam.feature.admin.cliente.model.Cliente
 import com.gert.tfgdam.feature.admin.direccion.model.Direccion
 import com.gert.tfgdam.feature.user.usersettings.direcciones.viewmodel.UserDireccionesViewModel
@@ -107,8 +110,8 @@ fun UserDireccionesScreen(
                 ) {
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    if (viewModel.direcciones.isEmpty()) {
-                        Text (
+                    if (viewModel.direcciones.isEmpty() || viewModel.direcciones.all { it.activo == false }) {
+                        Text(
                             text = "No se han encontrado direcciones",
                             color = MaterialTheme.colorScheme.onBackground,
                         )
@@ -158,6 +161,7 @@ fun DireccionItem(
     viewModel: UserDireccionesViewModel = viewModel()
 ) {
     var abrirModalEditarDireccion by remember { mutableStateOf(false) }
+    var direccionSeleccionadaDelete by remember { mutableStateOf<Direccion?>(null) }
     val estaSeleccionada = viewModel.direccionSeleccionada?.id == direccion.id
     val context = LocalContext.current
 
@@ -274,15 +278,38 @@ fun DireccionItem(
                     horizontalAlignment = Alignment.End
                 ) {
                     if(!isPago) {
-                        Button(
-                            modifier = Modifier.width(65.dp),
-                            onClick = { abrirModalEditarDireccion = true }
+                        Row(
+                            modifier = Modifier.width(100.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = "Editar",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
+                            IconButton(
+                                onClick = { abrirModalEditarDireccion = true },
+                                modifier = Modifier.width(50.dp).padding(end = 2.dp),
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Editar"
+                                )
+                            }
+
+                            IconButton(
+                                onClick = { direccionSeleccionadaDelete = direccion },
+                                modifier = Modifier.width(50.dp).padding(start = 4.dp),
+                                colors = IconButtonDefaults.iconButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.onError,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "Eliminar"
+                                )
+                            }
                         }
 
                         if (abrirModalEditarDireccion) {
@@ -294,6 +321,21 @@ fun DireccionItem(
                                 onSave = { direccionActualizada ->
                                     viewModel.actualizarDireccion(direccionActualizada)
                                     abrirModalEditarDireccion = false
+                                }
+                            )
+                        }
+
+                        if (direccionSeleccionadaDelete != null) {
+                            EliminarDireccion(
+                                showDialog = true,
+                                onDismiss = {
+                                    direccionSeleccionadaDelete = null
+                                },
+                                direccion = direccionSeleccionadaDelete!!,
+                                viewModel = viewModel,
+                                onSave = { direccionEliminada ->
+                                    viewModel.actualizarDireccion(direccionEliminada)
+                                    direccionSeleccionadaDelete = null
                                 }
                             )
                         }
@@ -344,7 +386,12 @@ fun EditarDireccionModal(
     onSave: (Direccion) -> Unit
 ) {
     if (showDialog) {
-        viewModel.restaurarCamposDireccion(direccionEditar)
+        LaunchedEffect(Unit) {
+            viewModel.restaurarCamposDireccion(direccionEditar)
+            viewModel.errorMessage = ""
+            viewModel.successMessage = ""
+        }
+
         Dialog(
             onDismissRequest = {
                 onDismiss()
@@ -558,7 +605,10 @@ fun EditarDireccionModal(
                     }
 
                     IconButton(
-                        onClick = { onDismiss() },
+                        onClick = {
+                            onDismiss()
+                            viewModel.restaurarCamposDireccion(null)
+                        },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .padding(4.dp)
@@ -568,6 +618,122 @@ fun EditarDireccionModal(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Cerrar",
                             tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EliminarDireccion(
+    direccion: Direccion,
+    viewModel: UserDireccionesViewModel = viewModel(),
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onSave: (Direccion) -> Unit
+) {
+    if (showDialog) {
+        LaunchedEffect(Unit) {
+            viewModel.errorMessage = ""
+            viewModel.successMessage = ""
+        }
+
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.background,
+                tonalElevation = 8.dp
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 35.dp, bottom = 20.dp, start = 8.dp, end = 8.dp)
+                            .fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = "Eliminar",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 40.sp,
+                            lineHeight = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Text(
+                            text = ("¿Seguro que quieres borrar la dirección?"),
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        if (viewModel.errorMessage !== "") {
+                            Text(
+                                text = viewModel.errorMessage,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                            onClick = {
+                                viewModel.eliminarDireccion(direccion) { direccionEliminada ->
+                                    viewModel.quitarDireccion(direccionEliminada)
+                                    onSave(direccionEliminada)
+                                }
+                            },
+                            enabled = !viewModel.isLoading,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onError,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            if (viewModel.isLoading) {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            } else {
+                                Text(
+                                    text = "ELIMINAR",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+
+                    IconButton(
+                        onClick = {
+                            onDismiss()
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar"
                         )
                     }
                 }

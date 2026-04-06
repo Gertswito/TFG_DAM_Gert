@@ -22,5 +22,7 @@ public interface VentaRepository extends JpaRepository<Venta, Long> {
             OR CAST(v.precioFinal AS string) LIKE CONCAT('%', :texto, '%')
     """)
     List<Venta> findAllPorBusqueda(@Param("texto") String texto);
+
+    boolean existsByDireccionId(Long direccionId);
 }
 

@@ -10,5 +10,6 @@ data class Direccion(
     var ciudad: String? = null,
     var provincia: String? = null,
     var codigoPostal: String? = null,
+    var activo: Boolean? = null,
     var cliente: Cliente? = null
 )

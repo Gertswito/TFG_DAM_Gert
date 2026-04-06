@@ -9,13 +9,17 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.gert.tfgdam.entity.Direccion;
 import com.gert.tfgdam.repository.DireccionRepository;
+import com.gert.tfgdam.repository.VentaRepository;
 
 @Service
 public class DireccionService {
     private final DireccionRepository direccionRepository;
 
-    public DireccionService(DireccionRepository direccionRepository) {
+    private final VentaRepository ventaRepository;
+
+    public DireccionService(DireccionRepository direccionRepository, VentaRepository ventaRepository) {
         this.direccionRepository = direccionRepository;
+        this.ventaRepository = ventaRepository;
     }
 
     public List<Direccion> getAllDireccion() {
@@ -34,10 +38,12 @@ public class DireccionService {
         if (!direccionRepository.existsById(id)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la dirección");
         }
-        try {
+        if (ventaRepository.existsByDireccionId(id)) {
+            Direccion direccionActualizada = direccionRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la dirección"));
+            direccionActualizada.setActivo(false);
+            direccionRepository.save(direccionActualizada);
+        } else {
             direccionRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta dirección no puede ser eliminada", e);
         }
     }
 

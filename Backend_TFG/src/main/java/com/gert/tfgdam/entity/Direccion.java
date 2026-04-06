@@ -40,6 +40,9 @@ public class Direccion implements Serializable {
     @Column(name = "codigo_postal", nullable = false, length = 5)
     private String codigoPostal;
 
+    @Column(name = "activo", nullable = false)
+    private boolean activo;
+
     public Integer getId() {
         return id;
     }
@@ -102,5 +105,13 @@ public class Direccion implements Serializable {
 
     public void setCodigoPostal(String codigoPostal) {
         this.codigoPostal = codigoPostal;
+    }
+
+    public boolean getActivo() {
+        return activo;
+    }
+
+    public void setActivo(boolean activo) {
+        this.activo = activo;
     }
 }
