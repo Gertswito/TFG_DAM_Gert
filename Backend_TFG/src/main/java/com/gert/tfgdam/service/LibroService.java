@@ -134,7 +134,7 @@ public class LibroService {
         try {
             libroRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este libro no puede ser eliminado", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este libro no puede ser eliminado ya que tiene líneas de venta asociadas", e);
         }
     }
 

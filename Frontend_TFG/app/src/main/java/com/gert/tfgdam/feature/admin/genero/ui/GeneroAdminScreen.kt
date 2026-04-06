@@ -18,8 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -42,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.gert.tfgdam.feature.admin.autor.viewmodel.AutorAdminViewModel
 import com.gert.tfgdam.feature.admin.genero.model.Genero
 import com.gert.tfgdam.feature.admin.genero.viewmodel.GeneroAdminViewModel
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
@@ -57,6 +60,7 @@ fun GeneroAdminScreen(
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
     var generoSeleccionado by remember { mutableStateOf<Genero?>(null) }
+    var idGeneroSeleccionado by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(generos) {
         if (generos.isEmpty()) {
@@ -174,7 +178,7 @@ fun GeneroAdminScreen(
 
                     Text(
                         text = "",
-                        modifier = Modifier.width(70.dp)
+                        modifier = Modifier.width(100.dp)
                     )
                 }
 
@@ -212,14 +216,14 @@ fun GeneroAdminScreen(
                                             .padding(end = 8.dp)
                                     )
 
-                                    Box(
-                                        modifier = Modifier
-                                            .width(70.dp)
-                                            .padding(horizontal = 8.dp),
+                                    Row(
+                                        modifier = Modifier.width(100.dp).padding(end = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         IconButton(
                                             onClick = { generoSeleccionado = genero },
-                                            modifier = Modifier.width(50.dp),
+                                            modifier = Modifier.width(50.dp).padding(end = 8.dp),
                                             colors = IconButtonDefaults.iconButtonColors(
                                                 containerColor = MaterialTheme.colorScheme.primary,
                                                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -228,6 +232,20 @@ fun GeneroAdminScreen(
                                             Icon(
                                                 imageVector = Icons.Default.Edit,
                                                 contentDescription = "Editar"
+                                            )
+                                        }
+
+                                        IconButton(
+                                            onClick = { idGeneroSeleccionado = genero.id },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.onError,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Eliminar"
                                             )
                                         }
                                     }
@@ -261,14 +279,14 @@ fun GeneroAdminScreen(
                                             .padding(end = 8.dp)
                                     )
 
-                                    Box(
-                                        modifier = Modifier
-                                            .width(70.dp)
-                                            .padding(horizontal = 8.dp),
+                                    Row(
+                                        modifier = Modifier.width(100.dp).padding(end = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         IconButton(
                                             onClick = { generoSeleccionado = genero },
-                                            modifier = Modifier.width(50.dp),
+                                            modifier = Modifier.width(50.dp).padding(end = 8.dp),
                                             colors = IconButtonDefaults.iconButtonColors(
                                                 containerColor = MaterialTheme.colorScheme.primary,
                                                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -277,6 +295,20 @@ fun GeneroAdminScreen(
                                             Icon(
                                                 imageVector = Icons.Default.Edit,
                                                 contentDescription = "Editar"
+                                            )
+                                        }
+
+                                        IconButton(
+                                            onClick = { idGeneroSeleccionado = genero.id },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.onError,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Eliminar"
                                             )
                                         }
                                     }
@@ -302,6 +334,19 @@ fun GeneroAdminScreen(
                         }
                     )
                 }
+
+                if (idGeneroSeleccionado != null) {
+                    EliminarGenero(
+                        idGenero = idGeneroSeleccionado!!,
+                        showDialog = true,
+                        onDismiss = {
+                            idGeneroSeleccionado = null
+                        },
+                        onSave = {
+                            idGeneroSeleccionado = null
+                        }
+                    )
+                }
             }
         }
     }
@@ -317,6 +362,8 @@ fun CrearEditarGenero(
 ) {
     if (showDialog) {
         LaunchedEffect(Unit) {
+            viewModel.errorMessage = ""
+
             if (genero != null) {
                 viewModel.restaurarCamposGenero(genero)
             }
@@ -457,6 +504,120 @@ fun CrearEditarGenero(
                     IconButton(
                         onClick = {
                             viewModel.restaurarCamposGenero(null)
+                            onDismiss()
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar"
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EliminarGenero(
+    idGenero: Long,
+    viewModel: GeneroAdminViewModel = viewModel(),
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit
+) {
+    if (showDialog) {
+        LaunchedEffect(Unit) {
+            viewModel.errorMessage = ""
+        }
+
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.background,
+                tonalElevation = 8.dp
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 35.dp, bottom = 20.dp, start = 8.dp, end = 8.dp)
+                            .fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = "Eliminar",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 40.sp,
+                            lineHeight = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Text(
+                            text = ("¿Seguro que quieres borrar el género con id ") + (idGenero.toString()) + "?",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        if (viewModel.errorMessage !== "") {
+                            Text(
+                                text = viewModel.errorMessage,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                            onClick = {
+                                viewModel.eliminarGenero(idGenero) {
+                                    onSave()
+                                }
+                            },
+                            enabled = !viewModel.isLoading,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onError,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            if (viewModel.isLoading) {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            } else {
+                                Text(
+                                    text = "ELIMINAR",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+
+                    IconButton(
+                        onClick = {
                             onDismiss()
                         },
                         modifier = Modifier

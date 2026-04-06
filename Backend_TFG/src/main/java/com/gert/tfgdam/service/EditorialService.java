@@ -37,7 +37,7 @@ public class EditorialService {
         try {
             editorialRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta editorial no puede ser eliminada", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta editorial no puede ser eliminada ya que tiene libros asociados", e);
         }
     }
 

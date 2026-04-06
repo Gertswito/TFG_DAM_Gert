@@ -51,7 +51,7 @@ public class GeneroService {
     public Genero update(Genero genero) {
         Genero existente = generoRepository.findByNombre(genero.getNombre());
         if (existente != null && !existente.getId().equals(genero.getId())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de género ya está registrado");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "El nombre de género ya está registrado ya que tiene libros asociados");
         }
         return generoRepository.save(genero);
     }

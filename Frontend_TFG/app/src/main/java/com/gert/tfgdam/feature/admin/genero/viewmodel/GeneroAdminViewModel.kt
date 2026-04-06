@@ -186,6 +186,37 @@ class GeneroAdminViewModel : ViewModel() {
         }
     }
 
+    fun eliminarGenero(idGenero: Long, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = ""
+
+            try {
+                val response = repository.delete(idGenero)
+                if (response.isSuccessful) {
+                    cargarGeneros()
+                    delay(500)
+                    onSuccess()
+                } else {
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("message")
+                    } catch (e: Exception) {
+                        "Error al eliminar el género"
+                    }
+                }
+            } catch (e: Exception) {
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
+                errorMessage = apiError.message ?: "Error desconocido"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     fun restaurarCamposGenero(genero: Genero? = null) {
         if (genero != null) {
             nombreGenero = genero.nombre ?: ""

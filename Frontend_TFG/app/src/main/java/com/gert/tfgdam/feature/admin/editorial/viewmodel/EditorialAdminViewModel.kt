@@ -186,6 +186,37 @@ class EditorialAdminViewModel : ViewModel() {
         }
     }
 
+    fun eliminarEditorial(idEditorial: Long, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = ""
+
+            try {
+                val response = repository.delete(idEditorial)
+                if (response.isSuccessful) {
+                    cargarEditoriales()
+                    delay(500)
+                    onSuccess()
+                } else {
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("message")
+                    } catch (e: Exception) {
+                        "Error al eliminar la editorial"
+                    }
+                }
+            } catch (e: Exception) {
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
+                errorMessage = apiError.message ?: "Error desconocido"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     fun restaurarCamposEditorial(editorial: Editorial? = null) {
         if (editorial != null) {
             nombreEditorial = editorial.nombre ?: ""

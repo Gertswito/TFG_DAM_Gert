@@ -37,7 +37,7 @@ public class TipoLibroService {
         try {
             tipoLibroRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este tipo de libro no puede ser borrado", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este tipo de libro no puede ser borrado ya que tiene libros asociados", e);
         }
     }
 

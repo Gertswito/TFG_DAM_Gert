@@ -37,7 +37,7 @@ public class AutorService {
         try {
             autorRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este autor no puede ser eliminado", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este autor no puede ser eliminado ya que tiene libros asociados", e);
         }
     }
 

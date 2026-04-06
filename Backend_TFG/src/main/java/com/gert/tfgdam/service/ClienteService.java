@@ -75,7 +75,7 @@ public class ClienteService {
         try {
             clienteRepository.deleteById(id);
         } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este usuario no puede ser eliminado", e);
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Este usuario no puede ser eliminado porque ha realizado una venta", e);
         }
     }
 

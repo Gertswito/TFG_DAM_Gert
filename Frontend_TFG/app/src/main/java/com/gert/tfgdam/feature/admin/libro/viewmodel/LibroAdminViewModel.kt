@@ -337,6 +337,37 @@ class LibroAdminViewModel : ViewModel() {
         }
     }
 
+    fun eliminarLibro(idLibro: Long, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = ""
+
+            try {
+                val response = repository.delete(idLibro)
+                if (response.isSuccessful) {
+                    cargarLibros()
+                    delay(500)
+                    onSuccess()
+                } else {
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("message")
+                    } catch (e: Exception) {
+                        "Error al eliminar el libro"
+                    }
+                }
+            } catch (e: Exception) {
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
+                errorMessage = apiError.message ?: "Error desconocido"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     fun restaurarCamposLibro(libro: Libro? = null) {
         if (libro != null) {
             idLibro = libro.id.toString() ?: ""

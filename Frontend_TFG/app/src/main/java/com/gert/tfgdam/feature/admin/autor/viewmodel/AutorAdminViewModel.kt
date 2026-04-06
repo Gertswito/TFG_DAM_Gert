@@ -186,6 +186,37 @@ class AutorAdminViewModel : ViewModel() {
         }
     }
 
+    fun eliminarAutor(idAutor: Long, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            isLoading = true
+            errorMessage = ""
+
+            try {
+                val response = repository.delete(idAutor)
+                if (response.isSuccessful) {
+                    cargarAutores()
+                    delay(500)
+                    onSuccess()
+                } else {
+                    val errorJson = response.errorBody()?.string()
+
+                    errorMessage = try {
+                        val jsonObject = JSONObject(errorJson ?: "")
+                        jsonObject.getString("message")
+                    } catch (e: Exception) {
+                        "Error al eliminar el autor"
+                    }
+                }
+            } catch (e: Exception) {
+                val errorJson = e.message.toString()
+                val apiError = Gson().fromJson(errorJson, ApiError::class.java)
+                errorMessage = apiError.message ?: "Error desconocido"
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     fun restaurarCamposAutor(autor: Autor? = null) {
         if (autor != null) {
             nombreAutor = autor.nombre ?: ""

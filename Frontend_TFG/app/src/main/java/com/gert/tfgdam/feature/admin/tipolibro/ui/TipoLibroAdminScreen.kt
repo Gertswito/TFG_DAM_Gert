@@ -18,8 +18,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -45,6 +47,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.feature.admin.autor.model.Autor
 import com.gert.tfgdam.feature.admin.autor.ui.CrearEditarAutor
+import com.gert.tfgdam.feature.admin.autor.viewmodel.AutorAdminViewModel
 import com.gert.tfgdam.feature.admin.tipolibro.model.TipoLibro
 import com.gert.tfgdam.feature.admin.tipolibro.viewmodel.TipoLibroAdminViewModel
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldBuscador
@@ -60,6 +63,7 @@ fun TipoLibroAdminScreen(
     var showEmpty by remember { mutableStateOf(false) }
     var abrirModal by remember { mutableStateOf(false) }
     var tipoLibroSeleccionado by remember { mutableStateOf<TipoLibro?>(null) }
+    var idTipoLibroSeleccionado by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(tiposlibros) {
         if (tiposlibros.isEmpty()) {
@@ -177,7 +181,7 @@ fun TipoLibroAdminScreen(
 
                     Text(
                         text = "",
-                        modifier = Modifier.width(70.dp)
+                        modifier = Modifier.width(100.dp)
                     )
                 }
 
@@ -215,14 +219,14 @@ fun TipoLibroAdminScreen(
                                             .padding(end = 8.dp)
                                     )
 
-                                    Box(
-                                        modifier = Modifier
-                                            .width(70.dp)
-                                            .padding(horizontal = 8.dp),
+                                    Row(
+                                        modifier = Modifier.width(100.dp).padding(end = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         IconButton(
                                             onClick = { tipoLibroSeleccionado = tipolibro },
-                                            modifier = Modifier.width(50.dp),
+                                            modifier = Modifier.width(50.dp).padding(end = 8.dp),
                                             colors = IconButtonDefaults.iconButtonColors(
                                                 containerColor = MaterialTheme.colorScheme.primary,
                                                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -231,6 +235,20 @@ fun TipoLibroAdminScreen(
                                             Icon(
                                                 imageVector = Icons.Default.Edit,
                                                 contentDescription = "Editar"
+                                            )
+                                        }
+
+                                        IconButton(
+                                            onClick = { idTipoLibroSeleccionado = tipolibro.id },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.onError,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Eliminar"
                                             )
                                         }
                                     }
@@ -264,14 +282,14 @@ fun TipoLibroAdminScreen(
                                             .padding(end = 8.dp)
                                     )
 
-                                    Box(
-                                        modifier = Modifier
-                                            .width(70.dp)
-                                            .padding(horizontal = 8.dp),
+                                    Row(
+                                        modifier = Modifier.width(100.dp).padding(end = 8.dp),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         IconButton(
                                             onClick = { tipoLibroSeleccionado = tipolibro },
-                                            modifier = Modifier.width(50.dp),
+                                            modifier = Modifier.width(50.dp).padding(end = 8.dp),
                                             colors = IconButtonDefaults.iconButtonColors(
                                                 containerColor = MaterialTheme.colorScheme.primary,
                                                 contentColor = MaterialTheme.colorScheme.onPrimary
@@ -280,6 +298,20 @@ fun TipoLibroAdminScreen(
                                             Icon(
                                                 imageVector = Icons.Default.Edit,
                                                 contentDescription = "Editar"
+                                            )
+                                        }
+
+                                        IconButton(
+                                            onClick = { idTipoLibroSeleccionado = tipolibro.id },
+                                            modifier = Modifier.width(50.dp),
+                                            colors = IconButtonDefaults.iconButtonColors(
+                                                containerColor = MaterialTheme.colorScheme.onError,
+                                                contentColor = MaterialTheme.colorScheme.onPrimary
+                                            )
+                                        ) {
+                                            Icon(
+                                                imageVector = Icons.Default.Delete,
+                                                contentDescription = "Eliminar"
                                             )
                                         }
                                     }
@@ -305,6 +337,19 @@ fun TipoLibroAdminScreen(
                         }
                     )
                 }
+
+                if (idTipoLibroSeleccionado != null) {
+                    EliminarTipoLibro(
+                        idTipoLibro = idTipoLibroSeleccionado!!,
+                        showDialog = true,
+                        onDismiss = {
+                            idTipoLibroSeleccionado = null
+                        },
+                        onSave = {
+                            idTipoLibroSeleccionado = null
+                        }
+                    )
+                }
             }
         }
     }
@@ -320,6 +365,8 @@ fun CrearEditarTipoLibro(
 ) {
     if (showDialog) {
         LaunchedEffect(Unit) {
+            viewModel.errorMessage = ""
+
             if (tipoLibro != null) {
                 viewModel.restaurarCamposTipoLibro(tipoLibro)
             }
@@ -460,6 +507,120 @@ fun CrearEditarTipoLibro(
                     IconButton(
                         onClick = {
                             viewModel.restaurarCamposTipoLibro(null)
+                            onDismiss()
+                        },
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Cerrar"
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun EliminarTipoLibro(
+    idTipoLibro: Long,
+    viewModel: TipoLibroAdminViewModel = viewModel(),
+    showDialog: Boolean,
+    onDismiss: () -> Unit,
+    onSave: () -> Unit
+) {
+    if (showDialog) {
+        LaunchedEffect(Unit) {
+            viewModel.errorMessage = ""
+        }
+
+        Dialog(onDismissRequest = { onDismiss() }) {
+            Surface(
+                shape = RoundedCornerShape(12.dp),
+                color = MaterialTheme.colorScheme.background,
+                tonalElevation = 8.dp
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .padding(top = 35.dp, bottom = 20.dp, start = 8.dp, end = 8.dp)
+                            .fillMaxWidth(),
+                    ) {
+                        Text(
+                            text = "Eliminar",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 40.sp,
+                            lineHeight = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 15.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(30.dp))
+
+                        Text(
+                            text = ("¿Seguro que quieres borrar el tipo de libro con id ") + (idTipoLibro.toString()) + "?",
+                            color = MaterialTheme.colorScheme.onBackground,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 10.dp)
+                        )
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        if (viewModel.errorMessage !== "") {
+                            Text(
+                                text = viewModel.errorMessage,
+                                color = MaterialTheme.colorScheme.error,
+                                modifier = Modifier.fillMaxWidth(),
+                                textAlign = TextAlign.Center,
+                                fontSize = 12.sp
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
+                        Button(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 8.dp),
+                            onClick = {
+                                viewModel.eliminarTipoLibro(idTipoLibro) {
+                                    onSave()
+                                }
+                            },
+                            enabled = !viewModel.isLoading,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.onError,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )
+                        ) {
+                            if (viewModel.isLoading) {
+                                CircularProgressIndicator(
+                                    color = MaterialTheme.colorScheme.onPrimary,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                            } else {
+                                Text(
+                                    text = "ELIMINAR",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                    }
+
+                    IconButton(
+                        onClick = {
                             onDismiss()
                         },
                         modifier = Modifier
