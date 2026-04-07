@@ -26,15 +26,7 @@ interface VentaApi {
 
     @POST("api/venta/new")
     suspend fun create(@Body venta: Venta): Response<Venta>
-
-    @PUT("api/venta/update/{id}")
-    suspend fun update(
-        @Path("id") id: Long,
-        @Body venta: Venta
-    ): Response<Venta>
-
-    @DELETE("api/venta/delete/{id}")
-    suspend fun delete(@Path("id") id: Long): Response<Unit>
+    
     @POST("api/venta/validar-stock")
     suspend fun validarStock(@Body lineas: List<CarritoItem>): Response<Unit>
 

@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -42,17 +41,6 @@ public class LineaVentaService {
 
     public List<LineaVenta> getAllLineaVentaPorVenta(Long ventaId) {
         return lineaVentaRepository.findByVentaId(ventaId);
-    }
-
-    public void delete(Long id) {
-        if (!lineaVentaRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la línea de venta");
-        }
-        try {
-            lineaVentaRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta línea de venta no puede ser borrada", e);
-        }
     }
 
     @Transactional
@@ -101,9 +89,5 @@ public class LineaVentaService {
 
             return lineaVentaRepository.save(lineaVenta);
         }
-    }
-
-    public LineaVenta update(LineaVenta lineaVenta) {
-        return lineaVentaRepository.save(lineaVenta);
     }
 }

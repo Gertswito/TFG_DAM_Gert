@@ -21,13 +21,4 @@ interface LineaVentaApi {
 
     @POST("api/linea-venta/new")
     suspend fun create(@Body lineaVenta: LineaVenta): Response<LineaVenta>
-
-    @PUT("api/linea-venta/update/{id}")
-    suspend fun update(
-        @Path("id") id: Long,
-        @Body lineaVenta: LineaVenta
-    ): Response<LineaVenta>
-
-    @DELETE("api/linea-venta/delete/{id}")
-    suspend fun delete(@Path("id") id: Long): Response<Unit>
 }

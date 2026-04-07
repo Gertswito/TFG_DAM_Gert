@@ -12,19 +12,15 @@ import com.gert.tfgdam.repository.LibroRepository;
 import com.gert.tfgdam.service.PayPalOrderService;
 import com.gert.tfgdam.service.VentaService;
 
-import jakarta.persistence.EntityNotFoundException;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -71,16 +67,6 @@ public class VentaController {
         return ventaService.getAllVentaPorBusqueda(texto);
     }
 
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
-        try {
-            ventaService.delete(id);
-            return ResponseEntity.noContent().build();
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }   
-
     @PostMapping("/new")
     public ResponseEntity<Object> create(@RequestBody Venta venta) throws URISyntaxException {
         try {
@@ -89,20 +75,6 @@ public class VentaController {
             return ResponseEntity.created(location).body(nuevaVenta);
         } catch (ResponseStatusException ex) {
             return ResponseEntity.status(ex.getStatusCode()).body(Map.of("error", ex.getReason()));
-        }
-    }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Venta> update(@PathVariable Long id, @RequestBody Venta venta) {
-        try {
-            if (ventaService.getVentaPorId(id) != null) {
-                ventaService.update(venta);
-                return ResponseEntity.ok(venta);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.notFound().build();
         }
     }
 

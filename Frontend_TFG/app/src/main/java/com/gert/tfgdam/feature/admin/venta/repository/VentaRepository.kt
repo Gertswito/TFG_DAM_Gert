@@ -32,14 +32,6 @@ class VentaRepository {
         return api.create(venta)
     }
 
-    suspend fun update(id: Long, venta: Venta): Response<Venta> {
-        return api.update(id, venta)
-    }
-
-    suspend fun delete(id: Long): Response<Unit> {
-        return api.delete(id)
-    }
-
     suspend fun validarStock(carrito: List<CarritoItem>): Response<Unit> {
         return api.validarStock(carrito)
     }

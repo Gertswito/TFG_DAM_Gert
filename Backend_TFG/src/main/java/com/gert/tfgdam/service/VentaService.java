@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -54,22 +53,7 @@ public class VentaService {
         return ventaRepository.findAllPorBusqueda(texto);
     }
 
-    public void delete(Long id) {
-        if (!ventaRepository.existsById(id)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado la venta");
-        }
-        try {
-            ventaRepository.deleteById(id);
-        } catch (DataIntegrityViolationException e) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Esta venta no puede ser borrada", e);
-        }
-    }
-
     public Venta save(Venta venta) {
-        return ventaRepository.save(venta);
-    }
-
-    public Venta update(Venta venta) {
         return ventaRepository.save(venta);
     }
 

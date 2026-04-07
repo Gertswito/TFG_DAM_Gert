@@ -25,12 +25,4 @@ class LineaVentaRepository {
     suspend fun create(lineaVenta: LineaVenta): Response<LineaVenta> {
         return api.create(lineaVenta)
     }
-
-    suspend fun update(id: Long, lineaVenta: LineaVenta): Response<LineaVenta> {
-        return api.update(id, lineaVenta)
-    }
-
-    suspend fun delete(id: Long): Response<Unit> {
-        return api.delete(id)
-    }
 }
