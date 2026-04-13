@@ -1,4 +1,4 @@
-package com.gert.tfgdam.feature.register.viewmodel
+package com.gert.tfgdam.feature.contrasenha.viewmodel
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -6,52 +6,53 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.gert.tfgdam.core.network.ApiError
-import com.gert.tfgdam.feature.admin.cliente.model.Cliente
 import com.gert.tfgdam.feature.admin.cliente.repository.ClienteRepository
 import com.google.gson.Gson
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-class RegisterViewModel : ViewModel() {
+class ContrasenhaViewModel : ViewModel() {
     private val repository = ClienteRepository()
 
     var usuario by mutableStateOf("")
-    var nombre by mutableStateOf("")
-    var apellidos by mutableStateOf("")
     var email by mutableStateOf("")
-    var contrasenha by mutableStateOf("")
+    var contrasenha1 by mutableStateOf("")
+    var contrasenha2 by mutableStateOf("")
 
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
 
-    fun register(onSuccess: () -> Unit = {}) {
+    fun cambiarContrasenha(onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = ""
 
             try {
-                val cliente = Cliente(
-                    usuario = usuario.trim().lowercase(),
-                    nombre = nombre.trim(),
-                    apellidos = apellidos.trim(),
-                    email = email.trim(),
-                    contrasenha = contrasenha.trim()
-                )
+                val usuarioTrim = usuario.trim()
+                val emailTrim = email.trim()
+                val contrasenha1Trim = contrasenha1.trim()
+                val contrasenha2Trim = contrasenha2.trim()
 
-                if (cliente.usuario.isNullOrBlank() || cliente.nombre.isNullOrBlank() || cliente.apellidos.isNullOrBlank() || cliente.email.isNullOrBlank() || cliente.contrasenha.isNullOrBlank()) {
+                if (emailTrim.isBlank() || contrasenha1Trim.isBlank() || contrasenha2Trim.isBlank() || usuarioTrim.isBlank()) {
                     errorMessage = "Por favor, rellene todos los campos"
                     isLoading = false
                     return@launch
                 }
 
-                if (!isEmailValid(email.trim())) {
+                if (!isEmailValid(emailTrim)) {
                     errorMessage = "Correo no válido, vuelva a intentarlo"
                     isLoading = false
                     return@launch
                 }
 
-                val response = repository.create(cliente)
+                if (contrasenha1Trim != contrasenha2Trim) {
+                    errorMessage = "Las contraseñas no coinciden"
+                    isLoading = false
+                    return@launch
+                }
+
+                val response = repository.cambiarContrasenhaSinSesion(usuarioTrim, emailTrim, contrasenha1Trim)
                 if (response.isSuccessful) {
                     delay(500)
                     onSuccess()
@@ -60,9 +61,9 @@ class RegisterViewModel : ViewModel() {
 
                     errorMessage = try {
                         val jsonObject = JSONObject(errorJson ?: "")
-                        jsonObject.getString("error")
+                        jsonObject.getString("message")
                     } catch (e: Exception) {
-                        "Error en el registro"
+                        "Error al cambiar la contraseña"
                     }
                 }
             } catch (e: Exception) {
@@ -70,10 +71,8 @@ class RegisterViewModel : ViewModel() {
                 val apiError = Gson().fromJson(errorJson, ApiError::class.java)
 
                 usuario = ""
-                nombre = ""
-                apellidos = ""
-                email = ""
-                contrasenha = ""
+                contrasenha1 = ""
+                contrasenha2 = ""
 
                 errorMessage = apiError.message ?: "Error desconocido"
             } finally {

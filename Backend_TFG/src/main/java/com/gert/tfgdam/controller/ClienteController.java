@@ -75,7 +75,24 @@ public class ClienteController {
             if (clienteService.getClientePorId(id) != null) {
                 String contrasenhaSinComillas = contrasenha.replace("\"", "");
                 clienteService.cambiarContrasenha(id, contrasenhaSinComillas);
+                clienteService.enviarCorreoCambioContrasenha(clienteService.getClientePorId(id));
                 return ResponseEntity.ok(clienteService.getClientePorId(id));
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @PutMapping("/cambiarContrasenha/{usuario}/{email}")
+    public ResponseEntity<Cliente> cambiarContrasenhaSinSesion(@PathVariable String usuario, @PathVariable String email, @RequestBody String contrasenha) {
+        try {
+            if (clienteService.getClientePorUsuario(usuario) != null && clienteService.getClientePorEmail(email) != null) {
+                String contrasenhaSinComillas = contrasenha.replace("\"", "");
+                clienteService.cambiarContrasenhaSinSesion(usuario, email, contrasenhaSinComillas);
+                clienteService.enviarCorreoCambioContrasenha(clienteService.getClientePorUsuario(usuario));
+                return ResponseEntity.ok(clienteService.getClientePorUsuario(usuario));
             } else {
                 return ResponseEntity.notFound().build();
             }

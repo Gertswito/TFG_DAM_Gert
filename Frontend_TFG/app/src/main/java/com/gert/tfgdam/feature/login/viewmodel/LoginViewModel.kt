@@ -23,13 +23,11 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
 
     var isLoading by mutableStateOf(false)
     var errorMessage by mutableStateOf("")
-    var successMessage by mutableStateOf("")
 
     fun login(onSuccessUser: () -> Unit = {}, onSuccessAdmin: () -> Unit = {}) {
         viewModelScope.launch {
             isLoading = true
             errorMessage = ""
-            successMessage = ""
 
             try {
                 val cliente = Cliente(
@@ -50,7 +48,6 @@ class LoginViewModel(application: Application) : AndroidViewModel(application)  
                 val payload = JwtManager.getUserInfoFromToken(token)
                 val rol = payload?.rol
 
-                successMessage = "Login exitoso"
                 delay(500)
 
                 when (rol) {

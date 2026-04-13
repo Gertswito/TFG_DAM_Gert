@@ -32,6 +32,7 @@ import com.gert.tfgdam.feature.user.libro.portipoygenero.ui.TipoLibroGeneroSelec
 import com.gert.tfgdam.feature.user.libro.portipo.ui.TipoLibroGenerosScreen
 import com.gert.tfgdam.feature.user.usersettings.ui.UserSettingsScreen
 import com.gert.tfgdam.feature.admin.venta.ui.VentaAdminScreen
+import com.gert.tfgdam.feature.contrasenha.ui.ContrasenhaScreen
 
 @Composable
 fun AppNavHost(navController: NavHostController, startDestination: String, orderIdPaypal: String?, ) {
@@ -46,6 +47,8 @@ fun AppNavHost(navController: NavHostController, startDestination: String, order
         composable(Routes.LOGIN) { backStackEntry -> LoginScreen(navController = navController) }
 
         composable(Routes.REGISTER) { backStackEntry -> RegisterScreen(navController = navController) }
+
+        composable(Routes.CONTRASENHA_OLVIDADA) { backStackEntry -> ContrasenhaScreen(navController = navController) }
 
         composable(Routes.USER_SETTINGS) { UserSettingsScreen() }
 

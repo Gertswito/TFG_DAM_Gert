@@ -114,7 +114,6 @@ class ClienteServiceTest {
     @Test
     void login_contrasenhaIncorrecta() {
         when(clienteRepository.existsByUsuario("usuarioTest")).thenReturn(true);
-        // Cliente real tiene contraseña "12345", pasamos otra distinta para que falle
         cliente.setContrasenha("wrongPass");
 
         when(clienteRepository.findByUsuario("usuarioTest")).thenReturn(new Cliente() {{
@@ -138,6 +137,37 @@ class ClienteServiceTest {
     void cambiarContrasenha_notFound() {
         when(clienteRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(ResponseStatusException.class, () -> clienteService.cambiarContrasenha(1L, "nuevaPass"));
+    }
+
+    @Test
+    void cambiarContrasenhaSinSesion_ok() {
+        when(clienteRepository.findWithDireccionesByUsuario("usuarioTest")).thenReturn(Optional.of(cliente));
+        when(clienteRepository.findWithDireccionesByEmail("test@email.com")).thenReturn(Optional.of(cliente));
+        when(clienteRepository.save(any())).thenReturn(cliente);
+
+        Cliente result = clienteService.cambiarContrasenhaSinSesion("usuarioTest", "test@email.com", "nuevaPass");
+
+        assertNotNull(result);
+        verify(clienteRepository).save(cliente);
+    }
+
+    @Test
+    void cambiarContrasenhaSinSesion_notFound_porUsuarioOEmail() {
+        when(clienteRepository.findWithDireccionesByUsuario("usuarioTest")).thenReturn(Optional.empty());
+        assertThrows(ResponseStatusException.class, () -> clienteService.cambiarContrasenhaSinSesion("usuarioTest", "test@email.com", "nuevaPass"));
+    }
+
+    @Test
+    void cambiarContrasenhaSinSesion_notFound_porNoCoincidir() {
+        Cliente cliente1 = new Cliente();
+        cliente1.setId(1);
+
+        Cliente cliente2 = new Cliente();
+        cliente2.setId(2);
+
+        when(clienteRepository.findWithDireccionesByUsuario("usuarioTest")).thenReturn(Optional.of(cliente1));
+        when(clienteRepository.findWithDireccionesByEmail("test@email.com")).thenReturn(Optional.of(cliente2));
+        assertThrows(ResponseStatusException.class, () ->clienteService.cambiarContrasenhaSinSesion("usuarioTest", "test@email.com", "nuevaPass"));
     }
 
     @Test

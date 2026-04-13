@@ -29,6 +29,9 @@ interface ClienteApi {
     @PUT("api/cliente/cambiarContrasenha/{id}")
     suspend fun cambiarContrasenha(@Path("id") id: Long, @Body contrasenha: String): Response<Cliente>
 
+    @PUT("api/cliente/cambiarContrasenha/{usuario}/{email}")
+    suspend fun cambiarContrasenhaSinSesion(@Path("usuario") usuario: String, @Path("email") email: String, @Body contrasenha: String): Response<Cliente>
+
     @POST("api/cliente/new")
     suspend fun create(@Body cliente: Cliente): Response<Cliente>
 

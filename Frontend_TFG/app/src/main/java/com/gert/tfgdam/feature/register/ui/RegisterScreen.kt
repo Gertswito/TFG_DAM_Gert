@@ -148,14 +148,6 @@ fun RegisterScreen(
                     )
                 }
 
-                if (viewModel.successMessage !== "") {
-                    Text(
-                        text = viewModel.successMessage,
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Text(

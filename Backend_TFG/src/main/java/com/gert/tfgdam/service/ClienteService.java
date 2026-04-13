@@ -1,6 +1,7 @@
 package com.gert.tfgdam.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,10 @@ public class ClienteService {
         return clienteRepository.findWithDireccionesByUsuario(usuario).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));    
     }
 
+    public Cliente getClientePorEmail(String email) { 
+        return clienteRepository.findWithDireccionesByEmail(email).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));    
+    }
+
     public List<Cliente> getAllClientePorBusqueda(String texto) {
         return clienteRepository.findAllPorBusqueda(texto);
     }
@@ -60,7 +65,25 @@ public class ClienteService {
     }
 
     public Cliente cambiarContrasenha(Long id, String contrasenha) {
-        Cliente clienteExistente = clienteRepository.findById(id).orElseThrow(() ->new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));
+        Cliente clienteExistente = clienteRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "No se ha encontrado al usuario"));
+
+        BCryptPasswordEncoder newPasswordEncoder = new BCryptPasswordEncoder();
+        clienteExistente.setContrasenha(newPasswordEncoder.encode(contrasenha));
+
+        return clienteRepository.save(clienteExistente);
+    }
+
+    public Cliente cambiarContrasenhaSinSesion(String usuario, String email, String contrasenha) {
+        Optional<Cliente> clientePorUsuario = clienteRepository.findWithDireccionesByUsuario(usuario);
+        Optional<Cliente> clientePorEmail = clienteRepository.findWithDireccionesByEmail(email);
+        if (clientePorUsuario.isEmpty() || clientePorEmail.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email y nombre de usuario no pertenecen a la misma cuenta");
+        }
+        if (!clientePorUsuario.get().getId().equals(clientePorEmail.get().getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El email y nombre de usuario no pertenecen a la misma cuenta");
+        }
+
+        Cliente clienteExistente = clientePorUsuario.get();
 
         BCryptPasswordEncoder newPasswordEncoder = new BCryptPasswordEncoder();
         clienteExistente.setContrasenha(newPasswordEncoder.encode(contrasenha));
@@ -147,5 +170,9 @@ public class ClienteService {
 
     public void enviarCorreoRegistro(Cliente nuevoCliente) {
         emailService.enviarCorreoRegistro(nuevoCliente);
+    }
+
+    public void enviarCorreoCambioContrasenha(Cliente cliente) {
+        emailService.enviarCorreoCambioContrasenha(cliente);
     }
 }

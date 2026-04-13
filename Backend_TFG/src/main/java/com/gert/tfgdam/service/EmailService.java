@@ -42,6 +42,22 @@ public class EmailService {
     }
 
     @Async
+    public void enviarCorreoCambioContrasenha(Cliente cliente) {
+        SimpleMailMessage mensaje = new SimpleMailMessage();
+
+        String asunto = "Se ha cambiado la contraseña de su cuenta";
+        String nombre = cliente.getNombre() + " " + cliente.getApellidos();
+        String cuerpo = String.format("Hola %s,\n\nLe queríamos avisar de que se ha producido un cambio de la contraseña en su cuenta. Si no ha sido usted, le rogamos que por favor se ponga en contacto con los administradores de la apliación para solucionar este problema.\n\nAtentamente, el equipo de Librerías Gert", nombre);
+
+        mensaje.setTo(cliente.getEmail());
+        mensaje.setSubject(asunto);
+        mensaje.setText(cuerpo);
+        mensaje.setFrom("noreply.libreriasgert@gmail.com");
+
+        mailSender.send(mensaje);
+    }
+
+    @Async
     public void enviarCorreoVenta(FinalizarCompra finalizarCompra) {
         if (finalizarCompra.getLineasVenta().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ventaSinLineas");

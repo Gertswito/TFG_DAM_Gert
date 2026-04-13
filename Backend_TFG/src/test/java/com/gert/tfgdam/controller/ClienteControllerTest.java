@@ -106,7 +106,8 @@ class ClienteControllerTest {
     void cambiarContrasenha_ok() throws Exception {
         when(clienteService.getClientePorId(1L)).thenReturn(cliente);
         when(clienteService.cambiarContrasenha(eq(1L), anyString())).thenReturn(cliente);
-
+        doNothing().when(clienteService).enviarCorreoCambioContrasenha(any());
+        
         mockMvc.perform(put("/api/cliente/cambiarContrasenha/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("\"nuevaPass123\""))
@@ -116,8 +117,33 @@ class ClienteControllerTest {
     @Test
     void cambiarContrasenha_notFound() throws Exception {
         when(clienteService.getClientePorId(1L)).thenReturn(null);
+        doNothing().when(clienteService).enviarCorreoCambioContrasenha(any());
 
         mockMvc.perform(put("/api/cliente/cambiarContrasenha/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("\"nuevaPass123\""))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void cambiarContrasenhaSinSesion_ok() throws Exception {
+        when(clienteService.getClientePorUsuario("usuarioTest")).thenReturn(cliente);
+        when(clienteService.getClientePorEmail("test@email.com")).thenReturn(cliente);
+        when(clienteService.cambiarContrasenhaSinSesion(eq("usuarioTest"), eq("test@email.com"), anyString())).thenReturn(cliente);
+        doNothing().when(clienteService).enviarCorreoCambioContrasenha(any());
+
+        mockMvc.perform(put("/api/cliente/cambiarContrasenha/usuarioTest/test@email.com")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("\"nuevaPass123\""))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void cambiarContrasenhaSinSesion_notFound() throws Exception {
+        when(clienteService.getClientePorUsuario("usuarioTest")).thenReturn(null);
+        doNothing().when(clienteService).enviarCorreoCambioContrasenha(any());
+
+        mockMvc.perform(put("/api/cliente/cambiarContrasenha/usuarioTest/test@email.com")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("\"nuevaPass123\""))
                 .andExpect(status().isNotFound());

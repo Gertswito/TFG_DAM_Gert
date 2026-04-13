@@ -1,4 +1,4 @@
-package com.gert.tfgdam.feature.login.ui
+package com.gert.tfgdam.feature.contrasenha.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -20,19 +20,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.gert.tfgdam.core.navigation.routes.Routes
-import com.gert.tfgdam.feature.login.viewmodel.LoginViewModel
+import com.gert.tfgdam.feature.contrasenha.viewmodel.ContrasenhaViewModel
 import com.gert.tfgdam.ui.theme.estiloreutilizable.textfield.TextFieldEstilo
 
 @Composable
-fun LoginScreen(
-    navController: NavController,
-    viewModel: LoginViewModel = viewModel()
+fun ContrasenhaScreen(
+    viewModel: ContrasenhaViewModel = viewModel(),
+    navController: NavController
 ) {
     Box(
         modifier = Modifier
@@ -56,7 +57,7 @@ fun LoginScreen(
             ) {
 
                 Text(
-                    text = "Iniciar sesión",
+                    text = "Contraseña",
                     fontSize = 40.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onBackground,
@@ -76,8 +77,19 @@ fun LoginScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 TextFieldEstilo(
-                    value = viewModel.contrasenha,
-                    onValueChange = { viewModel.contrasenha = it },
+                    value = viewModel.email,
+                    onValueChange = { viewModel.email = it },
+                    label = "Email",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                TextFieldEstilo(
+                    value = viewModel.contrasenha1,
+                    onValueChange = { viewModel.contrasenha1 = it },
                     label = "Contraseña",
                     isPassword = true,
                     modifier = Modifier
@@ -85,27 +97,22 @@ fun LoginScreen(
                         .padding(horizontal = 20.dp)
                 )
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(20.dp))
 
-                Text(
-                    text = "¿Has olvidado la contraseña?",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable { navController.navigate(Routes.CONTRASENHA_OLVIDADA) }
+                TextFieldEstilo(
+                    value = viewModel.contrasenha2,
+                    onValueChange = { viewModel.contrasenha2 = it },
+                    label = "Repetir contraseña",
+                    isPassword = true,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 20.dp)
                 )
 
                 Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
-                    onClick = { viewModel.login(
-                        onSuccessUser = { navController.navigate(Routes.HOME) {
-                            popUpTo(Routes.LOGIN) { inclusive = true }
-                        }},
-                        onSuccessAdmin = { navController.navigate(Routes.HOME_ADMIN) {
-                            popUpTo(Routes.LOGIN) { inclusive = true }
-                        }}
-                    )},
+                    onClick = { viewModel.cambiarContrasenha() { navController.navigate(Routes.LOGIN) } },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 15.dp),
@@ -117,7 +124,7 @@ fun LoginScreen(
                             modifier = Modifier.size(24.dp)
                         )
                     } else {
-                        Text("INICIAR SESIÓN")
+                        Text("CAMBIAR CONTRASEÑA")
                     }
                 }
 
@@ -125,19 +132,10 @@ fun LoginScreen(
                     Text(
                         text = viewModel.errorMessage,
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(top = 8.dp)
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 8.dp).fillMaxWidth()
                     )
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Text(
-                    text = "¿No tiene una cuenta? Registrese",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.secondary,
-                    textDecoration = TextDecoration.Underline,
-                    modifier = Modifier.clickable { navController.navigate(Routes.REGISTER) }
-                )
             }
         }
     }

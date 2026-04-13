@@ -40,6 +40,10 @@ class ClienteRepository {
         return api.cambiarContrasenha(id, contrasenha)
     }
 
+    suspend fun cambiarContrasenhaSinSesion(usuario: String, email: String, contrasenha: String): Response<Cliente> {
+        return api.cambiarContrasenhaSinSesion(usuario, email, contrasenha)
+    }
+
     suspend fun create(cliente: Cliente): Response<Cliente> {
         return api.create(cliente)
     }
