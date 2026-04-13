@@ -1,5 +1,5 @@
-<div align="center">
-  <h1>Librerías Gert</h1>
+<div>
+  <img style="100%" src="https://capsule-render.vercel.app/api?type=waving&height=100&section=header&reversal=false&text=Librerías%20Gert&fontSize=70&fontColor=FFFFF&fontAlign=50&fontAlignY=50&stroke=-&descSize=20&descAlign=50&descAlignY=50&textBg=false&theme=onedark"  />
 </div>
 
 ###
@@ -75,5 +75,7 @@
   <img height="325" src="https://raw.githubusercontent.com/Gertswito/Gertswito/main/TEST.PNG" />
 </div>
 
-###
+<div>
+  <img style="100%" src="https://capsule-render.vercel.app/api?type=waving&height=100&section=footer&reversal=false&text=&fontSize=20&fontColor=FFFFFF&fontAlign=50&fontAlignY=50&stroke=-&descSize=20&descAlign=50&descAlignY=50&theme=onedark"  />
+</div>
 
