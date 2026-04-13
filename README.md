@@ -29,6 +29,10 @@
   <p>Ya que la contraseña de los usuarios de ejemplo están protegidas, las dejo por aquí para que se pueda testear:</p>
   <p>    - Usuario: gertswito | Contraseña: 1234</p>
   <p>    - Usuario: admin | Contraseña: admin</p>
+
+  ###
+  
+  <p>También hace falta en MySQL Workbench un usuario con todos los permisos y con las credenciales "admin" y contraseña "admin"</p>
 </div>
 
 ###
@@ -47,7 +51,7 @@
   <p>Para lanzar el frontend solo hace falta meterte a Android Studio y darle a iniciar proyecto</p>
   <p>Para lanzar el back es necesario una de dos cosas:</p>
   <p>    - Descargar las extensiones de Spring en Visual Studio Code y lanzarlo desde ahí</p>
-  <p>    - escribir en la parte de "Consola" el siguiente comando desde la carpeta Backend_TFG: mvn springboot:run</p>
+  <p>    - Escribir en la parte de "Consola" el siguiente comando desde la carpeta Backend_TFG: mvn springboot:run</p>
 
   ###
 
