@@ -42,6 +42,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.gert.tfgdam.R
 import com.gert.tfgdam.core.navigation.routes.Routes
+import com.gert.tfgdam.core.util.CoilImageLoader.CoilImageLoader
 import com.gert.tfgdam.core.util.Jwt.JwtManager
 import com.gert.tfgdam.feature.user.libro.detail.viewmodel.LibroDetailsViewModel
 import com.gert.tfgdam.feature.user.listadeseados.viewmodel.ListaDeseadosViewModel
@@ -106,9 +107,12 @@ fun LibroDetailsScreen(
                     modifier = Modifier.fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
+                    val context = LocalContext.current
+                    val imageLoader = remember { CoilImageLoader.create(context) }
                     if (libroEspecifico?.portada != "") {
                         AsyncImage(
                             model = libroEspecifico?.portada ?: "",
+                            imageLoader = imageLoader,
                             contentDescription = libroEspecifico?.titulo,
                             modifier = Modifier
                                 .width(250.dp),

@@ -1,5 +1,6 @@
 package com.gert.tfgdam.ui.theme.estiloreutilizable.item
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -22,6 +23,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -35,8 +37,10 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.gert.tfgdam.R
 import com.gert.tfgdam.core.navigation.routes.Routes
+import com.gert.tfgdam.core.util.CoilImageLoader.CoilImageLoader
 import com.gert.tfgdam.core.util.Jwt.JwtManager
 import com.gert.tfgdam.feature.admin.libro.model.Libro
 import com.gert.tfgdam.feature.user.listadeseados.viewmodel.ListaDeseadosViewModel
@@ -69,9 +73,12 @@ fun LibroItem(
                     .fillMaxSize()
                     .padding(8.dp)
             ) {
+                val context = LocalContext.current
+                val imageLoader = remember { CoilImageLoader.create(context) }
                 if (libro.portada != "") {
                     AsyncImage(
                         model = libro.portada,
+                        imageLoader = imageLoader,
                         contentDescription = libro.titulo,
                         modifier = Modifier
                             .fillMaxWidth()

@@ -1,5 +1,6 @@
 package com.gert.tfgdam.feature.admin.libro.ui
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -46,6 +47,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,6 +58,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.gert.tfgdam.R
+import com.gert.tfgdam.core.util.CoilImageLoader.CoilImageLoader
 import com.gert.tfgdam.feature.admin.autor.viewmodel.AutorAdminViewModel
 import com.gert.tfgdam.feature.admin.libro.model.Libro
 import com.gert.tfgdam.feature.admin.libro.viewmodel.LibroAdminViewModel
@@ -284,9 +287,12 @@ fun LibroAdminScreen (
                                             .padding(8.dp),
                                     )
 
+                                    val context = LocalContext.current
+                                    val imageLoader = remember { CoilImageLoader.create(context) }
                                     if (libro.portada != "") {
                                         AsyncImage(
                                             model = libro.portada,
+                                            imageLoader = imageLoader,
                                             contentDescription = libro.titulo,
                                             modifier = Modifier
                                                 .width(100.dp)
@@ -644,9 +650,12 @@ fun CrearEditarLibro(
                                 verticalArrangement = Arrangement.Top,
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
+                                val context = LocalContext.current
+                                val imageLoader = remember { CoilImageLoader.create(context) }
                                 if (viewModel.portadaLibro != "") {
                                     AsyncImage(
                                         model = viewModel.portadaLibro,
+                                        imageLoader = imageLoader,
                                         contentDescription = viewModel.tituloLibro,
                                         modifier = Modifier
                                             .width(100.dp)

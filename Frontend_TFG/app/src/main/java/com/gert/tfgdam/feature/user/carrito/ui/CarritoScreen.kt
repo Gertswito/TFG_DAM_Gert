@@ -33,29 +33,19 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import com.gert.tfgdam.R
-import com.gert.tfgdam.feature.user.carrito.model.CarritoItem
-import com.gert.tfgdam.feature.admin.libro.model.Libro
 import com.gert.tfgdam.core.navigation.routes.Routes
-import com.gert.tfgdam.core.util.Jwt.JwtManager
 import com.gert.tfgdam.feature.user.carrito.viewmodel.CarritoViewModel
 import com.gert.tfgdam.ui.theme.estiloreutilizable.item.LibroItemCarrito
 import java.text.NumberFormat
-import java.time.LocalDate
 import java.util.Locale
 
 @Composable
