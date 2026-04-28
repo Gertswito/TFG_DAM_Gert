@@ -202,28 +202,28 @@ class LibroServiceTest {
 
     @Test
     void getAllLibroPorTipo_ok() {
-        when(libroRepository.findByTipoLibro_Nombre("Tipo Test")).thenReturn(List.of(libro));
+        when(libroRepository.findByTipoLibro_NombreAndStockGreaterThan("Tipo Test", 0)).thenReturn(List.of(libro));
         List<Libro> result = libroService.getAllLibroPorTipo("Tipo Test");
         assertEquals(1, result.size());
     }
 
     @Test
     void getAllLibroPorTipoGenero_ok() {
-        when(libroRepository.findByTipoLibro_NombreAndGeneros_Nombre("Tipo Test", "Genero Test")).thenReturn(List.of(libro));
+        when(libroRepository.findByTipoLibro_NombreAndGeneros_NombreAndStockGreaterThan("Tipo Test", "Genero Test", 0)).thenReturn(List.of(libro));
         List<Libro> result = libroService.getAllLibroPorTipoGenero("Tipo Test", "Genero Test");
         assertEquals(1, result.size());
     }
 
     @Test
     void getAllPorNombreDeAutor_ok() {
-        when(libroRepository.findByAutor_Nombre("Autor Test")).thenReturn(List.of(libro));
+        when(libroRepository.findByAutor_NombreAndStockGreaterThan("Autor Test", 0)).thenReturn(List.of(libro));
         List<Libro> result = libroService.getAllPorNombreDeAutor("Autor Test");
         assertEquals(1, result.size());
     }
 
     @Test
     void getAllPorNombreDeEditorial_ok() {
-        when(libroRepository.findByEditorial_Nombre("Editorial Test")).thenReturn(List.of(libro));
+        when(libroRepository.findByEditorial_NombreAndStockGreaterThan("Editorial Test", 0)).thenReturn(List.of(libro));
         List<Libro> result = libroService.getAllPorNombreDeEditorial("Editorial Test");
         assertEquals(1, result.size());
     }

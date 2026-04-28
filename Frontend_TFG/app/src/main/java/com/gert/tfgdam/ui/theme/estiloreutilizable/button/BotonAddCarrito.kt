@@ -36,10 +36,11 @@ fun BotonAddCarrito(
     val esUser = userInfo?.rol == "USER"
 
     val hoy = LocalDate.now()
-    val disponible = libroEspecifico.fechaSalida?.let { fecha ->
-        val fechaParsed = LocalDate.parse(fecha)
-        !fechaParsed.isAfter(hoy)
-    } ?: true
+    val disponible = (libroEspecifico.stock ?: 0) > 0 &&
+            (libroEspecifico.fechaSalida?.let { fecha ->
+                val fechaParsed = LocalDate.parse(fecha)
+                !fechaParsed.isAfter(hoy)
+            } ?: true)
 
     if (!isLibroDetails) {
         Button(

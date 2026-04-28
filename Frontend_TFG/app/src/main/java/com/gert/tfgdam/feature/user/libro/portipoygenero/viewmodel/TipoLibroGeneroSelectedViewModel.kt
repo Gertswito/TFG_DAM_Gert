@@ -41,7 +41,7 @@ class TipoLibroGeneroSelectedViewModel : ViewModel() {
                 val response = repository.getAllPorTipoGenero(tipoLibroSeleccionado ?: "", generoSeleccionado ?: "")
 
                 if (response.isSuccessful) {
-                    librosPorTipoGenero = response.body() ?: emptyList()
+                    librosPorTipoGenero = (response.body() ?: emptyList()).sortedBy { it.id }
                 } else {
                     librosPorTipoGenero = emptyList()
                 }
@@ -78,7 +78,7 @@ class TipoLibroGeneroSelectedViewModel : ViewModel() {
                 val response = repository.getAllPorBusquedaTipoGenero(texto, tipoLibro, genero)
 
                 if (response.isSuccessful) {
-                    librosFiltradosPorTipoGenero = response.body() ?: emptyList()
+                    librosFiltradosPorTipoGenero = (response.body() ?: emptyList()).sortedBy { it.id }
                 } else {
                     librosFiltradosPorTipoGenero = emptyList()
                 }

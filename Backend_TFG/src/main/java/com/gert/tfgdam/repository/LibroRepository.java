@@ -30,27 +30,31 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
             SELECT l.*,
                 ROW_NUMBER() OVER (PARTITION BY l.tipolibro_id ORDER BY l.id) as rn
             FROM libro l
+            WHERE l.stock > 0
         ) t
         WHERE t.rn <= 5
         """, nativeQuery = true)
     List<Libro> findLibrosLimitadosYDivididosPorTipoLibro();
-    
-    List<Libro> findByTipoLibro_Nombre(String nombre);
-    
-    List<Libro> findByTipoLibro_NombreAndGeneros_Nombre(String tipoLibro, String genero);
-    
-    List<Libro> findByAutor_Nombre(String autor);
-    
-    List<Libro> findByEditorial_Nombre(String editorial);
 
-    @Query("SELECT l FROM Libro l WHERE MONTH(l.fechaSalida) = :mes AND YEAR(l.fechaSalida) = :yearEnIngles")
+    List<Libro> findByTipoLibro_NombreAndStockGreaterThan(String nombre, int stock);
+
+    List<Libro> findByTipoLibro_NombreAndGeneros_NombreAndStockGreaterThan(String tipoLibro, String genero, int stock);
+
+    List<Libro> findByAutor_NombreAndStockGreaterThan(String autor, int stock);
+
+    List<Libro> findByEditorial_NombreAndStockGreaterThan(String editorial, int stock);
+
+    @Query("SELECT l FROM Libro l WHERE MONTH(l.fechaSalida) = :mes AND YEAR(l.fechaSalida) = :yearEnIngles AND l.stock > 0")
     List<Libro> findByMesActual(@Param("mes") int mes, @Param("yearEnIngles") int yearEnIngles);
-    
+
     @Query(value = """
         SELECT * FROM libro l
-        WHERE l.fecha_salida IS NULL OR NOT (
-            MONTH(l.fecha_salida) = :mes 
-            AND YEAR(l.fecha_salida) = :yearEnIngles
+        WHERE l.stock > 0
+        AND (
+            l.fecha_salida IS NULL OR NOT (
+                MONTH(l.fecha_salida) = :mes 
+                AND YEAR(l.fecha_salida) = :yearEnIngles
+            )
         )
         ORDER BY l.id DESC
         LIMIT 10
@@ -78,63 +82,65 @@ public interface LibroRepository extends JpaRepository<Libro, Long> {
 
     @Query("""
         SELECT l FROM Libro l
-        WHERE 
+        WHERE l.stock > 0
+        AND (
             LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
             OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
             OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
             OR LOWER(l.tipoLibro.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+        )
     """)
     List<Libro> findAllPorBusquedaUser(@Param("texto") String texto);
 
     @Query("""
         SELECT DISTINCT l FROM Libro l
         LEFT JOIN l.generos g
-        WHERE 
-            LOWER(l.tipoLibro.nombre) = LOWER(:tipoLibroNombre)
-            AND (
-                LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(g.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-            )
+        WHERE l.stock > 0
+        AND LOWER(l.tipoLibro.nombre) = LOWER(:tipoLibroNombre)
+        AND (
+            LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(g.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+        )
     """)
     List<Libro> findAllPorBusquedaTipo(@Param("tipoLibroNombre") String tipoLibroNombre, @Param("texto") String texto);
 
     @Query("""
         SELECT DISTINCT l FROM Libro l
         LEFT JOIN l.generos g
-        WHERE 
-            LOWER(l.tipoLibro.nombre) = LOWER(:tipoLibroNombre)
-            AND LOWER(g.nombre) = LOWER(:generoNombre)
-            AND (
-                LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-            )
+        WHERE l.stock > 0
+        AND LOWER(l.tipoLibro.nombre) = LOWER(:tipoLibroNombre)
+        AND LOWER(g.nombre) = LOWER(:generoNombre)
+        AND (
+            LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+        )
     """)
     List<Libro> findAllPorBusquedaTipoGenero(@Param("tipoLibroNombre") String tipoLibroNombre, @Param("generoNombre") String generoNombre, @Param("texto") String texto);
 
     @Query("""
         SELECT l FROM Libro l
-        WHERE 
-            LOWER(l.autor.nombre) = LOWER(:autor)
-            AND (
-                LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-            )
+        WHERE l.stock > 0
+        AND LOWER(l.autor.nombre) = LOWER(:autor)
+        AND (
+            LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+        )
     """)
     List<Libro> findAllPorAutorBusqueda(@Param("autor") String autor, @Param("texto") String texto);
 
     @Query("""
         SELECT l FROM Libro l
-        WHERE 
-            LOWER(l.editorial.nombre) = LOWER(:editorial)
-            AND (
-                LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-                OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
-            )
+        WHERE l.stock > 0
+        AND LOWER(l.editorial.nombre) = LOWER(:editorial)
+        AND (
+            LOWER(l.titulo) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.editorial.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+            OR LOWER(l.autor.nombre) LIKE LOWER(CONCAT('%', :texto, '%'))
+        )
     """)
     List<Libro> findAllPorEditorialBusqueda(@Param("editorial") String editorial, @Param("texto") String texto);
 }

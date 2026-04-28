@@ -36,7 +36,7 @@ public class LibroService {
     }
 
     public List<Libro> getAllLibroPorTipo(String tipoLibro) {
-        List<Libro> libros = libroRepository.findByTipoLibro_Nombre(tipoLibro);
+        List<Libro> libros = libroRepository.findByTipoLibro_NombreAndStockGreaterThan(tipoLibro, 0);
 
         if (libros.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen libros para el tipo: " + tipoLibro);
@@ -45,7 +45,7 @@ public class LibroService {
     }
 
     public List<Libro> getAllLibroPorTipoGenero(String tipoLibro, String genero) {
-        List<Libro> libros = libroRepository.findByTipoLibro_NombreAndGeneros_Nombre(tipoLibro, genero);
+        List<Libro> libros = libroRepository.findByTipoLibro_NombreAndGeneros_NombreAndStockGreaterThan(tipoLibro, genero, 0);
 
         if (libros.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen libros para el tipo o géneros: " + tipoLibro + " | " + genero);
@@ -54,7 +54,7 @@ public class LibroService {
     }
 
     public List<Libro> getAllPorNombreDeAutor(String autor) {
-        List<Libro> libros = libroRepository.findByAutor_Nombre(autor);
+        List<Libro> libros = libroRepository.findByAutor_NombreAndStockGreaterThan(autor, 0);
 
         if (libros.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen libros para el autor seleccionado");
@@ -63,7 +63,7 @@ public class LibroService {
     }
 
     public List<Libro> getAllPorNombreDeEditorial(String editorial) {
-        List<Libro> libros = libroRepository.findByEditorial_Nombre(editorial);
+        List<Libro> libros = libroRepository.findByEditorial_NombreAndStockGreaterThan(editorial, 0);
 
         if (libros.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "No existen libros para el autor seleccionado");
